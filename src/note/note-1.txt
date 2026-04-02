@@ -1,0 +1,942 @@
+import {
+  Badge,
+  Button,
+  Card,
+  Label,
+  Modal,
+  Select,
+  Spinner,
+  Table,
+  TextInput,
+} from "flowbite-react";
+import { useContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { BiSolidFileExport } from "react-icons/bi";
+import { IoMdAddCircle } from "react-icons/io";
+import { RiRefreshFill } from "react-icons/ri";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addBeat,
+  addUserBeat,
+  getBeatsByEmployee,
+  updateBeat,
+} from "../../api/api";
+import EditButton from "../../assets/common/EditButton";
+import StatusIndicator from "../../assets/common/StatusIndicator";
+import { ConfirmationModelContext } from "../../context/ContextProvider";
+import { fetchBeats } from "../../redux/beatSlice";
+import { fetchRegions } from "../../redux/regionSlice";
+import UniqueCode from "../../assets/common/UniqueCode";
+import { fetchDistributors } from "../../redux/distributorListSlice";
+import { fetchDesignations } from "../../redux/designationSlice";
+import { fetchEmployees } from "../../redux/employeeSlice";
+import { fetchBrands } from "../../redux/brandSlice";
+import { List } from "flowbite-react";
+import { fetchFieldUser } from "../../redux/fieldUserSlice";
+import { fetchStates } from "../../redux/stateSlice";
+
+const FieldUserManagement = () => {
+  const [openModal, setOpenModal] = useState(false);
+  const [name, setName] = useState("");
+  const [beatType, setBeatType] = useState("normal");
+  const [regionId, setRegionId] = useState("");
+  const [distributorId, setDistributorId] = useState("");
+  const [modalMode, setModalMode] = useState("add");
+  const [selectedBeat, setSelectedBeat] = useState(null);
+  const [formLoading, setFormLoading] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("active");
+  const [selectedRegion, setSelectedRegion] = useState("default");
+  const [selectedDesignation, setSelectedDesignation] = useState("default");
+  const [selectedDistributor, setSelectedDistributor] = useState("default");
+  const [selectedEmployee, setSelectedEmployee] = useState("default");
+  const [checkedBeats, setCheckedBeats] = useState([]);
+
+  const { openConfirmationModel } = useContext(ConfirmationModelContext);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchEmployees());
+    dispatch(fetchDesignations());
+    dispatch(fetchRegions());
+    dispatch(fetchBrands());
+    dispatch(fetchBeats());
+  }, [dispatch]);
+
+  const { employees, loading: employeesLoading } = useSelector(
+    (state) => state.employees
+  );
+
+  const { states, loading: statesLoading } = useSelector(
+    (state) => state.state
+  );
+
+  let filteredEmployees = [...employees];
+
+  const { designations } = useSelector((state) => state.designations);
+  const { regions } = useSelector((state) => state.region);
+  const { beats } = useSelector((state) => state.beat);
+
+  const filteredBeats = [...beats];
+
+  const activeRegions = regions.filter((region) => region.status === true);
+  const { distributors, loading: distributorsLoading } = useSelector(
+    (state) => state.distributors
+  );
+  const activeDistributors = distributors.filter(
+    (distributor) => distributor.status === true
+  );
+
+  if (selectedDesignation !== "default") {
+    filteredEmployees = [...filteredEmployees]?.filter(
+      (ele) => ele?.desgId?._id === selectedDesignation && ele.status === true
+    );
+  }
+
+  if (selectedRegion !== "default") {
+    filteredEmployees = [...filteredEmployees]?.filter(
+      (ele) => ele?.regionId?._id === selectedRegion && ele.status === true
+    );
+  }
+
+  const getStateDetailsById = (stateId) => {
+    const state = states.filter((state) => state._id === stateId);
+    return state[0];
+  };
+
+  const handleResetFilter = () => {
+    setSelectedStatus("active");
+    setSelectedRegion("default");
+    setSelectedDistributor("default");
+    dispatch(fetchBeats());
+  };
+
+  const validate = () => {
+    if (
+      name.trim() === "" ||
+      regionId.trim() === "" ||
+      distributorId.trim() === ""
+    ) {
+      toast.error("Please enter beat name, and select a region");
+      return false;
+    }
+    return true;
+  };
+
+  const handleExportToCSV = () => {
+    const csvData = filteredBeats.map((beat) => {
+      return {
+        "Beat Code": beat?.code,
+        "Beat Name": beat?.name,
+        "Beat Type": beat?.beat_type,
+        "Region Code": beat?.regionId?.code,
+        "Region Name": beat?.regionId?.name,
+        "Distributor Code": beat?.distributorId?.dbCode,
+        "Distributor Name": beat?.distributorId?.name,
+        Status: beat.status ? "Active" : "Inactive",
+      };
+    });
+
+    const csv = csvData.map((row) => Object.values(row).join(","));
+    csv.unshift(Object.keys(csvData[0]).join(","));
+
+    const csvString = csv.join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
+    a.setAttribute("download", "beats.csv");
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const handleSetEdit = (user) => {
+    setSelectedRegion(user?.empId?.regionId?._id);
+    setSelectedDesignation(user?.desgId?._id);
+    setSelectedEmployee(user?.empId?._id);
+    setCheckedBeats(user?.beatId.map((beat) => beat?._id));
+    setModalMode("edit");
+    setOpenModal(true);
+  };
+
+  const onCloseModal = () => {
+    setSelectedRegion("default");
+    setSelectedDesignation("default");
+    setSelectedEmployee("default");
+    setCheckedBeats([]);
+    setOpenModal(false);
+    setModalMode("add");
+  };
+
+  const handleEditFieldUser = async () => {
+    openConfirmationModel({
+      question: "Are you sure you want to update this beat?",
+      answer: ["Yes", "No"],
+      onClose: async (result) => {
+        if (result) {
+          try {
+            setFormLoading(true);
+            if (!validate()) return;
+            const payload = {
+              name,
+              beat_type: beatType,
+              regionId,
+              distributorId,
+            };
+            await updateBeat(payload, selectedBeat._id);
+            dispatch(fetchBeats());
+            toast.success("Beat updated successfully");
+            onCloseModal();
+          } catch (error) {
+            console.error(error);
+            toast.error(
+              error?.response?.data?.message ||
+                "Failed to update beat, try again"
+            );
+          } finally {
+            setFormLoading(false);
+          }
+        } else {
+          onCloseModal();
+          return;
+        }
+      },
+    });
+  };
+
+  const handleStatusUpdate = async (beat) => {
+    openConfirmationModel({
+      question: `Are you sure you want to ${
+        beat.status ? "deactivate" : "activate"
+      } this beat?`,
+      answer: ["Yes", "No"],
+      onClose: async (result) => {
+        if (result) {
+          try {
+            const payload = {
+              status: !beat.status,
+            };
+            const res = await updateBeat(payload, beat._id);
+            if (res?.data?.statusUpdateError) {
+              toast.error("Status Not Updated, dependency exists!");
+            } else {
+              toast.success("Status updated successfully");
+            }
+            dispatch(fetchBeats());
+          } catch (error) {
+            console.error(error);
+            toast.error(
+              error?.response?.data?.message || "Failed to update beat status"
+            );
+          }
+        } else {
+          return;
+        }
+      },
+    });
+  };
+
+  useEffect(() => {
+    dispatch(fetchFieldUser());
+    dispatch(fetchBeats());
+    dispatch(fetchRegions());
+    dispatch(fetchDistributors());
+    dispatch(fetchStates());
+  }, [dispatch]);
+
+  const { fieldUsers, loading: fieldUsersLoading } = useSelector(
+    (state) => state.fieldUsers
+  );
+
+  let filteredFieldUsers = [...fieldUsers];
+
+  const [expandedEmployee, setExpandedEmployee] = useState(null);
+  const [addedBeats, setAddedBeats] = useState({});
+
+  const toggleBeats = (employeeId) => {
+    setExpandedEmployee((prev) => (prev === employeeId ? null : employeeId));
+  };
+
+  const handleAddBeat = (employeeId, beatId) => {
+    setAddedBeats((prev) => ({
+      ...prev,
+      [employeeId]: prev[employeeId] ? [...prev[employeeId], beatId] : [beatId],
+    }));
+  };
+
+  const handleRemoveBeat = (employeeId, beatId) => {
+    setAddedBeats((prev) => ({
+      ...prev,
+      [employeeId]: prev[employeeId].filter((id) => id !== beatId),
+    }));
+  };
+
+  const isBeatAdded = (employeeId, beatId) => {
+    return addedBeats[employeeId]?.includes(beatId);
+  };
+
+  async function UserBeatAddHandler(employee) {
+    const payload = {
+      desgId: employee?.desgId?._id,
+      empId: employee?._id,
+      beatId: addedBeats[employee?._id],
+    };
+    console.log(payload);
+    try {
+      const res = await addUserBeat(payload);
+      if (res?.data?.error) {
+        toast.error("Something went wrong");
+      } else {
+        toast.success("Filed User Beat added successfully");
+      }
+      dispatch(fetchFieldUser());
+      toggleBeats(employee?._id);
+    } catch (error) {
+      toast.error(error?.message || "Something went wrong");
+    }
+    // const res = await addUserBeat(payload);
+    // if (res?.data?.error) {
+    //   toast.error("Something went wrong");
+    // } else {
+    //   toast.success("Filed User Beat added successfully");
+    // }
+    dispatch(fetchFieldUser());
+    toggleBeats(employee?._id);
+  }
+
+  async function getBeatsByEmployeeHandler(employee) {
+    // console.log("employee");
+    // const res = await getBeatsByEmployee(employee?._id);
+
+    // console.log(res?.data?.data);
+    // handleAddBeat(
+    //   employee?._id,
+    //   res?.data?.data?.beatId?.map((beat) => beat?._id)
+    // );
+
+    dispatch(fetchFieldUser());
+    toggleBeats(employee?._id);
+  }
+
+  return (
+    <>
+      <div className="flex justify-start items-center flex-col gap-4 w-full">
+        {/* page header */}
+        <div className="flex justify-between w-full items-center border-b-2 py-4">
+          <div className="flex justify-center items-center">
+            <h1 className="text-2xl font-bold">Field User Management</h1>
+          </div>
+        </div>
+
+        {/* filters */}
+        <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
+          <Card className="w-full flex justify-center items-center flex-col">
+            <div className="w-full flex flex-wrap justify-center items-center gap-2">
+              <Badge color="warning">Total Count : {fieldUsers?.length} </Badge>
+              <Badge color="warning">
+                Filtered Count : {fieldUsersLoading?.length}{" "}
+              </Badge>
+            </div>
+
+            <div className="flex justify-center w-full items-center gap-4 flex-wrap">
+              <div className="w-56">
+                <div className="mb-2 block">
+                  <Label htmlFor="statusSelect" value="Select Status" />
+                </div>
+                <Select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  id="statusSelect"
+                  required
+                >
+                  <option value="default">All</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </Select>
+              </div>
+
+              <div className="w-56">
+                <div className="mb-2 block">
+                  <Label htmlFor="zoneSelect" value="Select Zone" />
+                </div>
+                <Select
+                  value={selectedRegion}
+                  onChange={(e) => setSelectedRegion(e.target.value)}
+                  id="zoneSelect"
+                  required
+                >
+                  <option value="default">All</option>
+                  {regions.map((zone) => (
+                    <option key={zone._id} value={zone._id}>
+                      {zone.name}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+
+              <div className="w-56">
+                <div className="mb-2 block">
+                  <Label
+                    htmlFor="selectDistributor"
+                    value="Select Distributor"
+                  />
+                </div>
+                <Select
+                  value={selectedDistributor}
+                  onChange={(e) => setSelectedDistributor(e.target.value)}
+                  id="selectDistributor"
+                  required
+                >
+                  <option value="default">All</option>
+                  {selectedRegion !== "default"
+                    ? distributors
+                        .filter(
+                          (distributor) =>
+                            distributor.regionId._id === selectedRegion
+                        )
+                        .map((distributor) => (
+                          <option key={distributor._id} value={distributor._id}>
+                            {distributor.name}
+                          </option>
+                        ))
+                    : distributors.map((distributor) => (
+                        <option key={distributor._id} value={distributor._id}>
+                          {distributor.name}
+                        </option>
+                      ))}
+                </Select>
+              </div>
+            </div>
+
+            <div className="flex justify-center w-full items-center gap-2 flex-wrap">
+              <Button
+                className="text-xs"
+                size="sm"
+                color="success"
+                onClick={handleResetFilter}
+              >
+                <span className="flex justify-center items-center gap-2">
+                  <RiRefreshFill size={20} />
+                  Reset & Refresh
+                </span>
+              </Button>
+              <Button
+                className="text-xs"
+                size="sm"
+                onClick={() => setOpenModal(true)}
+              >
+                <span className="flex justify-center items-center gap-2">
+                  <IoMdAddCircle size={20} />
+                  Add New User
+                </span>
+              </Button>
+              <Button
+                className="text-xs"
+                size="sm"
+                color="blue"
+                onClick={() => {
+                  handleExportToCSV();
+                }}
+              >
+                <span className="flex justify-center items-center gap-2">
+                  <BiSolidFileExport size={20} />
+                  CSV Download
+                </span>
+              </Button>
+            </div>
+          </Card>
+        </div>
+
+        {/* table */}
+        <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
+          {fieldUsersLoading ? (
+            <div
+              className="w-full flex justify-center items-center"
+              role="status"
+            >
+              <Spinner aria-label="Default status example" size="xl" />
+            </div>
+          ) : (
+            <div className="overflow-x-auto w-full">
+              <Table striped>
+                <Table.Head className="text-center">
+                  <Table.HeadCell className="whitespace-nowrap">
+                    User Id
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    User Name
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Designation
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Zone Code
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Zone Name
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    State Code
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    State Name
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Region Code
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Region Name
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Brand Code
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Brand Name
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Beats
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Status
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Actions
+                  </Table.HeadCell>
+                </Table.Head>
+                <Table.Body>
+                  {filteredFieldUsers?.map((user) => {
+                    return (
+                      <Table.Row
+                        key={user?._id}
+                        className="text-center bg-white dark:border-gray-700 dark:bg-gray-800"
+                      >
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                          <UniqueCode
+                            text={user?.empId?.empId}
+                            codeName="Employee"
+                          />
+                        </Table.Cell>
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                          {user?.empId?.name}
+                        </Table.Cell>
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                          {user?.desgId?.name}
+                        </Table.Cell>
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                          <UniqueCode
+                            text={user?.empId?.zoneId?.code}
+                            codeName="Zone"
+                          />
+                        </Table.Cell>
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                          {user?.empId?.zoneId?.name}
+                        </Table.Cell>
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                          <UniqueCode
+                            text={
+                              getStateDetailsById(
+                                user?.empId?.regionId?.stateId
+                              )?.code
+                            }
+                            codeName="State"
+                          />
+                        </Table.Cell>
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                          {
+                            getStateDetailsById(user?.empId?.regionId?.stateId)
+                              ?.name
+                          }
+                        </Table.Cell>
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                          <UniqueCode
+                            text={user?.empId?.regionId?.code}
+                            codeName="Region"
+                          />
+                        </Table.Cell>
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                          {user?.empId?.regionId?.name}
+                        </Table.Cell>
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                          <UniqueCode
+                            text={user?.empId?.brandId?.code}
+                            codeName="Brand"
+                          />
+                        </Table.Cell>
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                          {user?.empId?.brandId?.name}
+                        </Table.Cell>
+                        <Table.Cell className="font-medium text-gray-900 dark:text-gray-200">
+                          <p className="min-w-40 text-wrap">
+                            {user?.beatId?.map((beat) => beat?.name).join(", ")}
+                          </p>
+                        </Table.Cell>
+                        <Table.Cell
+                          className={`whitespace-nowrap font-medium `}
+                        >
+                          <StatusIndicator
+                            status={user?.status}
+                            // onClick={() => handleStatusUpdate(beat)}
+                          />
+                        </Table.Cell>
+                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                          <div className="flex gap-2 justify-center items-center">
+                            <EditButton onClick={() => handleSetEdit(user)} />
+                          </div>
+                        </Table.Cell>
+                      </Table.Row>
+                    );
+                  })}
+                  {filteredFieldUsers?.length === 0 && (
+                    <Table.Row className="text-center bg-white dark:border-gray-700 dark:bg-gray-800">
+                      <Table.Cell
+                        colSpan={"100%"}
+                        className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200"
+                      >
+                        No data found
+                      </Table.Cell>
+                    </Table.Row>
+                  )}
+                </Table.Body>
+              </Table>
+            </div>
+          )}
+        </div>
+
+        <Modal show={openModal} size={"md"} onClose={onCloseModal}>
+          <Modal.Header>
+            {modalMode === "add" ? "Add Field User" : "Edit Field User"}
+          </Modal.Header>
+          <Modal.Body>
+            <div className="space-y-5">
+              <div className="w-full">
+                <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                  <Label htmlFor="selectedRegion">
+                    Region <span className="text-red-500">*</span>
+                  </Label>
+                </div>
+                <Select
+                  id="selectedRegion"
+                  name="selectedRegion"
+                  value={selectedRegion}
+                  onChange={(e) => setSelectedRegion(e.target.value)}
+                >
+                  <option value="default">Select Region</option>
+                  {regions?.length > 0 &&
+                    regions.map((region) => (
+                      <option key={region?._id} value={region?._id}>
+                        {region?.name}
+                      </option>
+                    ))}
+                </Select>
+              </div>
+              <div className="w-full">
+                <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                  <Label htmlFor="selectedDesignation">
+                    Designation <span className="text-red-500">*</span>
+                  </Label>
+                </div>
+                <Select
+                  id="selectedDesignation"
+                  name="selectedDesignation"
+                  value={selectedDesignation}
+                  onChange={(e) => setSelectedDesignation(e.target.value)}
+                >
+                  <option value="default">Select Designation</option>
+                  {designations?.length > 0 &&
+                    designations?.map((designation) => (
+                      <option key={designation?._id} value={designation?._id}>
+                        {designation?.name}
+                      </option>
+                    ))}
+                </Select>
+              </div>
+              {selectedRegion !== "default" &&
+                selectedDesignation !== "default" && (
+                  <>
+                    <div className="w-full">
+                      <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                        <Label htmlFor="selectedEmployee">
+                          Employee <span className="text-red-500">*</span>
+                        </Label>
+                      </div>
+                      <Select
+                        id="selectedEmployee"
+                        name="selectedEmployee"
+                        value={selectedEmployee}
+                        onChange={(e) => setSelectedEmployee(e.target.value)}
+                      >
+                        <option value="default">Select Employee</option>
+                        {!employeesLoading &&
+                          filteredEmployees.length > 0 &&
+                          filteredEmployees?.map((employee) => (
+                            <option key={employee?._id} value={employee?._id}>
+                              {employee?.name} ({employee?.desgId?.name}) [
+                              {
+                                getStateDetailsById(employee?.regionId?.stateId)
+                                  ?.name
+                              }
+                              , {employee?.regionId?.name}]
+                            </option>
+                          ))}
+                      </Select>
+                    </div>
+                  </>
+                )}
+              {selectedRegion !== "default" &&
+                selectedDesignation !== "default" &&
+                selectedEmployee !== "default" &&
+                filteredBeats?.length > 0 && (
+                  <div className="w-full">
+                    <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                      <Label>
+                        Select Beats <span className="text-red-500">*</span>
+                      </Label>
+                    </div>
+                    <div className="w-full flex justify-center items-start flex-col gap-2 px-2 max-h-40 overflow-y-auto">
+                      {filteredBeats.map((beat) => (
+                        <div key={beat._id} className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            name="beat-id"
+                            id="beat-id"
+                            className="h-4 w-4 rounded border-gray-300 text-blue-500 outline-none"
+                            checked={checkedBeats.includes(beat._id) ?? false}
+                            onChange={() => {
+                              setCheckedBeats((prevBeats) => {
+                                if (prevBeats.includes(beat._id)) {
+                                  return prevBeats.filter(
+                                    (item) => item !== beat._id
+                                  );
+                                } else {
+                                  return [...prevBeats, beat._id];
+                                }
+                              });
+                            }}
+                          />
+                          <Label htmlFor="beat-id">
+                            {beat.name} [{beat?.distributorId?.name} ({" "}
+                            {beat?.distributorId?.dbCode})]
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              disabled={formLoading}
+              // onClick={
+              //   modalMode === "add"
+              //     ? UserBeatAddHandler
+              //     : handleEditDistributor
+              // }
+            >
+              {formLoading ? (
+                <Spinner size="sm" light className="mr-2" />
+              ) : (
+                <>{modalMode === "add" ? "Add" : "Update"} Field User</>
+              )}
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
+    </>
+  );
+};
+
+export default FieldUserManagement;
+
+const FieldUserComponent = ({
+  selectedRegion,
+  setSelectedRegion,
+  selectedDesignation,
+  setSelectedDesignation,
+  selectedBeat,
+  setSelectedBeat,
+  openModal,
+  setOpenModal,
+  filteredEmployees,
+  toggleBeats,
+  expandedEmployee,
+  handleRemoveBeat,
+  handleAddBeat,
+  regions,
+  designations,
+  employeesLoading,
+  filteredBeats,
+  isBeatAdded,
+  UserBeatAddHandler,
+  getBeatsByEmployeeHandler,
+}) => {
+  console.log({ filteredEmployees });
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-row justify-evenly items-center">
+        <div className="w-1/3">
+          <div className="mb-2 block text-gray-700 dark:text-gray-100">
+            <Label value="Region *" />
+          </div>
+          <Select
+            name="regionId"
+            value={selectedRegion}
+            onChange={(e) => setSelectedRegion(e.target.value)}
+          >
+            <option value="">Select Region</option>
+            {regions?.length > 0 &&
+              regions.map((region) => (
+                <option key={region?._id} value={region?._id}>
+                  {region?.name}
+                </option>
+              ))}
+          </Select>
+        </div>
+        <div className="w-1/3">
+          <div className="mb-2 block text-gray-700 dark:text-gray-100">
+            <Label value="Designation *" />
+          </div>
+          <Select
+            name="designationId"
+            value={selectedDesignation}
+            onChange={(e) => setSelectedDesignation(e.target.value)}
+          >
+            <option value="">Select Designation</option>
+            {designations?.length > 0 &&
+              designations?.map((designation) => (
+                <option key={designation?._id} value={designation?._id}>
+                  {designation?.name}
+                </option>
+              ))}
+          </Select>
+        </div>
+      </div>
+      {(selectedRegion !== "default" || selectedDesignation !== "default") && (
+        <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
+          {employeesLoading ? (
+            <div
+              className="w-full flex justify-center items-center"
+              role="status"
+            >
+              <Spinner aria-label="Default status example" size="xl" />
+            </div>
+          ) : (
+            <div className="overflow-x-auto w-full">
+              <List>
+                <List.Item className="font-medium bg-gray-200 dark:bg-gray-700 p-2 flex">
+                  <div className="flex-1 text-center">User Name</div>
+                  <div className="flex-1 text-center">User Id</div>
+                  <div className="flex-1 text-center">Zone</div>
+                  <div className="flex-1 text-center">State</div>
+                  <div className="flex-1 text-center">Region</div>
+                  <div className="flex-1 text-center">Actions</div>
+                </List.Item>
+                {filteredEmployees.length > 0 ? (
+                  filteredEmployees.map((employee) => (
+                    <List.Item
+                      key={employee._id}
+                      className="flex flex-col text-center bg-white dark:border-gray-700 dark:bg-gray-800 p-2"
+                    >
+                      <div className="flex flex-col md:flex-row items-center">
+                        <div className="flex-1 p-2">
+                          {employee?.name} ({employee?.desgId?.name})
+                        </div>
+                        <div className="flex-1 p-2">{employee?.empId}</div>
+                        <div className="flex-1 p-2">
+                          {employee?.zoneId?.name}
+                        </div>
+                        <div className="flex-1 p-2">
+                          {employee?.stateId?.name}
+                        </div>
+                        <div className="flex-1 p-2">
+                          {employee?.regionId?.name}
+                        </div>
+                        <div className="flex-1 p-2">
+                          {employee?.beatId?.length > 0 ? (
+                            <div className="flex gap-2 justify-center items-center">
+                              <Button>Assigned Beats</Button>
+                            </div>
+                          ) : (
+                            <div className="flex gap-2 justify-center items-center">
+                              {expandedEmployee === employee._id ? (
+                                <Button
+                                  gradientMonochrome="success"
+                                  onClick={() => UserBeatAddHandler(employee)}
+                                >
+                                  Save
+                                </Button>
+                              ) : (
+                                <Button
+                                  gradientMonochrome="teal"
+                                  //onClick={() => toggleBeats(employee._id)}
+                                  onClick={() =>
+                                    getBeatsByEmployeeHandler(employee)
+                                  }
+                                >
+                                  + Assign Beats
+                                </Button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {/* Show the beats under the employee if expanded */}
+                      {expandedEmployee === employee._id && (
+                        <div className="mt-2 w-full p-2 m-4 bg-slate-300">
+                          <List unstyled className="w-full">
+                            {filteredBeats?.length > 0 &&
+                              filteredBeats.map((beat) => (
+                                <List.Item
+                                  key={beat?._id}
+                                  className="flex justify-around items-center p-2"
+                                >
+                                  <div>
+                                    {beat?.name} {beat?.distributorId?.name} ({" "}
+                                    {beat?.distributorId?.dbCode})
+                                  </div>
+                                  <div>
+                                    {isBeatAdded(employee._id, beat._id) ? (
+                                      <Button
+                                        size="xs"
+                                        color="failure"
+                                        onClick={() =>
+                                          handleRemoveBeat(
+                                            employee._id,
+                                            beat._id
+                                          )
+                                        }
+                                      >
+                                        Remove
+                                      </Button>
+                                    ) : (
+                                      <Button
+                                        size="xs"
+                                        onClick={() =>
+                                          handleAddBeat(employee._id, beat._id)
+                                        }
+                                      >
+                                        Add
+                                      </Button>
+                                    )}
+                                  </div>
+                                </List.Item>
+                              ))}
+                          </List>
+                        </div>
+                      )}
+                    </List.Item>
+                  ))
+                ) : (
+                  <List.Item className="flex justify-center p-4">
+                    <div className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                      No data found
+                    </div>
+                  </List.Item>
+                )}
+              </List>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};

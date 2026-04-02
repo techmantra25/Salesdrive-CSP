@@ -1,0 +1,30 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 22
+    commands:
+      - echo "[INSTALL PHASE] Using Node.js $(node -v)"
+      - echo "[INSTALL PHASE] Using npm $(npm -v)"
+
+  pre_build:
+    commands:
+      - npm ci --include=dev
+      - echo "VITE_NODE_ENV=$VITE_NODE_ENV" >> .env
+      - echo "VITE_BACKEND_URL=$VITE_BACKEND_URL" >> .env
+
+  build:
+    commands:
+      - npm run build
+      
+artifacts:
+  files:
+    - dist/**/*
+    - appspec.yml
+    - hook_afterinstall.sh
+    - hook_afterinstall_cleanup.sh
+    
+cache:
+  paths:
+    - "node_modules/**/*"

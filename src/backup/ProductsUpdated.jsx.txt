@@ -1,0 +1,995 @@
+import {
+  Badge,
+  Button,
+  Card,
+  Label,
+  Modal,
+  Pagination,
+  Select,
+  Spinner,
+  Table,
+  TextInput,
+} from "flowbite-react";
+import moment from "moment-timezone";
+import { useContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { BiSolidFileExport } from "react-icons/bi";
+import { IoMdAddCircle } from "react-icons/io";
+import { MdDownloadForOffline, MdSimCardDownload } from "react-icons/md";
+import { RiRefreshFill } from "react-icons/ri";
+import { useDispatch, useSelector } from "react-redux";
+import Datepicker from "react-tailwindcss-datepicker";
+import { AllSubBrandList, bulkUpload } from "../api/api";
+import { getAllProductPaginated } from "../api/productPaginated";
+import EditButton from "../assets/common/EditButton";
+import StatusIndicator from "../assets/common/StatusIndicator";
+import UniqueCode from "../assets/common/UniqueCode";
+import { ConfirmationModelContext } from "../context/ContextProvider";
+import { useDebounce } from "../hooks/useDebounce";
+import { fetchBrands } from "../redux/brandSlice";
+import { fetchCategories } from "../redux/categorySlice";
+import { fetchCollections } from "../redux/collectionSlice";
+import { fetchProducts } from "../redux/productSlice";
+import { FileUpload } from "../uploadWidget/FileUpload";
+
+const Product = () => {
+  const dispatch = useDispatch();
+  const [selectedCategory, setSelectedCategory] = useState("default");
+  const [selectedBrand, setSelectedBrand] = useState("default");
+  const [selectedCollection, setSelectedCollection] = useState("default");
+  const [openModal, setOpenModal] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("active");
+  const [errorLog, setErrorLog] = useState([]);
+  const [subBrandList, setSubBrandList] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [downloadLoading, setDownloadLoading] = useState(false);
+
+  // Pagination state
+  const [paginatedProducts, setPaginatedProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+  const [filteredCount, setFilteredCount] = useState(0);
+  const [paginatedLoading, setPaginatedLoading] = useState(false);
+
+  const [dateRange, setDateRange] = useState({
+    startDate: null,
+    endDate: null,
+  });
+
+  const handleDateRangeChange = (range) => {
+    setDateRange(range);
+  };
+
+  // Function to handle page change
+  const onPageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  // Function to fetch paginated products
+  const fetchProductsPaginatedWithoutDebounce = async () => {
+    setPaginatedLoading(true);
+    try {
+      // Build query parameters
+      const queryParams = {
+        page: currentPage,
+        limit: itemsPerPage,
+      };
+
+      // Add filters if selected
+      if (selectedStatus !== "default") {
+        queryParams.status = selectedStatus === "active" ? "true" : "false";
+      }
+
+      if (selectedCategory !== "default") {
+        queryParams.category = selectedCategory;
+      }
+
+      if (selectedBrand !== "default") {
+        queryParams.brand = selectedBrand;
+      }
+
+      if (selectedCollection !== "default") {
+        queryParams.collection = selectedCollection;
+      }
+
+      if (searchQuery) {
+        queryParams.search = searchQuery;
+      }
+
+      // Add date range if selected
+      if (dateRange.startDate && dateRange.endDate) {
+        queryParams.startDate = dateRange.startDate;
+        queryParams.endDate = dateRange.endDate;
+      }
+
+      const response = await getAllProductPaginated(queryParams);
+
+      if (response.status === 200) {
+        setPaginatedProducts(response.data);
+        setTotalItems(response.pagination.totalItems);
+        setTotalPages(response.pagination.totalPages);
+        setFilteredCount(response.pagination.filteredCount);
+      } else {
+        toast.error(response.message || "Failed to fetch products");
+      }
+    } catch (error) {
+      console.error("Error fetching paginated products:", error);
+      toast.error("Failed to fetch products");
+    } finally {
+      setPaginatedLoading(false);
+    }
+  };
+
+  // Apply debounce to the fetch function
+  const fetchProductsPaginated = useDebounce(
+    fetchProductsPaginatedWithoutDebounce,
+    500
+  );
+
+  const { products: productList, loading: productLoading } = useSelector(
+    (state) => state.product
+  );
+
+  const { categories: categoryList, loading: categoryLoading } = useSelector(
+    (state) => state.category
+  );
+  const activeCategories = categoryList.filter((cat) => cat.status === true);
+
+  const { brands: brandList, loading: brandLoading } = useSelector(
+    (state) => state.brand
+  );
+  const activeBrands = brandList.filter((brand) => brand.status === true);
+
+  const { collections: collectionList, loading: collectionLoading } =
+    useSelector((state) => state.collection);
+  const activeCollections = collectionList.filter(
+    (collection) => collection.status === true
+  );
+
+  const fetchAllSubBrands = async () => {
+    try {
+      const res = await AllSubBrandList();
+      if (res?.data?.data) {
+        setSubBrandList(res.data.data);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error?.response?.data?.message ||
+          "Failed to fetch Sub-Brands, try again"
+      );
+    }
+  };
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+    dispatch(fetchBrands());
+    dispatch(fetchCollections());
+    fetchAllSubBrands();
+  }, [dispatch]);
+
+  // Effect for fetching paginated products when filters or pagination change
+  useEffect(() => {
+    fetchProductsPaginated();
+  }, [
+    currentPage,
+    selectedCategory,
+    selectedBrand,
+    selectedCollection,
+    selectedStatus,
+    searchQuery,
+    dateRange.startDate,
+    dateRange.endDate,
+  ]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
+  }, [
+    selectedCategory,
+    selectedBrand,
+    selectedCollection,
+    selectedStatus,
+    searchQuery,
+    dateRange.startDate,
+    dateRange.endDate,
+  ]);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    cat_id: "",
+    brand: "",
+    subBrand: "",
+    collection_id: "",
+    sku_group__name: "",
+    sku_group_id: "",
+    product_code: "",
+    size: "",
+    img_path: "",
+    no_of_pieces_in_a_box: "",
+    description: "",
+    product_type: "",
+    product_hsn_code: "",
+    cgst: "",
+    sgst: "",
+    igst: "",
+    sbu: "",
+    base_point: "",
+    uom: "pcs",
+  });
+  const [modalMode, setModalMode] = useState("add");
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const { openConfirmationModel } = useContext(ConfirmationModelContext);
+
+  const handleExportToCSV = () => {
+    try {
+      setDownloadLoading(true);
+      // Use the paginated product list for CSV export
+      const products = paginatedProducts;
+
+      if (!products || products.length === 0) {
+        toast.error("No data to export");
+        setDownloadLoading(false);
+        return;
+      }
+
+      const csvData = products.map((product) => {
+        return {
+          "Product Code": product?.product_code || "",
+          "Product Name": product?.name || "",
+          "Image Path": product?.img_path || "",
+          "Brand Code": product?.brand?.code || "",
+          "Brand Name": product?.brand?.name || "",
+          "Sub Brand Code": product?.subBrand?.code || "",
+          "Sub Brand Name": product?.subBrand?.name || "",
+          "Category Code": product?.cat_id?.code || "",
+          "Category Name": product?.cat_id?.name || "",
+          "Collection Code": product?.collection_id?.code || "",
+          "Collection Name": product?.collection_id?.name || "",
+          "SKU Group Code": product?.sku_group_id || "",
+          "SKU Group Name": product?.sku_group__name || "",
+          Size: product?.size || "",
+          "Product Type": product?.product_type || "",
+          "HSN Code": product?.product_hsn_code || "",
+          "Pieces in Box": product?.no_of_pieces_in_a_box || "",
+          CGST: product?.cgst || "",
+          SGST: product?.sgst || "",
+          IGST: product?.igst || "",
+          SBU: product?.sbu || "",
+          UOM: product?.uom || "",
+          "Base Point": product?.base_point || "",
+          "Created Date Time": product?.createdAt
+            ? moment(product?.createdAt).tz("Asia/Kolkata").format("YYYY-MM-DD")
+            : "",
+          Status: product?.status ? "Active" : "Inactive",
+        };
+      });
+
+      const csv = csvData.map((row) => Object.values(row).join(","));
+      csv.unshift(Object.keys(csvData[0]).join(","));
+
+      const csvString = csv.join("\n");
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
+      a.setAttribute(
+        "download",
+        `products_export_${new Date().toISOString().slice(0, 10)}.csv`
+      );
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      toast.success("Export completed");
+    } catch (error) {
+      console.error("Export error:", error);
+      toast.error("Failed to export data");
+    } finally {
+      setDownloadLoading(false);
+    }
+  };
+
+  const handleCSVTemplateDownload = () => {
+    const csv = [
+      "Product Code,Product Name,Image Path,Brand Code,Brand Name,Collection Code,Collection Name,Category Code,Category Name,SKU Group Name,SKU Group Code,Product Type,Product Size,Pieces in a box,Product HSN Code,CGST,SGST,IGST,SBU,Base Points,Unit of Measure",
+      "SKU001-70,Product One,https://res.cloudinary.com/dglqycqea/image/upload/v1722588757/lux-dms/image-1722588755262.png,BRAND-LX-002,Brand Lux,COL-LX-010,Collection 01,CAT-LX-002,Inner Wear,SKU GROUP 01,SKU001,inner_wear,70,10,HSN001,5,5,0,SBU1,10, pcs",
+    ];
+
+    const csvString = csv.join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
+    a.setAttribute("download", "product_template.csv");
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const handleErrorLogDownload = () => {
+    // Construct CSV content
+    const csv = [
+      [
+        "Product Code",
+        "Product Name",
+        "Image Path",
+        "Brand Code",
+        "Brand Name",
+        "Sub Brand Code",
+        "Sub Brand Name",
+        "Collection Code",
+        "Collection Name",
+        "Category Code",
+        "Category Name",
+        "SKU Group Name",
+        "SKU Group Code",
+        "Product Type",
+        "Product Size",
+        "Pieces in a box",
+        "Product HSN Code",
+        "CGST",
+        "SGST",
+        "IGST",
+        "SBU",
+        "Base Points",
+        "Unit of Measure",
+        "Index",
+        "Reason",
+      ],
+      ...errorLog.map((data) => [
+        data["Product Code"] || "",
+        data["Product Name"] || "",
+        data["Image Path"] || "",
+        data["Brand Code"] || "",
+        data["Brand Name"] || "",
+        data["Collection Code"] || "",
+        data["Collection Name"] || "",
+        data["Category Code"] || "",
+        data["Category Name"] || "",
+        data["SKU Group Name"] || "",
+        data["SKU Group Code"] || "",
+        data["Product Type"] || "",
+        data["Product Size"] || "",
+        data["Pieces in a box"] || "",
+        data["Product HSN Code"] || "",
+        data["CGST"] || "",
+        data["SGST"] || "",
+        data["IGST"] || "",
+        data["SBU"] || "",
+        data["Base Points"] || "",
+        data["Unit of Measure"] || "",
+        data["index"] || "",
+        data["reason"] || "",
+      ]),
+    ];
+
+    // Create CSV string
+    const csvContent =
+      "data:text/csv;charset=utf-8," + csv.map((e) => e.join(",")).join("\n");
+
+    // Encode URI
+    const encodedUri = encodeURI(csvContent);
+
+    // Create a link element and trigger download
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "products-error-log.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Clear error log if necessary
+    setErrorLog([]);
+  };
+
+  const handleCSVImport = async (url) => {
+    try {
+      console.log(url);
+      dispatch(fetchProducts());
+      openConfirmationModel({
+        question: "Are you sure you want to import this products CSV?",
+        answer: ["Yes", "No"],
+        onClose: async (result) => {
+          if (result) {
+            try {
+              let payload = {
+                file: url,
+              };
+              setFormLoading(true);
+              const res = await bulkUpload(payload, "Product");
+              dispatch(fetchProducts());
+              if (
+                res?.data?.data?.length === 0 &&
+                res?.data?.skippedRows?.length === 0
+              ) {
+                toast.error("No data found in the file to import");
+                return;
+              } else if (res?.data?.skippedRows?.length > 0) {
+                toast.error(
+                  `${res?.data?.skippedRows?.length} rows skipped, ${
+                    res?.data?.data?.length ? res?.data?.data?.length : 0
+                  } rows imported in the Product Master`
+                );
+                setErrorLog(res?.data?.skippedRows);
+              } else {
+                toast.success(
+                  `${res?.data?.data?.length} rows imported in the Product Master`
+                );
+              }
+              onCloseModal();
+            } catch (error) {
+              console.error(error);
+              toast.error(
+                error?.response?.data?.message ||
+                  "Failed to import products, try again"
+              );
+            } finally {
+              setFormLoading(false);
+            }
+          } else {
+            onCloseModal();
+            return;
+          }
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleSetEdit = (product) => {
+    setSelectedProduct(product);
+    setModalMode("edit");
+    setFormData({
+      name: product?.name || "",
+      cat_id: product?.cat_id?._id || "",
+      brand: product?.brand?._id || "",
+      subBrand: product?.subBrand?._id || "",
+      collection_id: product?.collection_id?._id || "",
+      sku_group__name: product?.sku_group__name || "", // Updated key
+      sku_group_id: product?.sku_group_id || "", // Added key
+      product_code: product?.product_code || "",
+      size: product?.size || "",
+      img_path: product?.img_path || "", // Added key
+      no_of_pieces_in_a_box: product?.no_of_pieces_in_a_box || "",
+      description: product?.description || "",
+      product_type: product?.product_type || "",
+      product_hsn_code: product?.product_hsn_code || "",
+      cgst: product?.cgst || "",
+      sgst: product?.sgst || "",
+      igst: product?.igst || "",
+      sbu: product?.sbu || "",
+      base_point: product?.base_point,
+      uom: product?.uom || "pcs", // Default value is "pcs"
+    });
+    setOpenModal(true);
+  };
+
+  const handleAddProduct = async () => {
+    // Implementation...
+  };
+
+  const handleEditProduct = async () => {
+    // Implementation...
+  };
+
+  const onCloseModal = () => {
+    // Implementation...
+  };
+
+  const handleStatusUpdate = async (product) => {
+    // Implementation...
+  };
+
+  const handleResetFilter = () => {
+    setSelectedCategory("default");
+    setSelectedBrand("default");
+    setSelectedCollection("default");
+    setSelectedStatus("active");
+    setSearchQuery("");
+    setDateRange({
+      startDate: null,
+      endDate: null,
+    });
+    setCurrentPage(1);
+    fetchProductsPaginated();
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  return (
+    <>
+      <div className="flex justify-start items-center flex-col gap-4 w-full">
+        {/* page header */}
+        <div className="flex justify-between w-full items-center border-b-2 py-4">
+          <div className="flex justify-center items-center">
+            <h1 className="text-2xl font-bold">Product Master</h1>
+          </div>
+        </div>
+
+        {/* filters */}
+        <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
+          <Card className="w-full flex justify-center items-center flex-col">
+            {/* filter card header */}
+            <div className="w-full flex flex-wrap justify-center items-center gap-2">
+              <Badge color="warning">Total Count : {totalItems}</Badge>
+              <Badge color="warning">Filtered Count : {filteredCount}</Badge>
+            </div>
+            {/* filter div */}
+            <div className="flex justify-center w-full items-center gap-2 flex-wrap">
+              {/* Status filter */}
+              <div className="w-56">
+                <div className="mb-2 block">
+                  <Label htmlFor="statusSelect" value="Select Status" />
+                </div>
+                <Select
+                  value={selectedStatus}
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                  id="statusSelect"
+                  required
+                >
+                  <option value="default">All</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </Select>
+              </div>
+
+              {/* Brand filter */}
+              <div className="w-56">
+                <div className="mb-2 block">
+                  <Label htmlFor="brandSelect" value="Select Brand" />
+                </div>
+                <Select
+                  value={selectedBrand}
+                  onChange={(e) => setSelectedBrand(e.target.value)}
+                  id="brandSelect"
+                  required
+                >
+                  <option value="default">All</option>
+                  {brandList.map((brand) => (
+                    <option key={brand._id} value={brand._id}>
+                      {brand.name}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+
+              {/* Category filter */}
+              <div className="w-56">
+                <div className="mb-2 block">
+                  <Label htmlFor="categorySelect" value="Select Category" />
+                </div>
+                <Select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  id="categorySelect"
+                  required
+                >
+                  <option value="default">All</option>
+                  {categoryList.map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+
+              {/* Collection filter */}
+              <div className="w-56">
+                <div className="mb-2 block">
+                  <Label htmlFor="collectionSelect" value="Select Collection" />
+                </div>
+                <Select
+                  value={selectedCollection}
+                  onChange={(e) => setSelectedCollection(e.target.value)}
+                  id="collectionSelect"
+                  required
+                >
+                  <option value="default">All</option>
+                  {collectionList
+                    ?.filter(
+                      (ele) =>
+                        selectedCategory === "default" ||
+                        ele?.cat_id?._id === selectedCategory
+                    )
+                    .map((collection) => (
+                      <option key={collection?._id} value={collection?._id}>
+                        {collection?.name}
+                      </option>
+                    ))}
+                </Select>
+              </div>
+
+              {/* Search filter */}
+              <div className="w-56">
+                <div className="mb-2 block">
+                  <Label htmlFor="searchInput" value="Search" />
+                </div>
+                <TextInput
+                  id="searchInput"
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+
+              {/* Date range filter */}
+              <div className="w-64">
+                <div className="mb-2 block">
+                  <Label
+                    htmlFor="dateRangeFilter"
+                    value="Filter By CreatedAt"
+                  />
+                </div>
+                <Datepicker
+                  showShortcuts={true}
+                  value={dateRange}
+                  onChange={handleDateRangeChange}
+                />
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-center w-full items-center gap-2 flex-wrap">
+              <Button
+                className="text-xs"
+                size="sm"
+                color="success"
+                onClick={handleResetFilter}
+              >
+                <span className="flex justify-center items-center gap-2">
+                  <RiRefreshFill size={20} />
+                  Reset & Refresh
+                </span>
+              </Button>
+              <Button
+                className="text-xs"
+                size="sm"
+                onClick={() => setOpenModal(true)}
+              >
+                <span className="flex justify-center items-center gap-2">
+                  <IoMdAddCircle size={20} />
+                  Add Product
+                </span>
+              </Button>
+              <Button
+                className="text-xs"
+                color="light"
+                size="sm"
+                onClick={handleCSVTemplateDownload}
+              >
+                <span className="flex justify-center items-center gap-2">
+                  <MdSimCardDownload size={20} />
+                  Template
+                </span>
+              </Button>
+              <Button
+                className={`text-xs ${
+                  downloadLoading ? "opacity-60 cursor-not-allowed" : ""
+                }`}
+                size="sm"
+                color="blue"
+                onClick={handleExportToCSV}
+                disabled={downloadLoading}
+              >
+                <span className="flex justify-center items-center gap-2">
+                  <BiSolidFileExport size={20} />
+                  {downloadLoading ? "Exporting..." : "CSV Download"}
+                </span>
+              </Button>
+
+              <FileUpload
+                type="single-file"
+                page="bulk-import"
+                onSetFileUrl={(url) => {
+                  handleCSVImport(url);
+                }}
+              />
+
+              {errorLog.length > 0 && (
+                <Button
+                  className="text-xs"
+                  size="sm"
+                  color="red"
+                  onClick={handleErrorLogDownload}
+                >
+                  <span className="flex justify-center items-center gap-2">
+                    <MdDownloadForOffline size={20} />
+                    Error Log
+                    <Badge color="gray">{errorLog.length}</Badge>
+                  </span>
+                </Button>
+              )}
+            </div>
+          </Card>
+        </div>
+
+        {/* Pagination */}
+        <div className="flex justify-end items-center w-full px-4">
+          <div className="flex overflow-x-auto sm:justify-center">
+            {!paginatedLoading && filteredCount > itemsPerPage && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+                showIcons
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Product list */}
+        <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
+          {paginatedLoading ? (
+            <div
+              className="w-full flex justify-center items-center"
+              role="status"
+            >
+              <Spinner aria-label="Loading data" size="xl" />
+            </div>
+          ) : (
+            <div className="overflow-x-auto w-full">
+              <Table striped>
+                <Table.Head className="text-center">
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Product Code
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Product Name
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Image
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Brand Code
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Brand Name
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Sub Brand Code
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Sub Brand Name
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Category Code
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Category Name
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Collection Code
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Collection Name
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    SKU Group Code
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    SKU Group Name
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Size
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Product Type
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    HSN Code
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Pieces in Box
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    CGST
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    SGST
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    IGST
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    SBU
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Base Point
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    UOM
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Created Date Time
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Status
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    Actions
+                  </Table.HeadCell>
+                </Table.Head>
+                <Table.Body>
+                  {paginatedProducts.length > 0 ? (
+                    paginatedProducts.map((product) => (
+                      <Table.Row key={product?._id} className="text-center">
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          <UniqueCode
+                            text={product?.product_code}
+                            codeName="Product"
+                          />
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.name}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          <div className="flex gap-2 justify-center items-center">
+                            {product?.img_path ? (
+                              <img
+                                src={product?.img_path}
+                                alt={product?.name}
+                                className="h-14 object-contain rounded-lg"
+                              />
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          <UniqueCode
+                            text={product?.brand?.code}
+                            codeName="Brand"
+                          />
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.brand?.name}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          <UniqueCode
+                            text={product?.subBrand?.code}
+                            codeName="Sub Brand"
+                          />
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.subBrand?.name}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          <UniqueCode
+                            text={product?.cat_id?.code}
+                            codeName="Category"
+                          />
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.cat_id?.name}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          <UniqueCode
+                            text={product?.collection_id?.code}
+                            codeName="Collection"
+                          />
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.collection_id?.name}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          <UniqueCode
+                            text={product?.sku_group_id}
+                            codeName="SKU Group"
+                          />
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.sku_group__name}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.size}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.product_type}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          <UniqueCode
+                            text={product?.product_hsn_code}
+                            codeName="HSN"
+                          />
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.no_of_pieces_in_a_box}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.cgst}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.sgst}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.igst}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.sbu}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.base_point}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.uom}
+                        </Table.Cell>
+                        <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                          {product?.createdAt
+                            ? moment(product?.createdAt)
+                                .tz("Asia/Kolkata")
+                                .format("YYYY-MM-DD")
+                            : ""}
+                        </Table.Cell>
+                        <Table.Cell>
+                          <StatusIndicator
+                            status={product.status}
+                            onClick={() => handleStatusUpdate(product)}
+                          />
+                        </Table.Cell>
+                        <Table.Cell>
+                          <div className="flex gap-2 justify-center items-center">
+                            <EditButton
+                              onClick={() => handleSetEdit(product)}
+                            />
+                          </div>
+                        </Table.Cell>
+                      </Table.Row>
+                    ))
+                  ) : (
+                    <Table.Row>
+                      <Table.Cell colSpan={"100%"} className="text-center">
+                        No products found
+                      </Table.Cell>
+                    </Table.Row>
+                  )}
+                </Table.Body>
+              </Table>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Add/Edit Product Modal */}
+      <Modal show={openModal} onClose={onCloseModal}>
+        <Modal.Header>
+          {modalMode === "add" ? "Add Product" : "Edit Product"}
+        </Modal.Header>
+        <Modal.Body>
+          {/* Form fields - implementation abbreviated */}
+        </Modal.Body>
+        <Modal.Footer>
+          {modalMode === "add" ? (
+            <Button onClick={handleAddProduct} disabled={formLoading}>
+              {formLoading ? (
+                <Spinner size="sm" aria-label="Loading spinner" />
+              ) : (
+                "Add Product"
+              )}
+            </Button>
+          ) : (
+            <Button onClick={handleEditProduct} disabled={formLoading}>
+              {formLoading ? (
+                <Spinner size="sm" aria-label="Loading spinner" />
+              ) : (
+                "Update Product"
+              )}
+            </Button>
+          )}
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+};
+
+export default Product;

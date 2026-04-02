@@ -1,0 +1,743 @@
+import { useEffect, useState } from "react";
+import { getApprovedOutletList } from "../../api/api";
+import toast from "react-hot-toast";
+import {
+  AllDistributorTransactionList,
+  retryDistributorTransaction,
+} from "../../api/distributorTransactionApi";
+import { useDebounce } from "../../hooks/useDebounce";
+import {
+  Badge,
+  Button,
+  Card,
+  Label,
+  Modal,
+  Pagination,
+  Select,
+  Spinner,
+  Table,
+  TextInput,
+} from "flowbite-react";
+import Datepicker from "react-tailwindcss-datepicker";
+import SearchableSelect from "../../components/SearchableSelect";
+import { RiRefreshFill } from "react-icons/ri";
+import UniqueCode from "../../assets/common/UniqueCode";
+import moment from "moment";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchDistributors } from "../../redux/distributorListSlice";
+import { FaCopy } from "react-icons/fa";
+
+const AllRewardTransactions = () => {
+  const dispatch = useDispatch();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageLoading, setPageLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+  const [outletList, setOutletList] = useState([]);
+  const [transactionList, setTransactionList] = useState([]);
+  const [filteredCount, setFilteredCount] = useState(0);
+  const [dateRange, setDateRange] = useState({
+    startDate: null,
+    endDate: null,
+  });
+  const [transactionType, setTransactionType] = useState("all");
+  const [transactionFor, setTransactionFor] = useState("all");
+  const [transactionStatus, setTransactionStatus] = useState("all");
+  const [retailerId, setRetailerId] = useState("all");
+  const [distributorId, setDistributorId] = useState("all");
+  const [dataLoading, setDataLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentBalance, setCurrentBalance] = useState(0);
+  const [trasactionLoading, setTransactionLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Filter states for modal
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedDistributors, setSelectedDistributors] = useState([]);
+
+  const { distributors, loading: distributorsLoading } = useSelector(
+    (state) => state.distributors
+  );
+  const activeDistributors = distributors.filter(
+    (distributor) => distributor.status === true
+  );
+
+  const handleDateRangeChange = (range) => {
+    setDateRange(range);
+  };
+
+  const onPageChange = (page) => setCurrentPage(page);
+
+  async function getOutletList() {
+    setDataLoading(true);
+    try {
+      const res = await getApprovedOutletList();
+
+      setOutletList(res?.data?.data);
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to fetch all outlet List"
+      );
+    } finally {
+      setDataLoading(false);
+    }
+  }
+
+  // Function to fetch paginated distributor transactions
+  const fetchDistributorTransactions = async () => {
+    try {
+      setPageLoading(true);
+
+      // Build query object
+      const query = {
+        page: currentPage,
+        limit: 10,
+      };
+      if (distributorId && distributorId !== "all") {
+        query.distributorId = distributorId;
+      }
+
+      if (dateRange?.startDate && dateRange?.endDate) {
+        query.fromDate = dateRange.startDate;
+        query.toDate = dateRange.endDate;
+      }
+
+      if (transactionType !== "all") {
+        query.transactionType = transactionType;
+      }
+
+      if (transactionFor !== "all") {
+        query.transactionFor = transactionFor;
+      }
+
+      if (transactionStatus !== "all") {
+        query.status = transactionStatus;
+      }
+
+      if (searchTerm) {
+        query.search = searchTerm;
+      }
+
+      if (retailerId && retailerId !== "all") {
+        query.retailerId = retailerId;
+      }
+
+      const response = await AllDistributorTransactionList(query);
+
+      setTransactionList(response?.data?.data);
+      setTotalPages(response?.data?.pagination?.totalPages);
+      setFilteredCount(response?.data?.pagination?.filteredCount);
+      setCurrentBalance(response?.data?.balance);
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to fetch Distributor Transactions"
+      );
+    } finally {
+      setPageLoading(false);
+    }
+  };
+
+  const debouncedFetchDistributorTransactions = useDebounce(
+    fetchDistributorTransactions,
+    500
+  );
+
+  useEffect(() => {
+    if (distributorId !== "all") {
+      debouncedFetchDistributorTransactions();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    dateRange,
+    currentPage,
+    searchTerm,
+    transactionType,
+    transactionFor,
+    transactionStatus,
+    retailerId,
+    distributorId,
+  ]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    dateRange,
+    searchTerm,
+    transactionType,
+    transactionFor,
+    transactionStatus,
+    retailerId,
+    distributorId,
+  ]);
+
+  useEffect(() => {
+    getOutletList();
+    dispatch(fetchDistributors());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
+
+  const handleResetFilter = () => {
+    setDateRange({
+      startDate: null,
+      endDate: null,
+    });
+    setTransactionType("all");
+    setTransactionFor("all");
+    setTransactionStatus("all");
+    setSearchTerm("");
+    setCurrentPage(1);
+    setRetailerId("all");
+    setDistributorId("all");
+    setTransactionList([]);
+  };
+
+  const handleRefetchTransactions = async (transactionId) => {
+    setTransactionLoading(true);
+    const payload = {
+      transactionId: transactionId,
+    };
+    try {
+      await toast.promise(retryDistributorTransaction(payload), {
+        loading: `Retrying transaction...`,
+        success: () => "Transaction retried successfully",
+        error: (err) =>
+          err?.response?.data?.message || "Failed to retry transaction",
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setTransactionLoading(false);
+      debouncedFetchDistributorTransactions();
+    }
+  };
+
+  const months = [
+    { name: "January", value: 1 },
+    { name: "February", value: 2 },
+    { name: "March", value: 3 },
+    { name: "April", value: 4 },
+    { name: "May", value: 5 },
+    { name: "June", value: 6 },
+    { name: "July", value: 7 },
+    { name: "August", value: 8 },
+    { name: "September", value: 9 },
+    { name: "October", value: 10 },
+    { name: "November", value: 11 },
+    { name: "December", value: 12 },
+  ];
+
+  // Generate year options from 2024 to current year
+  const currentYear = moment().year();
+  const years = [];
+  for (let y = 2024; y <= currentYear; y++) {
+    years.push(y);
+  }
+
+  // Function to handle modal submit
+  const handleProcessMultipliers = () => {
+    console.log("Month:", selectedMonth);
+    console.log("Year:", selectedYear);
+    console.log("Distributor:", selectedDistributors);
+
+    // TODO: Call your API here with selectedMonth, selectedYear, selectedDistributor
+
+    setIsModalOpen(false); // Close modal after processing
+  };
+
+  const handleDistributorChange = (e) =>
+    setSelectedDistributors(e.target.value);
+
+  return (
+    <div>
+      <div className="flex justify-start items-center flex-col w-full">
+        <div className="flex justify-start items-center flex-col gap-2 w-full p-2">
+          <Card className="w-full flex justify-center items-center flex-col">
+            <div className="w-full flex flex-wrap justify-center items-center gap-2">
+              {distributorId !== "all" && !pageLoading ? (
+                <>
+                  <Badge color="indigo">Count: {filteredCount}</Badge>
+                  <Badge color="indigo">
+                    Current Balance: {currentBalance}
+                  </Badge>
+                </>
+              ) : distributorId !== "all" && pageLoading ? (
+                <Spinner aria-label="Loading..." size="sm" />
+              ) : null}
+            </div>
+
+            <div className="flex justify-start w-full items-end gap-2 flex-wrap">
+              {/* Date Range */}
+              <div className="w-64">
+                <div className="block">
+                  <Label value="Select Date Range" />
+                </div>
+                <Datepicker
+                  inputClassName="relative py-1.5 pl-4 pr-14 w-full border border-gray-300 rounded-lg dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white/80 rounded-xs tracking-wide text-sm placeholder-gray-400 focus:ring-1 focus:border-cyan-500 focus:outline-none dark:placeholder-gray-400 dark:focus:border-cyan-500"
+                  showShortcuts={true}
+                  value={dateRange}
+                  onChange={handleDateRangeChange}
+                  size="sm"
+                />
+              </div>
+
+              <div>
+                <div className="mb-2 block">
+                  <Label htmlFor="distributorId" value="Distributors *" />
+                </div>
+                <SearchableSelect
+                  id="distributorId"
+                  options={activeDistributors}
+                  value={distributorId}
+                  onChange={(e) => setDistributorId(e.target.value)}
+                  placeholder="Select Distributor"
+                  displayKey="name"
+                  disabled={distributorsLoading || pageLoading}
+                  valueKey="_id"
+                  descKey="dbCode"
+                  label="Distributor Name"
+                  defaultValue="all"
+                  className={"w-44"}
+                />
+              </div>
+
+              {/* Transaction Type */}
+              <div className="w-44">
+                <div className="block">
+                  <Label value="Transaction Type" />
+                </div>
+                <Select
+                  value={transactionType}
+                  onChange={(e) => setTransactionType(e.target.value)}
+                  id="transactionType"
+                  sizing={"sm"}
+                >
+                  <option value="all">All</option>
+                  <option value="credit">Credit</option>
+                  <option value="debit">Debit</option>
+                </Select>
+              </div>
+
+              {/* Transaction For */}
+              <div className="w-44">
+                <div className="block">
+                  <Label value="Transaction For" />
+                </div>
+                <Select
+                  value={transactionFor}
+                  onChange={(e) => setTransactionFor(e.target.value)}
+                  id="transactionFor"
+                  sizing={"sm"}
+                >
+                  <option value="all">All</option>
+                  {/* These options must match your Mongoose enum */}
+                  <option value="GRN">GRN</option>
+                  <option value="SALES">SALES</option>
+                  <option value="other">Other</option>
+                </Select>
+              </div>
+
+              {/* Transaction Status (New Filter) */}
+              <div className="w-44">
+                <div className="block">
+                  <Label value="Transaction Status" />
+                </div>
+                <Select
+                  value={transactionStatus}
+                  onChange={(e) => setTransactionStatus(e.target.value)}
+                  id="transactionStatus"
+                  sizing={"sm"}
+                >
+                  <option value="all">All</option>
+                  <option value="Success">Success</option>
+                  <option value="Failed">Failed</option>
+                  <option value="Pending">Pending</option>
+                </Select>
+              </div>
+
+              {/* Search Transaction */}
+              <div className="w-44">
+                <div className="block">
+                  <Label value="Search" />
+                </div>
+                <TextInput
+                  placeholder="Search"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value?.trim())}
+                  sizing={"sm"}
+                />
+              </div>
+              <div className="w-56">
+                <div className="mb-2 block">
+                  <Label value="Retailer Name" />
+                </div>
+                <SearchableSelect
+                  options={outletList}
+                  value={retailerId}
+                  onChange={(e) => setRetailerId(e.target.value)}
+                  placeholder="Select Retailer"
+                  disabled={dataLoading || pageLoading}
+                  displayKey="outletName"
+                  valueKey="_id"
+                  descKey="outletUID"
+                  className="w-44"
+                  id="retailer-select"
+                  label="Retailer Name"
+                  defaultValue="all"
+                />
+              </div>
+
+              <div className="flex items-end gap-2">
+                <Button
+                  className="text-xs text-white"
+                  size="xs"
+                  color="blue"
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  <span className="flex justify-center items-center gap-2">
+                    <RiRefreshFill size={18} />
+                    Process Multipliers
+                  </span>
+                </Button>
+                <Button
+                  className="text-xs text-white"
+                  size="xs"
+                  color="success"
+                  onClick={handleResetFilter}
+                >
+                  <span className="flex justify-center items-center gap-2">
+                    <RiRefreshFill size={18} />
+                    Reset Filters
+                  </span>
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        <div className="flex justify-end items-center w-full px-4">
+          <div className="flex overflow-x-auto sm:justify-center">
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+                showIcons
+              />
+            )}
+          </div>
+        </div>
+
+        {distributorId !== "all" ? (
+          <div className="flex justify-center w-full items-center gap-2 flex-wrap p-2 mt-4">
+            <div className="overflow-x-auto w-full">
+              <Table striped className="rounded-none text-xs">
+                <Table.Head className="text-center">
+                  <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
+                    Transaction ID
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
+                    Transaction For
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
+                    Transaction Type
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
+                    Amount
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
+                    Balance
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
+                    Transaction Status
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
+                    Transaction Date
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
+                    Retailer
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
+                    Invoice No
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
+                    Bill No
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
+                    Remark
+                  </Table.HeadCell>
+                </Table.Head>
+                <Table.Body className="divide-y">
+                  {pageLoading ? (
+                    <Table.Row>
+                      <Table.Cell colSpan="100%">
+                        <div
+                          className="w-full flex justify-center items-center py-4"
+                          role="status"
+                        >
+                          <Spinner aria-label="Loading..." size="xl" />
+                        </div>
+                      </Table.Cell>
+                    </Table.Row>
+                  ) : (
+                    <>
+                      {transactionList?.map((ele, index) => (
+                        <Table.Row
+                          key={index}
+                          className="text-center bg-white dark:border-gray-700 dark:bg-gray-800"
+                        >
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            <div className="flex items-center justify-center gap-2">
+                              {/* Displaying transaction _id as unique identifier */}
+                              {/* <UniqueCode
+                                text={ele?._id?.toUpperCase()}
+                                codeName={"Transaction ID"}
+                              /> */}
+                              <FaCopy
+                                size={15}
+                                className="cursor-pointer"
+                                title={ele?._id?.toUpperCase()}
+                                onClick={() => {
+                                  navigator.clipboard.writeText(
+                                    ele?._id?.toUpperCase()
+                                  );
+                                  toast.success("ID copied to clipboard");
+                                }}
+                              />
+                            </div>
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            {ele?.transactionFor}
+                          </Table.Cell>
+                          <Table.Cell
+                            className={`whitespace-nowrap ${
+                              ele?.transactionType === "debit"
+                                ? "text-red-600 font-bold"
+                                : "text-green-600 font-bold"
+                            } dark:text-gray-200`}
+                          >
+                            {ele?.transactionType === "debit"
+                              ? "Debit"
+                              : "Credit"}
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            <span
+                              className={`flex items-center justify-center gap-2 ${
+                                ele?.transactionType === "debit"
+                                  ? "text-red-600 font-bold"
+                                  : "text-green-600 font-bold"
+                              }`}
+                            >
+                              {ele?.point}
+                            </span>
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            <span
+                              className={`flex items-center justify-center gap-2 ${
+                                ele?.balance < 0
+                                  ? "text-red-600 font-bold"
+                                  : "text-black font-bold dark:text-gray-200" // Or a different color for positive balance
+                              }`}
+                            >
+                              {ele?.balance}
+                            </span>
+                          </Table.Cell>
+                          <Table.Cell
+                            className={`whitespace-nowrap ${
+                              ele?.status === "Success"
+                                ? "text-green-500 font-bold"
+                                : ele?.status === "Failed"
+                                ? "text-red-700 font-bold"
+                                : "text-yellow-400 font-bold"
+                            } dark:text-gray-200`}
+                          >
+                            <div className="flex items-center justify-center gap-2">
+                              <span
+                                className={`${
+                                  ele?.status === "Failed" &&
+                                  ele?.transactionFor === "SALES"
+                                    ? "cursor-pointer"
+                                    : ""
+                                }`}
+                                onClick={() => {
+                                  if (
+                                    ele?.status === "Failed" &&
+                                    ele?.transactionFor === "SALES"
+                                  ) {
+                                    alert(
+                                      JSON.stringify(ele?.apiResponse, null, 2)
+                                    );
+                                  }
+                                }}
+                              >
+                                {ele?.status}
+                              </span>
+
+                              {ele?.status === "Failed" &&
+                              ele?.transactionFor === "SALES" ? (
+                                <Button
+                                  size="xs"
+                                  color="blue"
+                                  onClick={() =>
+                                    handleRefetchTransactions(ele?._id)
+                                  }
+                                  disabled={trasactionLoading}
+                                >
+                                  Retry
+                                </Button>
+                              ) : null}
+                            </div>
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            {moment(ele?.createdAt)
+                              .tz("Asia/Kolkata")
+                              .format("LLL")}
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            {ele?.retailerId?.outletName && (
+                              <>
+                                {ele?.retailerId?.outletName}
+                                (
+                                <UniqueCode
+                                  text={ele?.retailerId?.outletUID}
+                                  codeName={"Retailer ID"}
+                                />
+                                )
+                              </>
+                            )}
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            <div className="flex items-center justify-center gap-2">
+                              {ele?.invoiceId?.invoiceNo ? (
+                                <UniqueCode
+                                  text={ele?.invoiceId?.invoiceNo?.toUpperCase()}
+                                  codeName={"Invoice No"}
+                                />
+                              ) : null}
+                            </div>
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            <div className="flex items-center justify-center gap-2">
+                              {ele?.billId?.billNo ? (
+                                <UniqueCode
+                                  text={ele?.billId?.billNo?.toUpperCase()}
+                                  codeName={"Bill No"}
+                                />
+                              ) : null}
+                            </div>
+                          </Table.Cell>
+                          <Table.Cell className="font-medium text-gray-900 dark:text-gray-200 min-w-96">
+                            {ele?.remark}
+                          </Table.Cell>
+                        </Table.Row>
+                      ))}
+                      {transactionList?.length === 0 && (
+                        <Table.Row className="text-center bg-white dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell
+                            colSpan="100%"
+                            className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200"
+                          >
+                            <span className="w-full flex justify-center items-center gap-2 py-4">
+                              No transactions found
+                            </span>
+                          </Table.Cell>
+                        </Table.Row>
+                      )}
+                    </>
+                  )}
+                </Table.Body>
+              </Table>
+            </div>
+          </div>
+        ) : (
+          <div className="w-full flex justify-center items-center py-4">
+            <span className="text-gray-200 text-2xl font-semibold">
+              Please select a distributor to view transactions.
+            </span>
+          </div>
+        )}
+      </div>
+      <Modal
+        show={isModalOpen}
+        size="xl"
+        popup={true}
+        onClose={() => setIsModalOpen(false)}
+      >
+        <Modal.Header>
+          {" "}
+          <div className="p-2">Process Multiplier</div>{" "}
+        </Modal.Header>
+        <Modal.Body className="max-h-[80vh] overflow-y-auto">
+          <div className="space-y-4">
+            {/* Distributor Filter */}
+            <div>
+              <Label value="Select Distributor(s)" />
+              <SearchableSelect
+                id="distributor-select"
+                className="w-full"
+                options={activeDistributors}
+                value={selectedDistributors}
+                onChange={handleDistributorChange}
+                placeholder="Select Distributor(s)"
+                displayKey="name"
+                valueKey="_id"
+                descKey="dbCode"
+                multiple
+              />
+            </div>
+
+            {/* Month Filter */}
+            <div>
+              <Label value="Select Month" />
+              <Select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+              >
+                <option value="">Select Month</option>
+                {months.map((m) => (
+                  <option key={m.value} value={m.value}>
+                    {m.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
+
+            {/* Year Filter */}
+            <div>
+              <Label value="Select Year" />
+              <Select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+              >
+                <option value="">Select Year</option>
+                {years.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-2 mt-8">
+              <Button color="gray" onClick={() => setIsModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button color="blue" onClick={handleProcessMultipliers}>
+                Process
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
+    </div>
+  );
+};
+
+export default AllRewardTransactions;

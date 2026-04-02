@@ -1,0 +1,37 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 22
+    commands:
+      - echo "[INSTALL PHASE] Using Node.js $(node -v)"
+      - echo "[INSTALL PHASE] Using npm $(npm -v)"
+
+  pre_build:
+    commands:
+      - npm ci --include=dev
+      - echo "VITE_NODE_ENV=$VITE_NODE_ENV" >> .env
+      - echo "VITE_BACKEND_URL=$VITE_BACKEND_URL" >> .env
+
+  build:
+    commands:
+      - npm run build
+
+  post_build:
+    commands:
+      - BUILD_NUMBER=$(date +%Y%m%d)_$CODEBUILD_BUILD_NUMBER
+      - echo "Copying from s3://$BUCKET_NAME  to s3://$BACKUP_BUCKET/$PROJECT_NAME/$BUILD_NUMBER"
+      - aws s3 sync s3://$BUCKET_NAME s3://$BACKUP_BUCKET/$PROJECT_NAME/$BUILD_NUMBER --exact-timestamps
+      - echo "Cleaning up old backups... keeping last $BACKUP_RETENTION only"
+      - aws s3 ls s3://$BACKUP_BUCKET/$PROJECT_NAME/ | awk '{print $2}' | sort | head -n -$BACKUP_RETENTION | xargs -I {} aws s3 rm s3://$BACKUP_BUCKET/$PROJECT_NAME/{} --recursive
+      - echo "Uploading all except index.html...."
+      - aws s3 sync ./dist s3://$BUCKET_NAME/ --exclude "index.html" --exact-timestamps
+      - echo "Uploading index.html (last)..."
+      - aws s3 cp ./dist/index.html s3://$BUCKET_NAME/index.html
+      - echo "Cleaning up old files (safe delete)..."
+      - aws s3 sync ./dist s3://$BUCKET_NAME/ --delete --exclude "index.html"
+
+cache:
+  paths:
+    - "node_modules/**/*"
