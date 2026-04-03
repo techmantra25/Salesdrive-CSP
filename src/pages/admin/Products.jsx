@@ -112,8 +112,8 @@ const Product = () => {
       console.error(error);
       toast.error(
         error?.response?.data?.message ||
-          error?.message ||
-          "Failed to fetch suppliers",
+        error?.message ||
+        "Failed to fetch suppliers",
       );
     }
   };
@@ -145,7 +145,7 @@ const Product = () => {
       }
 
       if (selectedSubBrand !== "default") {
-        queryParams.subBrand = selectedSubBrand;
+       queryParams.segment = selectedSubBrand;
       }
 
       if (searchQuery.trim() !== "") {
@@ -225,28 +225,28 @@ const Product = () => {
       console.error(error);
       toast.error(
         error?.response?.data?.message ||
-          "Failed to fetch Sub-Brands, try again",
+        "Failed to fetch Sub-Brands, try again",
       );
     }
   };
 
   const [formData, setFormData] = useState({
-    name: "",
+    s4hana_code: "",
+    description: "",
     cat_id: "",
     supplier: "",
     brand: "",
-    subBrand: "",
+    segment: "",
     collection_id: "",
     sku_group__name: "",
     sku_group_id: "",
-    product_code: "",
     pack: "",
     size: "",
     color: "",
     img_path: "",
-    no_of_pieces_in_a_box: "",
-    description: "",
-    product_type: "",
+    std_pkg_in_pc: "",
+    wp_pc: "", // ✅ NEW
+    collection_product_type: "",
     product_valuation_type: "",
     product_hsn_code: "",
     cgst: "",
@@ -261,46 +261,53 @@ const Product = () => {
   const { openConfirmationModel } = useContext(ConfirmationModelContext);
 
   const validate = () => {
-    if (!formData.name.trim()) {
-      toast.error("Product name is required");
-      return false;
-    }
+  if (!formData.s4hana_code.trim()) {
+    toast.error("S/4HANA Code is required");
+    return false;
+  }
 
-    if (!formData.supplier.trim()) {
-      toast.error("Supplier is required");
-      return false;
-    }
+  if (!formData.description.trim()) {
+    toast.error("Description is required");
+    return false;
+  }
 
-    if (!formData.subBrand.trim()) {
-      toast.error("Sub Brand is required");
-      return false;
-    }
-    if (!formData.brand.trim()) {
-      toast.error("Brand is required");
-      return false;
-    }
+  // if (!formData.supplier.trim()) {
+  //   toast.error("Supplier is required");
+  //   return false;
+  // }
 
-    if (!formData.cat_id.trim()) {
-      toast.error("Category is required");
-      return false;
-    }
+  if (!formData.segment.trim()) {
+    toast.error("Segment is required");
+    return false;
+  }
 
-    if (!formData.collection_id.trim()) {
-      toast.error("Collection is required");
-      return false;
-    }
+  if (!formData.brand.trim()) {
+    toast.error("Brand is required");
+    return false;
+  }
 
-    if (!formData.sku_group_id.trim()) {
-      toast.error("SKU Group Code is required");
-      return false;
-    }
-    if (!formData.sku_group__name.trim()) {
-      toast.error("SKU Group Name is required");
-      return false;
-    }
+  if (!formData.cat_id.trim()) {
+    toast.error("Category is required");
+    return false;
+  }
 
-    return true;
-  };
+  if (!formData.collection_id.trim()) {
+    toast.error("Collection is required");
+    return false;
+  }
+
+  if (!formData.sku_group_id.trim()) {
+    toast.error("SKU Group Code is required");
+    return false;
+  }
+
+  if (!formData.sku_group__name.trim()) {
+    toast.error("SKU Group Name is required");
+    return false;
+  }
+
+  return true;
+};
 
   const handleExportToCSV = () => {
     // Build query parameters
@@ -564,8 +571,7 @@ const Product = () => {
                 return;
               } else if (res?.data?.skippedRows?.length > 0) {
                 toast.error(
-                  `${res?.data?.skippedRows?.length} rows skipped, ${
-                    res?.data?.data?.length ? res?.data?.data?.length : 0
+                  `${res?.data?.skippedRows?.length} rows skipped, ${res?.data?.data?.length ? res?.data?.data?.length : 0
                   } rows imported in the Product Master`,
                 );
                 setErrorLog(res?.data?.skippedRows);
@@ -579,7 +585,7 @@ const Product = () => {
               console.error(error);
               toast.error(
                 error?.response?.data?.message ||
-                  "Failed to import products, try again",
+                "Failed to import products, try again",
               );
             } finally {
               setFormLoading(false);
@@ -628,23 +634,28 @@ const Product = () => {
     setOpenModal(true);
   };
 
-  const handleAddProduct = async () => {
-    try {
-      if (!validate()) return;
-      setFormLoading(true);
-      await addProduct(formData);
-      onCloseModal();
-      toast.success("Product added successfully");
-    } catch (error) {
-      console.error(error);
-      toast.error(
-        error?.response?.data?.message || "Failed to add product, try again",
-      );
-    } finally {
-      setFormLoading(false);
-      fetchProductsPaginated();
-    }
-  };
+ const handleAddProduct = async () => {
+  try {
+    if (!validate()) return;
+
+    setFormLoading(true);
+
+    await addProduct({
+      ...formData,
+    });
+
+    onCloseModal();
+    toast.success("Product added successfully");
+  } catch (error) {
+    console.error(error);
+    toast.error(
+      error?.response?.data?.message || "Failed to add product, try again"
+    );
+  } finally {
+    setFormLoading(false);
+    fetchProductsPaginated();
+  }
+};
 
   const handleEditProduct = async () => {
     openConfirmationModel({
@@ -688,7 +699,7 @@ const Product = () => {
             console.error(error);
             toast.error(
               error?.response?.data?.message ||
-                "Failed to update product, try again",
+              "Failed to update product, try again",
             );
           } finally {
             setFormLoading(false);
@@ -701,35 +712,39 @@ const Product = () => {
     });
   };
 
-  const onCloseModal = () => {
-    setOpenModal(false);
-    setModalMode("add");
-    setFormData({
-      name: "",
-      img_path: "",
-      supplier: "",
-      cat_id: "",
-      brand: "",
-      collection_id: "",
-      sku_group_id: "",
-      product_code: "",
-      size: "",
-      color: "",
-      pack: "",
-      no_of_pieces_in_a_box: "",
-      description: "",
-      product_type: "",
-      product_valuation_type: "",
-      product_hsn_code: "",
-      cgst: "",
-      sgst: "",
-      igst: "",
-      sbu: "",
-      base_point: "",
-      uom: "pcs",
-    });
-    setSelectedProduct(null);
-  };
+const onCloseModal = () => {
+  setOpenModal(false);
+  setModalMode("add");
+
+  setFormData({
+    s4hana_code: "",
+    description: "",
+    cat_id: "",
+    supplier: "",
+    brand: "",
+    segment: "",
+    collection_id: "",
+    sku_group__name: "",
+    sku_group_id: "",
+    pack: "",
+    size: "",
+    color: "",
+    img_path: "",
+    std_pkg_in_pc: "",
+    wp_pc: "",
+    collection_product_type: "",
+    product_valuation_type: "",
+    product_hsn_code: "",
+    cgst: "",
+    sgst: "",
+    igst: "",
+    sbu: "",
+    base_point: "",
+    uom: "pcs",
+  });
+
+  setSelectedProduct(null);
+};
 
   const handleStatusUpdate = async (product) => {
     openConfirmationModel({
@@ -754,7 +769,7 @@ const Product = () => {
             console.error(error);
             toast.error(
               error?.response?.data?.message ||
-                "Failed to update product status",
+              "Failed to update product status",
             );
           } finally {
             fetchProductsPaginated();
@@ -948,655 +963,625 @@ const Product = () => {
   // filteredProducts = Object.values(multiProductArray).flat();
 
   return (
-  <>
-    {pagePermission?.view && (
-      <>
-        <div className="flex justify-start items-center flex-col gap-4 w-full">
+    <>
+      {pagePermission?.view && (
+        <>
+          <div className="flex justify-start items-center flex-col gap-4 w-full">
 
-        {/* page header */}
-        <div className="flex justify-between w-full items-center border-b-2 py-4">
-          <div className="flex justify-center items-center">
-            <h1 className="text-2xl font-bold">Product Master</h1>
-          </div>
-        </div>
-
-        {/* Compact Filters Section */}
-        {/* Compact Filters + Actions */}
-        <div className="w-full p-2">
-          <Card className="w-full p-3 flex flex-col gap-3 text-xs">
-            {/* Header Badges (compact) */}
-            <div className="flex flex-wrap justify-center gap-2">
-              <Badge color="warning" className="px-2 py-1">
-                Total: {totalItems}
-              </Badge>
-              <Badge color="warning" className="px-2 py-1">
-                Filtered: {filteredCount}
-              </Badge>
+            {/* page header */}
+            <div className="flex justify-between w-full items-center border-b-2 py-4">
+              <div className="flex justify-center items-center">
+                <h1 className="text-2xl font-bold">Product Master</h1>
+              </div>
             </div>
 
-            {/* Filters (dense row, wraps on small screens) */}
-            <div className="flex flex-wrap gap-2 justify-center items-center">
-              {/* Search */}
-              <div className="w-40">
-                <Label
-                  htmlFor="searchInput"
-                  value="Search"
-                  className="sr-only"
-                />
-                <TextInput
-                  id="searchInput"
-                  type="text"
-                  placeholder="Search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  sizing="sm"
-                  className="h-8 text-xs"
-                  aria-label="Search"
-                />
-              </div>
+            {/* Compact Filters Section */}
+            {/* Compact Filters + Actions */}
+            <div className="w-full p-2">
+              <Card className="w-full p-3 flex flex-col gap-3 text-xs">
+                {/* Header Badges (compact) */}
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Badge color="warning" className="px-2 py-1">
+                    Total: {totalItems}
+                  </Badge>
+                  <Badge color="warning" className="px-2 py-1">
+                    Filtered: {filteredCount}
+                  </Badge>
+                </div>
 
-              {/* Status */}
-              <div className="w-40">
-                <Label
-                  htmlFor="statusSelect"
-                  value="Select Status"
-                  className="sr-only"
-                />
-                <Select
-                  id="statusSelect"
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                  sizing="sm"
-                  className="h-8 text-xs"
-                  aria-label="Select Status"
-                >
-                  <option value="default">All Status</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </Select>
-              </div>
+                {/* Filters (dense row, wraps on small screens) */}
+                <div className="flex flex-wrap gap-2 justify-center items-center">
+                  {/* Search */}
+                  <div className="w-40">
+                    <Label
+                      htmlFor="searchInput"
+                      value="Search"
+                      className="sr-only"
+                    />
+                    <TextInput
+                      id="searchInput"
+                      type="text"
+                      placeholder="Search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      sizing="sm"
+                      className="h-8 text-xs"
+                      aria-label="Search"
+                    />
+                  </div>
 
-              {/* Brand */}
-              <div className="w-44">
-                <Label
-                  htmlFor="brandSelect"
-                  value="Select Brand"
-                  className="sr-only"
-                />
-                <Select
-                  id="brandSelect"
-                  value={selectedBrand}
-                  onChange={(e) => setSelectedBrand(e.target.value)}
-                  sizing="sm"
-                  className="h-8 text-xs"
-                  aria-label="Select Brand"
-                >
-                  <option value="default">All Brands</option>
-                  {activeBrands?.map((brand) => (
-                    <option key={brand._id} value={brand._id}>
-                      {brand.name} {brand.desc ? `(${brand.desc})` : ""}
-                    </option>
-                  ))}
-                </Select>
-              </div>
+                  {/* Status */}
+                  <div className="w-40">
+                    <Label
+                      htmlFor="statusSelect"
+                      value="Select Status"
+                      className="sr-only"
+                    />
+                    <Select
+                      id="statusSelect"
+                      value={selectedStatus}
+                      onChange={(e) => setSelectedStatus(e.target.value)}
+                      sizing="sm"
+                      className="h-8 text-xs"
+                      aria-label="Select Status"
+                    >
+                      <option value="default">All Status</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </Select>
+                  </div>
 
-              {/* Sub Brand */}
-              {selectedBrand !== "default" && (
-                <div className="w-44">
-                  <Label
-                    htmlFor="subBrandSelect"
-                    value="Select Sub Brand"
-                    className="sr-only"
-                  />
-                  <Select
-                    id="subBrandSelect"
-                    value={selectedSubBrand}
-                    onChange={(e) => setSelectedSubBrand(e.target.value)}
-                    sizing="sm"
-                    className="h-8 text-xs"
-                    aria-label="Select Sub Brand"
-                  >
-                    <option value="default">All Sub Brands</option>
-                    {activeSubBrands
-                      ?.filter((ele) => ele?.brandId?._id === selectedBrand)
-                      ?.map((subBrand) => (
-                        <option key={subBrand._id} value={subBrand._id}>
-                          {subBrand.name}{" "}
-                          {subBrand.desc ? `(${subBrand.desc})` : ""}
+                  {/* Brand */}
+                  <div className="w-44">
+                    <Label
+                      htmlFor="brandSelect"
+                      value="Select Brand"
+                      className="sr-only"
+                    />
+                    <Select
+                      id="brandSelect"
+                      value={selectedBrand}
+                      onChange={(e) => setSelectedBrand(e.target.value)}
+                      sizing="sm"
+                      className="h-8 text-xs"
+                      aria-label="Select Brand"
+                    >
+                      <option value="default">All Brands</option>
+                      {activeBrands?.map((brand) => (
+                        <option key={brand._id} value={brand._id}>
+                          {brand.name} {brand.desc ? `(${brand.desc})` : ""}
                         </option>
                       ))}
-                  </Select>
-                </div>
-              )}
+                    </Select>
+                  </div>
 
-              {/* Category */}
-              {selectedBrand !== "default" && (
-                <div className="w-44">
-                  <Label
-                    htmlFor="categorySelect"
-                    value="Select Category"
-                    className="sr-only"
-                  />
-                  <Select
-                    id="categorySelect"
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    sizing="sm"
-                    className="h-8 text-xs"
-                    aria-label="Select Category"
-                  >
-                    <option value="default">All Categories</option>
-                    {activeCategories
-                      ?.filter((ele) =>
-                        ele?.brandId?.some(
-                          (brand) => brand._id === selectedBrand,
-                        ),
-                      )
-                      .map((category) => (
-                        <option key={category._id} value={category._id}>
-                          {category.name}
-                        </option>
-                      ))}
-                  </Select>
-                </div>
-              )}
-
-              {/* Collection */}
-              {selectedCategory !== "default" && (
-                <div className="w-44">
-                  <Label
-                    htmlFor="collectionSelect"
-                    value="Select Collection"
-                    className="sr-only"
-                  />
-                  <Select
-                    id="collectionSelect"
-                    value={selectedCollection}
-                    onChange={(e) => setSelectedCollection(e.target.value)}
-                    sizing="sm"
-                    className="h-8 text-xs"
-                    aria-label="Select Collection"
-                  >
-                    <option value="default">All Collections</option>
-                    {activeCollections
-                      ?.filter((ele) => ele?.cat_id?._id === selectedCategory)
-                      ?.map((collection) => (
-                        <option key={collection?._id} value={collection?._id}>
-                          {collection?.name}
-                        </option>
-                      ))}
-                  </Select>
-                </div>
-              )}
-
-              <div className="w-56 mb-2">
-                <div className="block">
-                  <Label
-                    htmlFor="effectiveDateSelect"
-                    value="Filter By Created At Date Range"
-                  />
-                </div>
-                <Datepicker
-                  showShortcuts={true}
-                  value={dateRange}
-                  onChange={handleDateRangeChange}
-                  popoverDirection="down" // or "up" depending on your layout
-                  inputClassName={
-                    "w-full rounded-md focus:ring-0 font-normal text-white bg-gray-800 dark:bg-gray-800 border-gray-600 dark:border-gray-600"
-                  }
-                  containerClassName={`relative ${openModal ? "z-0" : "z-[1000]"
-                    }`}
-                />
-              </div>
-
-              <Button
-                size="xs"
-                color="success"
-                onClick={handleResetFilter}
-                aria-label="Reset and Refresh"
-                className="text-[11px]"
-              >
-                <span className="flex items-center gap-1">
-                  <RiRefreshFill size={16} />
-                  <span className="hidden sm:inline">Reset & Refresh</span>
-                </span>
-              </Button>
-
-              {pagePermission?.create && (
-                <Button
-                  size="xs"
-                  onClick={() => setOpenModal(true)}
-
-                  aria-label="Add Product"
-                  className="text-[11px]"
-                >
-                  <span className="flex items-center gap-1">
-                    <IoMdAddCircle size={16} />
-                    <span className="hidden sm:inline">Add Product</span>
-                  </span>
-                </Button>)}
-
-              <Button
-                size="xs"
-                color="light"
-                onClick={handleCSVTemplateDownload}
-                aria-label="Download Template"
-                className="text-[11px]"
-              >
-                <span className="flex items-center gap-1">
-                  <MdSimCardDownload size={16} />
-                  <span className="hidden sm:inline">Template</span>
-                </span>
-              </Button>
-
-              <Button
-                size="xs"
-                color="blue"
-                onClick={handleExportToCSV}
-                aria-label="Download CSV"
-                className="text-[11px]"
-              >
-                <span className="flex items-center gap-1">
-                  <BiSolidFileExport size={16} />
-                  <span className="hidden sm:inline">Download CSV</span>
-                </span>
-              </Button>
-
-              {pagePermission?.update && (
-                <Button
-                  size="xs"
-                  color="blue"
-                  disabled={syncingProducts}
-                  onClick={handleSyncProducts}
-
-                  aria-label="Sync Products"
-                  className="text-[11px]"
-                >
-                  <span className="flex items-center gap-1">
-                    <IoSyncCircleSharp size={16} />
-                    <span className="hidden sm:inline">
-                      {syncingProducts ? "Syncing..." : "Sync Products"}
-                    </span>
-                  </span>
-                </Button>)}
-
-              {pagePermission?.create && (
-                <FileUpload
-                  type="single-file"
-                  page="bulk-import"
-                  size="xs"
-                  onSetFileUrl={(url) => handleCSVImport(url)}
-                />
-              )}
-
-
-              {/* <Label className="text-black">EAN Code Upload</Label> */}
-              <input
-                type="file"
-                accept=".xlsx,.csv"
-                ref={eanFileInputRef}
-                onChange={handleEanUpload}
-                className="hidden"
-              />
-              <Button
-                size="xs"
-                color="warning"
-                disabled={eanUploading}
-                onClick={() => eanFileInputRef.current?.click()}
-                className="text-[11px]"
-              >
-                {eanUploading ? "Uploading..." : "Upload EAN File"}
-              </Button>
-
-              {errorLog.length > 0 && (
-                <Button
-                  size="xs"
-                  color="red"
-                  onClick={handleErrorLogDownload}
-                  aria-label="Download Error Log"
-                  className="text-[11px]"
-                >
-                  <span className="flex items-center gap-1">
-                    <MdDownloadForOffline size={16} />
-                    <span className="hidden sm:inline">Error Log</span>
-                    <Badge color="gray" className="ml-1 px-2 py-0.5">
-                      {errorLog.length}
-                    </Badge>
-                  </span>
-                </Button>
-              )}
-            </div>
-          </Card>
-        </div>
-
-        {/* Pagination */}
-        <div className="flex justify-end items-center w-full px-4">
-          <div className="flex overflow-x-auto sm:justify-center">
-            {!paginatedLoading && filteredCount > itemsPerPage && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-                showIcons
-              />
-            )}
-          </div>
-        </div>
-
-        {/* product list */}
-        <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
-          {" "}
-          {paginatedLoading ? (
-            <div
-              className="w-full flex justify-center items-center"
-              role="status"
-            >
-              <Spinner aria-label="Loading data" size="xl" />
-            </div>
-          ) : (
-            <div className="overflow-x-auto w-full overflow-y-auto">
-              <Table className="text-sm whitespace-nowrap bg-white dark:bg-gray-800">
-                <Table.Head className="text-center text-sm bg-white dark:bg-gray-800 border-b-2 border-gray-200 dark:border-gray-700">
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 sticky left-0 z-20 bg-white dark:bg-gray-800">
-                    SKU Group Code <br /> (Base Code)
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 sticky left-[140px] z-20 bg-white dark:bg-gray-800">
-                    Product Code
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 sticky left-[140px] z-20 bg-white dark:bg-gray-800">
-                    Ean Code
-                  </Table.HeadCell>
-
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Product Name
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Size
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Color
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Pack
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Supplier
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Brand
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Sub Brand
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Category
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Collection
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    SKU Group Name
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Product Type
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Product Valuation Type
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    UOM
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Pieces in Box
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    HSN Code
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    CGST
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    SGST
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    IGST
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Base Point
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Created Date Time
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Updated Date Time
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Status
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Actions
-                  </Table.HeadCell>
-                </Table.Head>
-
-                <Table.Body className="divide-y bg-white dark:bg-gray-800">
-                  {filteredProducts?.length > 0 ? (
-                    filteredProducts?.map((product) => (
-                      <Table.Row
-                        key={product?._id}
-                        className="text-center text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                  {/* Sub Brand */}
+                  {selectedBrand !== "default" && (
+                    <div className="w-44">
+                      <Label
+                        htmlFor="subBrandSelect"
+                        value="Select Sub Brand"
+                        className="sr-only"
+                      />
+                      <Select
+                        id="subBrandSelect"
+                        value={selectedSubBrand}
+                        onChange={(e) => setSelectedSubBrand(e.target.value)}
+                        sizing="sm"
+                        className="h-8 text-xs"
+                        aria-label="Select Sub Brand"
                       >
-                        <Table.Cell className="px-2 py-1 text-gray-900 dark:text-gray-200 whitespace-nowrap sticky left-0 z-10 bg-white dark:bg-gray-800">
-                          <UniqueCode
-                            text={product?.sku_group_id}
-                            codeName="SKU Group"
-                          />
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1 text-gray-900 dark:text-gray-200 whitespace-nowrap sticky left-[140px] z-10 bg-white dark:bg-gray-800">
-                          <UniqueCode
-                            text={product?.product_code}
-                            codeName="Product"
-                          />
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.ean11}
-                        </Table.Cell>
-
-                        <Table.Cell className="px-2 py-1">
-                          {product?.name}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.size}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.color}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.pack}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.supplier && (
-                            <>
-                              <UniqueCode
-                                text={product?.supplier?.supplierCode}
-                                codeName="Supplier"
-                              />{" "}
-                              ({product?.supplier?.supplierName}
-                              {product?.supplier?.city
-                                ? " - " + product?.supplier?.city
-                                : ""}
-                              )
-                            </>
-                          )}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.brand && (
-                            <>
-                              <UniqueCode
-                                text={product?.brand?.code}
-                                codeName="Brand"
-                              />{" "}
-                              ({product?.brand?.desc})
-                            </>
-                          )}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.subBrand && (
-                            <>
-                              <UniqueCode
-                                text={product?.subBrand?.code}
-                                codeName="Sub Brand"
-                              />{" "}
-                              ({product?.subBrand?.desc})
-                            </>
-                          )}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.cat_id && (
-                            <>
-                              <UniqueCode
-                                text={product?.cat_id?.code}
-                                codeName="Category"
-                              />{" "}
-                              ({product?.cat_id?.name})
-                            </>
-                          )}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.collection_id && (
-                            <>
-                              <UniqueCode
-                                text={product?.collection_id?.code}
-                                codeName="Collection"
-                              />{" "}
-                              ({product?.collection_id?.name})
-                            </>
-                          )}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.sku_group__name}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.product_type}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.product_valuation_type}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.uom}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.no_of_pieces_in_a_box}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          <UniqueCode
-                            text={product?.product_hsn_code}
-                            codeName="HSN"
-                          />
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.cgst}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.sgst}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.igst}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.base_point}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.createdAt
-                            ? moment(product?.createdAt)
-                              .tz("Asia/Kolkata")
-                              .format("DD-MM-YYYY hh:mm A")
-                            : ""}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          {product?.updatedAt
-                            ? moment(product?.updatedAt)
-                              .tz("Asia/Kolkata")
-                              .format("DD-MM-YYYY hh:mm A")
-                            : ""}
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          <StatusIndicator
-                            status={product.status}
-                            onClick={
-                              pagePermission?.update
-                                ? () => handleStatusUpdate(product)
-                                : undefined
-                            }
-                          />
-
-                        </Table.Cell>
-                        <Table.Cell className="px-2 py-1">
-                          <div className="flex gap-1 justify-center items-center">
-                            {pagePermission?.update && (
-                              <EditButton
-                                onClick={() => handleSetEdit(product)}
-                              />
-                            )}
-
-                          </div>
-                        </Table.Cell>
-                      </Table.Row>
-                    ))
-                  ) : (
-                    <Table.Row>
-                      <Table.Cell
-                        colSpan={"100%"}
-                        className="text-center px-2 py-1 text-sm"
-                      >
-                        No products found
-                      </Table.Cell>
-                    </Table.Row>
+                        <option value="default">All Sub Brands</option>
+                        {activeSubBrands
+                          ?.filter((ele) => ele?.brandId?._id === selectedBrand)
+                          ?.map((subBrand) => (
+                            <option key={subBrand._id} value={subBrand._id}>
+                              {subBrand.name}{" "}
+                              {subBrand.desc ? `(${subBrand.desc})` : ""}
+                            </option>
+                          ))}
+                      </Select>
+                    </div>
                   )}
-                </Table.Body>
-              </Table>
-            </div>
-          )}
-        </div>
-      </div>
 
-      {/* Your existing code for displaying the product list and modal */}
-      <Modal show={openModal} onClose={onCloseModal}>
-        <Modal.Header>
-          {modalMode === "add" ? "Add Product" : "Edit Product"}
-        </Modal.Header>
-        <Modal.Body>
-          <form>
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="product_code">Product Code</Label>
-                <span className="text-red-500">*</span>
-              </div>
-              <TextInput
-                id="product_code"
-                name="product_code"
-                value={formData.product_code}
-                onChange={handleChange}
-                placeholder="Enter Product Code"
-                required
-                readOnly={modalMode !== "add" ? true : false}
-                disabled={modalMode !== "add" ? true : false}
-              />
+                  {/* Category */}
+                  {selectedBrand !== "default" && (
+                    <div className="w-44">
+                      <Label
+                        htmlFor="categorySelect"
+                        value="Select Category"
+                        className="sr-only"
+                      />
+                      <Select
+                        id="categorySelect"
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        sizing="sm"
+                        className="h-8 text-xs"
+                        aria-label="Select Category"
+                      >
+                        <option value="default">All Categories</option>
+                        {activeCategories
+                          ?.filter((ele) =>
+                            ele?.brandId?.some(
+                              (brand) => brand._id === selectedBrand,
+                            ),
+                          )
+                          .map((category) => (
+                            <option key={category._id} value={category._id}>
+                              {category.name}
+                            </option>
+                          ))}
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* Collection */}
+                  {selectedCategory !== "default" && (
+                    <div className="w-44">
+                      <Label
+                        htmlFor="collectionSelect"
+                        value="Select Collection"
+                        className="sr-only"
+                      />
+                      <Select
+                        id="collectionSelect"
+                        value={selectedCollection}
+                        onChange={(e) => setSelectedCollection(e.target.value)}
+                        sizing="sm"
+                        className="h-8 text-xs"
+                        aria-label="Select Collection"
+                      >
+                        <option value="default">All Collections</option>
+                        {activeCollections
+                          ?.filter((ele) => ele?.cat_id?._id === selectedCategory)
+                          ?.map((collection) => (
+                            <option key={collection?._id} value={collection?._id}>
+                              {collection?.name}
+                            </option>
+                          ))}
+                      </Select>
+                    </div>
+                  )}
+
+                  <div className="w-56 mb-2">
+                    <div className="block">
+                      <Label
+                        htmlFor="effectiveDateSelect"
+                        value="Filter By Created At Date Range"
+                      />
+                    </div>
+                    <Datepicker
+                      showShortcuts={true}
+                      value={dateRange}
+                      onChange={handleDateRangeChange}
+                      popoverDirection="down" // or "up" depending on your layout
+                      inputClassName={
+                        "w-full rounded-md focus:ring-0 font-normal text-white bg-gray-800 dark:bg-gray-800 border-gray-600 dark:border-gray-600"
+                      }
+                      containerClassName={`relative ${openModal ? "z-0" : "z-[1000]"
+                        }`}
+                    />
+                  </div>
+
+                  <Button
+                    size="xs"
+                    color="success"
+                    onClick={handleResetFilter}
+                    aria-label="Reset and Refresh"
+                    className="text-[11px]"
+                  >
+                    <span className="flex items-center gap-1">
+                      <RiRefreshFill size={16} />
+                      <span className="hidden sm:inline">Reset & Refresh</span>
+                    </span>
+                  </Button>
+
+                  {pagePermission?.create && (
+                    <Button
+                      size="xs"
+                      onClick={() => setOpenModal(true)}
+
+                      aria-label="Add Product"
+                      className="text-[11px]"
+                    >
+                      <span className="flex items-center gap-1">
+                        <IoMdAddCircle size={16} />
+                        <span className="hidden sm:inline">Add Product</span>
+                      </span>
+                    </Button>)}
+
+                  <Button
+                    size="xs"
+                    color="light"
+                    onClick={handleCSVTemplateDownload}
+                    aria-label="Download Template"
+                    className="text-[11px]"
+                  >
+                    <span className="flex items-center gap-1">
+                      <MdSimCardDownload size={16} />
+                      <span className="hidden sm:inline">Template</span>
+                    </span>
+                  </Button>
+
+                  <Button
+                    size="xs"
+                    color="blue"
+                    onClick={handleExportToCSV}
+                    aria-label="Download CSV"
+                    className="text-[11px]"
+                  >
+                    <span className="flex items-center gap-1">
+                      <BiSolidFileExport size={16} />
+                      <span className="hidden sm:inline">Download CSV</span>
+                    </span>
+                  </Button>
+
+                  {pagePermission?.update && (
+                    <Button
+                      size="xs"
+                      color="blue"
+                      disabled={syncingProducts}
+                      onClick={handleSyncProducts}
+
+                      aria-label="Sync Products"
+                      className="text-[11px]"
+                    >
+                      <span className="flex items-center gap-1">
+                        <IoSyncCircleSharp size={16} />
+                        <span className="hidden sm:inline">
+                          {syncingProducts ? "Syncing..." : "Sync Products"}
+                        </span>
+                      </span>
+                    </Button>)}
+
+                  {pagePermission?.create && (
+                    <FileUpload
+                      type="single-file"
+                      page="bulk-import"
+                      size="xs"
+                      onSetFileUrl={(url) => handleCSVImport(url)}
+                    />
+                  )}
+
+
+                  {/* <Label className="text-black">EAN Code Upload</Label> */}
+                  <input
+                    type="file"
+                    accept=".xlsx,.csv"
+                    ref={eanFileInputRef}
+                    onChange={handleEanUpload}
+                    className="hidden"
+                  />
+                  <Button
+                    size="xs"
+                    color="warning"
+                    disabled={eanUploading}
+                    onClick={() => eanFileInputRef.current?.click()}
+                    className="text-[11px]"
+                  >
+                    {eanUploading ? "Uploading..." : "Upload EAN File"}
+                  </Button>
+
+                  {errorLog.length > 0 && (
+                    <Button
+                      size="xs"
+                      color="red"
+                      onClick={handleErrorLogDownload}
+                      aria-label="Download Error Log"
+                      className="text-[11px]"
+                    >
+                      <span className="flex items-center gap-1">
+                        <MdDownloadForOffline size={16} />
+                        <span className="hidden sm:inline">Error Log</span>
+                        <Badge color="gray" className="ml-1 px-2 py-0.5">
+                          {errorLog.length}
+                        </Badge>
+                      </span>
+                    </Button>
+                  )}
+                </div>
+              </Card>
             </div>
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="name">Name</Label>
-                <span className="text-red-500">*</span>
+
+            {/* Pagination */}
+            <div className="flex justify-end items-center w-full px-4">
+              <div className="flex overflow-x-auto sm:justify-center">
+                {!paginatedLoading && filteredCount > itemsPerPage && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={onPageChange}
+                    showIcons
+                  />
+                )}
               </div>
-              <TextInput
-                id="name"
-                name="name"
-                placeholder="Enter Product Name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
             </div>
-            <div className="mb-4">
+
+            {/* product list */}
+            <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
+              {" "}
+              {paginatedLoading ? (
+                <div
+                  className="w-full flex justify-center items-center"
+                  role="status"
+                >
+                  <Spinner aria-label="Loading data" size="xl" />
+                </div>
+              ) : (
+                <div className="overflow-x-auto w-full overflow-y-auto">
+                 <Table className="text-sm whitespace-nowrap bg-white dark:bg-gray-800">
+
+  {/* ================= HEAD ================= */}
+  <Table.Head className="text-center text-sm">
+    <Table.HeadCell>SKU Group</Table.HeadCell>
+    <Table.HeadCell>S/4HANA Code</Table.HeadCell>
+    <Table.HeadCell>EAN</Table.HeadCell>
+    <Table.HeadCell>Description</Table.HeadCell>
+    <Table.HeadCell>Size</Table.HeadCell>
+    <Table.HeadCell>Color</Table.HeadCell>
+    <Table.HeadCell>Pack</Table.HeadCell>
+    <Table.HeadCell>Supplier</Table.HeadCell>
+    <Table.HeadCell>Brand</Table.HeadCell>
+    <Table.HeadCell>Segment</Table.HeadCell>
+    <Table.HeadCell>Category</Table.HeadCell>
+    <Table.HeadCell>Collection</Table.HeadCell>
+    <Table.HeadCell>SKU GROUPE NAME</Table.HeadCell>
+    <Table.HeadCell>Product Type</Table.HeadCell>
+    <Table.HeadCell>Valuation</Table.HeadCell>
+    <Table.HeadCell>UOM</Table.HeadCell>
+    <Table.HeadCell>Std Pkg</Table.HeadCell>
+    <Table.HeadCell>HSN CODE</Table.HeadCell>
+    <Table.HeadCell>CGST</Table.HeadCell>
+    <Table.HeadCell>SGST</Table.HeadCell>
+    <Table.HeadCell>IGST</Table.HeadCell>
+    <Table.HeadCell>Base Point</Table.HeadCell>
+    <Table.HeadCell>Created</Table.HeadCell>
+    <Table.HeadCell>Updated</Table.HeadCell>
+    <Table.HeadCell>Status</Table.HeadCell>
+    <Table.HeadCell>Action</Table.HeadCell>
+  </Table.Head>
+
+  {/* ================= BODY ================= */}
+  <Table.Body className="divide-y bg-white dark:bg-gray-800">
+    {filteredProducts?.length > 0 ? (
+      filteredProducts.map((product) => (
+        <Table.Row
+          key={product?._id}
+          className="text-center text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+
+          {/* SKU */}
+          <Table.Cell className="px-2 py-1">
+            <UniqueCode
+              text={product?.sku_group_id}
+              codeName="SKU Group"
+            />
+          </Table.Cell>
+
+          {/* S4HANA */}
+          <Table.Cell className="px-2 py-1">
+            <UniqueCode
+              text={product?.s4hana_code || "-"}
+              codeName="Product"
+            />
+          </Table.Cell>
+
+          {/* EAN */}
+          <Table.Cell>{product?.ean11 || "-"}</Table.Cell>
+
+          {/* DESCRIPTION */}
+          <Table.Cell>{product?.description || "-"}</Table.Cell>
+
+          {/* SIZE */}
+          <Table.Cell>{product?.size || "-"}</Table.Cell>
+
+          {/* COLOR */}
+          <Table.Cell>{product?.color || "-"}</Table.Cell>
+
+          {/* PACK */}
+          <Table.Cell>{product?.pack || "-"}</Table.Cell>
+
+          {/* SUPPLIER */}
+          <Table.Cell>
+            {product?.supplier &&
+              typeof product?.supplier === "object" && (
+                <>
+                  <UniqueCode
+                    text={product?.supplier?.supplierCode}
+                    codeName="Supplier"
+                  />{" "}
+                  ({product?.supplier?.supplierName}
+                  {product?.supplier?.city
+                    ? " - " + product?.supplier?.city
+                    : ""}
+                  )
+                </>
+              )}
+          </Table.Cell>
+
+          {/* BRAND */}
+          <Table.Cell>
+            {product?.brand && (
+              <>
+                <UniqueCode
+                  text={product?.brand?.code}
+                  codeName="Brand"
+                />{" "}
+                ({product?.brand?.desc})
+              </>
+            )}
+          </Table.Cell>
+
+          {/* SEGMENT */}
+          <Table.Cell>
+            {product?.segment &&
+              (typeof product?.segment === "object" ? (
+                <>
+                  <UniqueCode
+                    text={product?.segment?.code}
+                    codeName="Segment"
+                  />{" "}
+                  ({product?.segment?.desc})
+                </>
+              ) : (
+                product?.segment
+              ))}
+          </Table.Cell>
+
+          {/* CATEGORY */}
+          <Table.Cell>
+            {product?.cat_id && (
+              <>
+                <UniqueCode
+                  text={product?.cat_id?.code}
+                  codeName="Category"
+                />{" "}
+                ({product?.cat_id?.name})
+              </>
+            )}
+          </Table.Cell>
+
+          {/* COLLECTION */}
+          <Table.Cell>
+            {product?.collection_id && (
+              <>
+                <UniqueCode
+                  text={product?.collection_id?.code}
+                  codeName="Collection"
+                />{" "}
+                ({product?.collection_id?.name})
+              </>
+            )}
+          </Table.Cell>
+
+          {/* SKU NAME */}
+          <Table.Cell>{product?.sku_group__name || "-"}</Table.Cell>
+
+          {/* PRODUCT TYPE */}
+          <Table.Cell>{product?.collection_product_type || "-"}</Table.Cell>
+
+          {/* VALUATION */}
+          <Table.Cell>{product?.product_valuation_type || "-"}</Table.Cell>
+
+          {/* UOM */}
+          <Table.Cell>{product?.uom || "-"}</Table.Cell>
+
+          {/* STD PKG */}
+          <Table.Cell>{product?.std_pkg_in_pc || "-"}</Table.Cell>
+
+          {/* HSN */}
+          <Table.Cell>
+            <UniqueCode
+              text={product?.product_hsn_code || "-"}
+              codeName="HSN"
+            />
+          </Table.Cell>
+
+          {/* TAX */}
+          <Table.Cell>{product?.cgst || "-"}</Table.Cell>
+          <Table.Cell>{product?.sgst || "-"}</Table.Cell>
+          <Table.Cell>{product?.igst || "-"}</Table.Cell>
+
+          {/* BASE POINT */}
+          <Table.Cell>{product?.base_point || "-"}</Table.Cell>
+
+          {/* CREATED */}
+          <Table.Cell>
+            {product?.createdAt
+              ? moment(product?.createdAt)
+                  .tz("Asia/Kolkata")
+                  .format("DD-MM-YYYY hh:mm A")
+              : "-"}
+          </Table.Cell>
+
+          {/* UPDATED */}
+          <Table.Cell>
+            {product?.updatedAt
+              ? moment(product?.updatedAt)
+                  .tz("Asia/Kolkata")
+                  .format("DD-MM-YYYY hh:mm A")
+              : "-"}
+          </Table.Cell>
+
+          {/* STATUS */}
+          <Table.Cell>
+            <StatusIndicator
+              status={product.status}
+              onClick={
+                pagePermission?.update
+                  ? () => handleStatusUpdate(product)
+                  : undefined
+              }
+            />
+          </Table.Cell>
+
+          {/* ACTION */}
+          <Table.Cell>
+            <div className="flex gap-1 justify-center items-center">
+              {pagePermission?.update && (
+                <EditButton
+                  onClick={() => handleSetEdit(product)}
+                />
+              )}
+            </div>
+          </Table.Cell>
+
+        </Table.Row>
+      ))
+    ) : (
+      <Table.Row>
+        <Table.Cell colSpan="100%" className="text-center">
+          No products found
+        </Table.Cell>
+      </Table.Row>
+    )}
+  </Table.Body>
+
+</Table>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Your existing code for displaying the product list and modal */}
+          <Modal show={openModal} onClose={onCloseModal}>
+            <Modal.Header>
+              {modalMode === "add" ? "Add Product" : "Edit Product"}
+            </Modal.Header>
+            <Modal.Body>
+              <form>
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="s4hana_code">S/4HANA Code</Label>
+                    <span className="text-red-500">*</span>
+                  </div>
+                  <TextInput
+                    id="s4hana_code"
+                    name="s4hana_code"
+                    value={formData.s4hana_code}
+                    onChange={handleChange}
+                    placeholder="Enter S/4HANA Code"
+                    required
+                    readOnly={modalMode !== "add" ? true : false}
+                    disabled={modalMode !== "add" ? true : false}
+                  />
+                </div>
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="description">Description</Label>
+                    <span className="text-red-500">*</span>
+                  </div>
+                  <TextInput
+                    id="description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    placeholder="Enter Description"
+                    required
+                  />
+                </div>
+                {/* <div className="mb-4">
               <div className="mb-2 block text-gray-700 dark:text-gray-100">
                 <Label htmlFor="supplier">Supplier</Label>
                 <span className="text-red-500">*</span>
@@ -1614,385 +1599,395 @@ const Product = () => {
                   </option>
                 ))}
               </Select>
-            </div>
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="brand">Brand</Label>
-                <span className="text-red-500">*</span>
-              </div>
-              <Select
-                id="brand"
-                name="brand"
-                value={formData.brand}
-                onChange={handleChange}
-              >
-                <option value="">Select Brand</option>
-                {modalMode === "add"
-                  ? activeBrands?.map((brand) => (
-                    <option key={brand._id} value={brand._id}>
-                      {brand.name}({brand?.desc})
-                    </option>
-                  ))
-                  : sortedBrandList?.map((brand) => (
-                    <option key={brand._id} value={brand._id}>
-                      {brand.name}({brand?.desc})
-                    </option>
-                  ))}
-              </Select>
-            </div>
-            {formData?.brand ? (
-              <div className="mb-4">
-                <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                  <Label htmlFor="brand">Sub Brand</Label>
-                  <span className="text-red-500">*</span>
-                </div>
-                <Select
-                  id="subBrand"
-                  name="subBrand"
-                  value={formData.subBrand}
-                  onChange={handleChange}
-                  disabled={formData.brand_id}
-                >
-                  <option value="">Select Sub Brand</option>
-
-                  {modalMode === "add"
-                    ? activeSubBrands
-                      ?.filter((ele) => ele?.brandId?._id == formData?.brand)
-                      ?.map((ele) => (
-                        <option key={ele?._id} value={ele?._id}>
-                          {ele?.name}({ele?.desc})
+            </div> */}
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="brand">Brand</Label>
+                    <span className="text-red-500">*</span>
+                  </div>
+                  <Select
+                    id="brand"
+                    name="brand"
+                    value={formData.brand}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select Brand</option>
+                    {modalMode === "add"
+                      ? activeBrands?.map((brand) => (
+                        <option key={brand._id} value={brand._id}>
+                          {brand.name}({brand?.desc})
                         </option>
                       ))
-                    : sortedSubBrandList
-                      ?.filter((ele) => ele?.brandId?._id == formData?.brand)
-                      ?.map((subBrand) => (
-                        <option key={subBrand._id} value={subBrand._id}>
-                          {subBrand.name} ({subBrand.desc})
+                      : sortedBrandList?.map((brand) => (
+                        <option key={brand._id} value={brand._id}>
+                          {brand.name}({brand?.desc})
                         </option>
                       ))}
-                </Select>
-              </div>
-            ) : null}
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="cat_id">Category</Label>
-                <span className="text-red-500">*</span>
-              </div>
-              <Select
-                id="cat_id"
-                name="cat_id"
-                value={formData?.cat_id}
-                onChange={handleChange}
-              >
-                <option value="">Select Category</option>
-                {modalMode === "add"
-                  ? activeCategories?.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.name}
-                    </option>
-                  ))
-                  : sortedCategoryList?.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.name}
-                    </option>
-                  ))}
-              </Select>
-            </div>
-            {formData?.cat_id ? (
-              <div className="mb-4">
-                <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                  <Label htmlFor="collection_id">Collection</Label>
-                  <span className="text-red-500">*</span>
+                  </Select>
                 </div>
-                <Select
-                  id="collection_id"
-                  name="collection_id"
-                  value={formData.collection_id}
-                  onChange={handleChange}
-                >
-                  <option value="">Select Collection</option>
-                  {modalMode === "add"
-                    ? activeCollections
-                      ?.filter((ele) => ele?.cat_id?._id == formData?.cat_id)
-                      ?.map((collection) => (
-                        <option key={collection._id} value={collection._id}>
-                          {collection.name}
+                {formData?.brand ? (
+                  <div className="mb-4">
+                    <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                      <Label htmlFor="brand">Segment</Label>
+                      <span className="text-red-500">*</span>
+                    </div>
+                    <Select
+                      id="segment"
+                      name="segment"
+                      value={formData.segment}
+                      onChange={handleChange}
+                      disabled={formData.brand_id}
+                    >
+                      <option value="">Select Sub Brand</option>
+
+                      {modalMode === "add"
+                        ? activeSubBrands
+                          ?.filter((ele) => ele?.brandId?._id == formData?.brand)
+                          ?.map((ele) => (
+                            <option key={ele?._id} value={ele?._id}>
+                              {ele?.name}({ele?.desc})
+                            </option>
+                          ))
+                        : sortedSubBrandList
+                          ?.filter((ele) => ele?.brandId?._id == formData?.brand)
+                          ?.map((subBrand) => (
+                            <option key={subBrand._id} value={subBrand._id}>
+                              {subBrand.name} ({subBrand.desc})
+                            </option>
+                          ))}
+                    </Select>
+                  </div>
+                ) : null}
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="cat_id">Category</Label>
+                    <span className="text-red-500">*</span>
+                  </div>
+                  <Select
+                    id="cat_id"
+                    name="cat_id"
+                    value={formData?.cat_id}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select Category</option>
+                    {modalMode === "add"
+                      ? activeCategories?.map((cat) => (
+                        <option key={cat._id} value={cat._id}>
+                          {cat.name}
                         </option>
                       ))
-                    : sortedCollectionList
-                      ?.filter((ele) => ele?.cat_id?._id == formData?.cat_id)
-                      ?.map((collection) => (
-                        <option key={collection._id} value={collection._id}>
-                          {collection.name}
+                      : sortedCategoryList?.map((cat) => (
+                        <option key={cat._id} value={cat._id}>
+                          {cat.name}
                         </option>
                       ))}
-                </Select>
-              </div>
-            ) : null}
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="sku_group__name">SKU Group Name</Label>
-                <span className="text-red-500">*</span>
-              </div>
+                  </Select>
+                </div>
+                {formData?.cat_id ? (
+                  <div className="mb-4">
+                    <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                      <Label htmlFor="collection_id">Collection</Label>
+                      <span className="text-red-500">*</span>
+                    </div>
+                    <Select
+                      id="collection_id"
+                      name="collection_id"
+                      value={formData.collection_id}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select Collection</option>
+                      {modalMode === "add"
+                        ? activeCollections
+                          ?.filter((ele) => ele?.cat_id?._id == formData?.cat_id)
+                          ?.map((collection) => (
+                            <option key={collection._id} value={collection._id}>
+                              {collection.name}
+                            </option>
+                          ))
+                        : sortedCollectionList
+                          ?.filter((ele) => ele?.cat_id?._id == formData?.cat_id)
+                          ?.map((collection) => (
+                            <option key={collection._id} value={collection._id}>
+                              {collection.name}
+                            </option>
+                          ))}
+                    </Select>
+                  </div>
+                ) : null}
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="sku_group__name">SKU Group Name</Label>
+                    <span className="text-red-500">*</span>
+                  </div>
 
-              <TextInput
-                placeholder="Enter SKU Group Name"
-                id="sku_group__name"
-                name="sku_group__name"
-                value={formData.sku_group__name}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="sku_group_id">SKU Group Code</Label>
-                <span className="text-red-500">*</span>
-              </div>
+                  <TextInput
+                    placeholder="Enter SKU Group Name"
+                    id="sku_group__name"
+                    name="sku_group__name"
+                    value={formData.sku_group__name}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="sku_group_id">SKU Group Code</Label>
+                    <span className="text-red-500">*</span>
+                  </div>
 
-              <TextInput
-                placeholder="Enter Code"
-                id="sku_group_id"
-                name="sku_group_id"
-                value={formData.sku_group_id}
-                onChange={handleChange}
-                readOnly={modalMode !== "add" ? true : false}
-                disabled={modalMode !== "add" ? true : false}
-              />
-            </div>
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="product_type">Product Type</Label>
-                {/* <span className="text-red-500">*</span> */}
-              </div>
-              <TextInput
-                id="product_type"
-                name="product_type"
-                value={formData.product_type}
-                onChange={handleChange}
-                placeholder="Enter Product Type"
-              />
-            </div>
+                  <TextInput
+                    placeholder="Enter Code"
+                    id="sku_group_id"
+                    name="sku_group_id"
+                    value={formData.sku_group_id}
+                    onChange={handleChange}
+                    readOnly={modalMode !== "add" ? true : false}
+                    disabled={modalMode !== "add" ? true : false}
+                  />
+                </div>
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="product_type">Collection/Product Type</Label>
+                    {/* <span className="text-red-500">*</span> */}
+                  </div>
+                  <TextInput
+                    id="collection_product_type"
+                    name="collection_product_type"
+                    value={formData.collection_product_type}
+                    onChange={handleChange}
+                    placeholder="Enter Collection / Product Type"
+                  />
+                </div>
 
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="valuation_type">Product Valuation Type</Label>
-                {/* <span className="text-red-500">*</span> */}
-              </div>
-              <TextInput
-                id="product_valuation_type"
-                name="product_valuation_type"
-                value={formData.product_valuation_type}
-                onChange={handleChange}
-                placeholder="Enter Product Valuation Type"
-              />
-            </div>
-            <div className="w-full mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="img_path">Product Image</Label>
-              </div>
-              <div className="flex justify-center items-center gap-2 w-full">
-                <TextInput
-                  placeholder="Enter Image Path"
-                  id="img_path"
-                  name="img_path"
-                  value={formData?.img_path}
-                  className="w-full"
-                  onChange={handleChange}
-                />
-                <FileUpload
-                  onSetFileUrl={(url) => {
-                    setFormData({ ...formData, img_path: url });
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="valuation_type">Product Valuation Type</Label>
+                    {/* <span className="text-red-500">*</span> */}
+                  </div>
+                  <TextInput
+                    id="product_valuation_type"
+                    name="product_valuation_type"
+                    value={formData.product_valuation_type}
+                    onChange={handleChange}
+                    placeholder="Enter Product Valuation Type"
+                  />
+                </div>
+                <div className="w-full mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="img_path">Product Image</Label>
+                  </div>
+                  <div className="flex justify-center items-center gap-2 w-full">
+                    <TextInput
+                      placeholder="Enter Image Path"
+                      id="img_path"
+                      name="img_path"
+                      value={formData?.img_path}
+                      className="w-full"
+                      onChange={handleChange}
+                    />
+                    <FileUpload
+                      onSetFileUrl={(url) => {
+                        setFormData({ ...formData, img_path: url });
+                      }}
+                      type="single-image"
+                      page="modal-form"
+                    />
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="size">Size</Label>
+                  </div>
+                  <TextInput
+                    id="size"
+                    name="size"
+                    value={formData.size}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="color">Color</Label>
+                  </div>
+                  <TextInput
+                    id="color"
+                    name="color"
+                    value={formData.color}
+                    onChange={handleChange}
+                  />
+                </div>
+                {/* add pack input field  */}
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="pack">Pack</Label>
+                    {/* <span className="text-red-500">*</span> */}
+                  </div>
+                  <TextInput
+                    id="pack"
+                    name="pack"
+                    value={formData.pack}
+                    onChange={handleChange}
+                    placeholder="Enter Pack"
+                  />
+                </div>
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="no_of_pieces_in_a_box">Std Pkg in Pc</Label>
+                  </div>
+                  <TextInput
+                    id="std_pkg_in_pc"
+                    name="std_pkg_in_pc"
+                    value={formData.std_pkg_in_pc}
+                    onChange={handleChange}
+                    type="number"
+                  />
+                </div>
+
+
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="no_of_pieces_in_a_box">W/P Pc</Label>
+                  </div>
+                  <TextInput
+                    id="wp_pc"
+                    name="wp_pc"
+                    value={formData.wp_pc}
+                    onChange={handleChange}
+                    placeholder="Enter W/P Pc"
+                  />
+                </div>
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="product_hsn_code">Product HSN Code</Label>
+                    <span className="text-red-500">*</span>
+                  </div>
+                  <TextInput
+                    id="product_hsn_code"
+                    name="product_hsn_code"
+                    value={formData.product_hsn_code}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="cgst">CGST</Label>
+                    {/* <span className="text-red-500">*</span> */}
+                  </div>
+                  <TextInput
+                    id="cgst"
+                    name="cgst"
+                    value={formData.cgst}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="sgst">SGST</Label>
+                    {/* <span className="text-red-500">*</span> */}
+                  </div>
+                  <TextInput
+                    id="sgst"
+                    name="sgst"
+                    value={formData.sgst}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="igst">IGST</Label>
+                    {/* <span className="text-red-500">*</span> */}
+                  </div>
+                  <TextInput
+                    id="igst"
+                    name="igst"
+                    value={formData.igst}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="sbu">SBU</Label>
+                    {/* <span className="text-red-500">*</span> */}
+                  </div>
+                  <TextInput
+                    id="sbu"
+                    name="sbu"
+                    value={formData.sbu}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="sbu">Base point</Label>
+                    {/* <span className="text-red-500">*</span> */}
+                  </div>
+                  <TextInput
+                    id="base_point"
+                    name="base_point"
+                    value={formData.base_point}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="uom">Unit of Measure(UOM)</Label>
+                    {/* <span className="text-red-500">*</span> */}
+                  </div>
+                 <Select
+  id="uom"
+  name="uom"
+  value={formData.uom}
+  onChange={handleChange}
+>
+  <option value="pcs">pcs</option>
+  <option value="bndl">bndl</option>
+  <option value="box">box</option>
+  <option value="coil">coil</option>
+</Select>
+                </div>
+              </form>
+            </Modal.Body>
+            <Modal.Footer>
+              {modalMode === "add" ? (
+                <Button
+                  onClick={() => {
+                    if (modalMode === "add" && pagePermission?.create) {
+                      handleAddProduct();
+                    }
                   }}
-                  type="single-image"
-                  page="modal-form"
-                />
-              </div>
-            </div>
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="size">Size</Label>
-              </div>
-              <TextInput
-                id="size"
-                name="size"
-                value={formData.size}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="color">Color</Label>
-              </div>
-              <TextInput
-                id="color"
-                name="color"
-                value={formData.color}
-                onChange={handleChange}
-              />
-            </div>
-            {/* add pack input field  */}
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="pack">Pack</Label>
-                {/* <span className="text-red-500">*</span> */}
-              </div>
-              <TextInput
-                id="pack"
-                name="pack"
-                value={formData.pack}
-                onChange={handleChange}
-                placeholder="Enter Pack"
-              />
-            </div>
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="no_of_pieces_in_a_box">Pieces in a box</Label>
-              </div>
-              <TextInput
-                id="no_of_pieces_in_a_box"
-                name="no_of_pieces_in_a_box"
-                type="number"
-                value={formData.no_of_pieces_in_a_box}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="product_hsn_code">Product HSN Code</Label>
-                <span className="text-red-500">*</span>
-              </div>
-              <TextInput
-                id="product_hsn_code"
-                name="product_hsn_code"
-                value={formData.product_hsn_code}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="cgst">CGST</Label>
-                {/* <span className="text-red-500">*</span> */}
-              </div>
-              <TextInput
-                id="cgst"
-                name="cgst"
-                value={formData.cgst}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="sgst">SGST</Label>
-                {/* <span className="text-red-500">*</span> */}
-              </div>
-              <TextInput
-                id="sgst"
-                name="sgst"
-                value={formData.sgst}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="igst">IGST</Label>
-                {/* <span className="text-red-500">*</span> */}
-              </div>
-              <TextInput
-                id="igst"
-                name="igst"
-                value={formData.igst}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="sbu">SBU</Label>
-                {/* <span className="text-red-500">*</span> */}
-              </div>
-              <TextInput
-                id="sbu"
-                name="sbu"
-                value={formData.sbu}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="sbu">Base point</Label>
-                {/* <span className="text-red-500">*</span> */}
-              </div>
-              <TextInput
-                id="base_point"
-                name="base_point"
-                value={formData.base_point}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="uom">Unit of Measure(UOM)</Label>
-                {/* <span className="text-red-500">*</span> */}
-              </div>
-              <Select
-                id="uom"
-                name="uom"
-                value={formData.uom}
-                onChange={handleChange}
-              >
-                <option value="pcs">pcs</option>
-                <option value="box">box</option>
-                <option value="dz">dz</option>
-                <option value="1PA">1PA</option>
-                <option value="2PA">2PA</option>
-                <option value="3PA">3PA</option>
-                <option value="PAA">PAA</option>
-                <option value="PAK">PAK</option>
-              </Select>
-            </div>
-          </form>
-        </Modal.Body>
-        <Modal.Footer>
-          {modalMode === "add" ? (
-            <Button
-              onClick={() => {
-                if (modalMode === "add" && pagePermission?.create) {
-                  handleAddProduct();
-                }
-              }}
-              disabled={formLoading}
-            >
+                  disabled={formLoading}
+                >
 
-              {formLoading ? (
-                <Spinner size="sm" aria-label="Loading spinner" />
+                  {formLoading ? (
+                    <Spinner size="sm" aria-label="Loading spinner" />
+                  ) : (
+                    "Add Product"
+                  )}
+                </Button>
               ) : (
-                "Add Product"
-              )}
-            </Button>
-          ) : (
-            <Button
-              onClick={() => {
-                if (modalMode === "edit" && pagePermission?.update) {
-                  handleEditProduct();
-                }
-              }}
-              disabled={formLoading}
-            >
+                <Button
+                  onClick={() => {
+                    if (modalMode === "edit" && pagePermission?.update) {
+                      handleEditProduct();
+                    }
+                  }}
+                  disabled={formLoading}
+                >
 
-              {formLoading ? (
-                <Spinner size="sm" aria-label="Loading spinner" />
-              ) : (
-                "Update Product"
+                  {formLoading ? (
+                    <Spinner size="sm" aria-label="Loading spinner" />
+                  ) : (
+                    "Update Product"
+                  )}
+                </Button>
               )}
-            </Button>
-          )}
-        </Modal.Footer>
+            </Modal.Footer>
           </Modal>
-      
-      </>
-    )}
-  </>
-);
+
+        </>
+      )}
+    </>
+  );
 
 };
 
