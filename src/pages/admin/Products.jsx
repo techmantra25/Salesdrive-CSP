@@ -382,7 +382,7 @@ const Product = () => {
         "Product Name": "JR FAV PRNTD BERMUDA, PRINTED, 060, P01",
         "Image Path": "",
         "Supplier Code": "C1011",
-        "Supplier Name": "RUPA & COMPANY LIMITED",
+        "Supplier Name": "CALCUTTA METAL CORPORATION ",
         "Brand Code": "BM",
         "Brand Name": "BM",
         "Sub Brand Code": "BMBU",

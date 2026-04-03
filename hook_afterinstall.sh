@@ -10,7 +10,7 @@ TEMP_PROJECT_PATH="/home/saas/temp-rupa-central-portal"
 
 PROJECT_PATH="/home/saas/app/rupa-central-portal"
 
-echo -e "${YELLOW}************** Rupa Central Portal Deployment Start **************${NC}"
+echo -e "${YELLOW}************** CMC Central Portal Deployment Start **************${NC}"
 
 num_cpu=$(nproc)
 process_cpu=$((num_cpu / 2))
@@ -29,4 +29,4 @@ ls -A "$TEMP_PROJECT_PATH"/ | xargs -I {} -P $process_cpu -n 1 rsync -rlpgoDcK \
   --exclude='.git' \
   "$TEMP_PROJECT_PATH"/{} "$PROJECT_PATH" --out-format="%n"
 
-echo -e "${GREEN}############# Rupa Central Portal Deployment End ##############${NC}"
+echo -e "${GREEN}############# CMC Central Portal Deployment End ##############${NC}"
