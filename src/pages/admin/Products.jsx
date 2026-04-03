@@ -145,7 +145,7 @@ const Product = () => {
       }
 
       if (selectedSubBrand !== "default") {
-       queryParams.segment = selectedSubBrand;
+        queryParams.segment = selectedSubBrand;
       }
 
       if (searchQuery.trim() !== "") {
@@ -261,53 +261,53 @@ const Product = () => {
   const { openConfirmationModel } = useContext(ConfirmationModelContext);
 
   const validate = () => {
-  if (!formData.s4hana_code.trim()) {
-    toast.error("S/4HANA Code is required");
-    return false;
-  }
+    if (!formData.s4hana_code.trim()) {
+      toast.error("S/4HANA Code is required");
+      return false;
+    }
 
-  if (!formData.description.trim()) {
-    toast.error("Description is required");
-    return false;
-  }
+    if (!formData.description.trim()) {
+      toast.error("Description is required");
+      return false;
+    }
 
-  // if (!formData.supplier.trim()) {
-  //   toast.error("Supplier is required");
-  //   return false;
-  // }
+    // if (!formData.supplier.trim()) {
+    //   toast.error("Supplier is required");
+    //   return false;
+    // }
 
-  if (!formData.segment.trim()) {
-    toast.error("Segment is required");
-    return false;
-  }
+    if (!formData.segment.trim()) {
+      toast.error("Segment is required");
+      return false;
+    }
 
-  if (!formData.brand.trim()) {
-    toast.error("Brand is required");
-    return false;
-  }
+    if (!formData.brand.trim()) {
+      toast.error("Brand is required");
+      return false;
+    }
 
-  if (!formData.cat_id.trim()) {
-    toast.error("Category is required");
-    return false;
-  }
+    if (!formData.cat_id.trim()) {
+      toast.error("Category is required");
+      return false;
+    }
 
-  if (!formData.collection_id.trim()) {
-    toast.error("Collection is required");
-    return false;
-  }
+    if (!formData.collection_id.trim()) {
+      toast.error("Collection is required");
+      return false;
+    }
 
-  if (!formData.sku_group_id.trim()) {
-    toast.error("SKU Group Code is required");
-    return false;
-  }
+    if (!formData.sku_group_id.trim()) {
+      toast.error("SKU Group Code is required");
+      return false;
+    }
 
-  if (!formData.sku_group__name.trim()) {
-    toast.error("SKU Group Name is required");
-    return false;
-  }
+    if (!formData.sku_group__name.trim()) {
+      toast.error("SKU Group Name is required");
+      return false;
+    }
 
-  return true;
-};
+    return true;
+  };
 
   const handleExportToCSV = () => {
     // Build query parameters
@@ -634,28 +634,28 @@ const Product = () => {
     setOpenModal(true);
   };
 
- const handleAddProduct = async () => {
-  try {
-    if (!validate()) return;
+  const handleAddProduct = async () => {
+    try {
+      if (!validate()) return;
 
-    setFormLoading(true);
+      setFormLoading(true);
 
-    await addProduct({
-      ...formData,
-    });
+      await addProduct({
+        ...formData,
+      });
 
-    onCloseModal();
-    toast.success("Product added successfully");
-  } catch (error) {
-    console.error(error);
-    toast.error(
-      error?.response?.data?.message || "Failed to add product, try again"
-    );
-  } finally {
-    setFormLoading(false);
-    fetchProductsPaginated();
-  }
-};
+      onCloseModal();
+      toast.success("Product added successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error?.response?.data?.message || "Failed to add product, try again"
+      );
+    } finally {
+      setFormLoading(false);
+      fetchProductsPaginated();
+    }
+  };
 
   const handleEditProduct = async () => {
     openConfirmationModel({
@@ -712,39 +712,39 @@ const Product = () => {
     });
   };
 
-const onCloseModal = () => {
-  setOpenModal(false);
-  setModalMode("add");
+  const onCloseModal = () => {
+    setOpenModal(false);
+    setModalMode("add");
 
-  setFormData({
-    s4hana_code: "",
-    description: "",
-    cat_id: "",
-    supplier: "",
-    brand: "",
-    segment: "",
-    collection_id: "",
-    sku_group__name: "",
-    sku_group_id: "",
-    pack: "",
-    size: "",
-    color: "",
-    img_path: "",
-    std_pkg_in_pc: "",
-    wp_pc: "",
-    collection_product_type: "",
-    product_valuation_type: "",
-    product_hsn_code: "",
-    cgst: "",
-    sgst: "",
-    igst: "",
-    sbu: "",
-    base_point: "",
-    uom: "pcs",
-  });
+    setFormData({
+      s4hana_code: "",
+      description: "",
+      cat_id: "",
+      supplier: "",
+      brand: "",
+      segment: "",
+      collection_id: "",
+      sku_group__name: "",
+      sku_group_id: "",
+      pack: "",
+      size: "",
+      color: "",
+      img_path: "",
+      std_pkg_in_pc: "",
+      wp_pc: "",
+      collection_product_type: "",
+      product_valuation_type: "",
+      product_hsn_code: "",
+      cgst: "",
+      sgst: "",
+      igst: "",
+      sbu: "",
+      base_point: "",
+      uom: "pcs",
+    });
 
-  setSelectedProduct(null);
-};
+    setSelectedProduct(null);
+  };
 
   const handleStatusUpdate = async (product) => {
     openConfirmationModel({
@@ -1310,235 +1310,235 @@ const onCloseModal = () => {
                 </div>
               ) : (
                 <div className="overflow-x-auto w-full overflow-y-auto">
-                 <Table className="text-sm whitespace-nowrap bg-white dark:bg-gray-800">
+                  <Table className="text-sm whitespace-nowrap bg-white dark:bg-gray-800">
 
-  {/* ================= HEAD ================= */}
-  <Table.Head className="text-center text-sm">
-    <Table.HeadCell>SKU Group</Table.HeadCell>
-    <Table.HeadCell>S/4HANA Code</Table.HeadCell>
-    <Table.HeadCell>EAN</Table.HeadCell>
-    <Table.HeadCell>Description</Table.HeadCell>
-    <Table.HeadCell>Size</Table.HeadCell>
-    <Table.HeadCell>Color</Table.HeadCell>
-    <Table.HeadCell>Pack</Table.HeadCell>
-    <Table.HeadCell>Supplier</Table.HeadCell>
-    <Table.HeadCell>Brand</Table.HeadCell>
-    <Table.HeadCell>Segment</Table.HeadCell>
-    <Table.HeadCell>Category</Table.HeadCell>
-    <Table.HeadCell>Collection</Table.HeadCell>
-    <Table.HeadCell>SKU GROUPE NAME</Table.HeadCell>
-    <Table.HeadCell>Product Type</Table.HeadCell>
-    <Table.HeadCell>Valuation</Table.HeadCell>
-    <Table.HeadCell>UOM</Table.HeadCell>
-    <Table.HeadCell>Std Pkg</Table.HeadCell>
-    <Table.HeadCell>HSN CODE</Table.HeadCell>
-    <Table.HeadCell>CGST</Table.HeadCell>
-    <Table.HeadCell>SGST</Table.HeadCell>
-    <Table.HeadCell>IGST</Table.HeadCell>
-    <Table.HeadCell>Base Point</Table.HeadCell>
-    <Table.HeadCell>Created</Table.HeadCell>
-    <Table.HeadCell>Updated</Table.HeadCell>
-    <Table.HeadCell>Status</Table.HeadCell>
-    <Table.HeadCell>Action</Table.HeadCell>
-  </Table.Head>
+                    {/* ================= HEAD ================= */}
+                    <Table.Head className="text-center text-sm">
+                      <Table.HeadCell>SKU Group</Table.HeadCell>
+                      <Table.HeadCell>S/4HANA Code</Table.HeadCell>
+                      <Table.HeadCell>EAN</Table.HeadCell>
+                      <Table.HeadCell>Description</Table.HeadCell>
+                      <Table.HeadCell>Size</Table.HeadCell>
+                      <Table.HeadCell>Color</Table.HeadCell>
+                      <Table.HeadCell>Pack</Table.HeadCell>
+                      <Table.HeadCell>Supplier</Table.HeadCell>
+                      <Table.HeadCell>Brand</Table.HeadCell>
+                      <Table.HeadCell>Segment</Table.HeadCell>
+                      <Table.HeadCell>Category</Table.HeadCell>
+                      <Table.HeadCell>Collection</Table.HeadCell>
+                      <Table.HeadCell>SKU GROUPE NAME</Table.HeadCell>
+                      <Table.HeadCell>Product Type</Table.HeadCell>
+                      <Table.HeadCell>Valuation</Table.HeadCell>
+                      <Table.HeadCell>UOM</Table.HeadCell>
+                      <Table.HeadCell>Std Pkg</Table.HeadCell>
+                      <Table.HeadCell>HSN CODE</Table.HeadCell>
+                      <Table.HeadCell>CGST</Table.HeadCell>
+                      <Table.HeadCell>SGST</Table.HeadCell>
+                      <Table.HeadCell>IGST</Table.HeadCell>
+                      <Table.HeadCell>Base Point</Table.HeadCell>
+                      <Table.HeadCell>Created</Table.HeadCell>
+                      <Table.HeadCell>Updated</Table.HeadCell>
+                      <Table.HeadCell>Status</Table.HeadCell>
+                      <Table.HeadCell>Action</Table.HeadCell>
+                    </Table.Head>
 
-  {/* ================= BODY ================= */}
-  <Table.Body className="divide-y bg-white dark:bg-gray-800">
-    {filteredProducts?.length > 0 ? (
-      filteredProducts.map((product) => (
-        <Table.Row
-          key={product?._id}
-          className="text-center text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
-        >
+                    {/* ================= BODY ================= */}
+                    <Table.Body className="divide-y bg-white dark:bg-gray-800">
+                      {filteredProducts?.length > 0 ? (
+                        filteredProducts.map((product) => (
+                          <Table.Row
+                            key={product?._id}
+                            className="text-center text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
 
-          {/* SKU */}
-          <Table.Cell className="px-2 py-1">
-            <UniqueCode
-              text={product?.sku_group_id}
-              codeName="SKU Group"
-            />
-          </Table.Cell>
+                            {/* SKU */}
+                            <Table.Cell className="px-2 py-1">
+                              <UniqueCode
+                                text={product?.sku_group_id}
+                                codeName="SKU Group"
+                              />
+                            </Table.Cell>
 
-          {/* S4HANA */}
-          <Table.Cell className="px-2 py-1">
-            <UniqueCode
-              text={product?.s4hana_code || "-"}
-              codeName="Product"
-            />
-          </Table.Cell>
+                            {/* S4HANA */}
+                            <Table.Cell className="px-2 py-1">
+                              <UniqueCode
+                                text={product?.s4hana_code || "-"}
+                                codeName="Product"
+                              />
+                            </Table.Cell>
 
-          {/* EAN */}
-          <Table.Cell>{product?.ean11 || "-"}</Table.Cell>
+                            {/* EAN */}
+                            <Table.Cell>{product?.ean11 || "-"}</Table.Cell>
 
-          {/* DESCRIPTION */}
-          <Table.Cell>{product?.description || "-"}</Table.Cell>
+                            {/* DESCRIPTION */}
+                            <Table.Cell>{product?.description || "-"}</Table.Cell>
 
-          {/* SIZE */}
-          <Table.Cell>{product?.size || "-"}</Table.Cell>
+                            {/* SIZE */}
+                            <Table.Cell>{product?.size || "-"}</Table.Cell>
 
-          {/* COLOR */}
-          <Table.Cell>{product?.color || "-"}</Table.Cell>
+                            {/* COLOR */}
+                            <Table.Cell>{product?.color || "-"}</Table.Cell>
 
-          {/* PACK */}
-          <Table.Cell>{product?.pack || "-"}</Table.Cell>
+                            {/* PACK */}
+                            <Table.Cell>{product?.pack || "-"}</Table.Cell>
 
-          {/* SUPPLIER */}
-          <Table.Cell>
-            {product?.supplier &&
-              typeof product?.supplier === "object" && (
-                <>
-                  <UniqueCode
-                    text={product?.supplier?.supplierCode}
-                    codeName="Supplier"
-                  />{" "}
-                  ({product?.supplier?.supplierName}
-                  {product?.supplier?.city
-                    ? " - " + product?.supplier?.city
-                    : ""}
-                  )
-                </>
-              )}
-          </Table.Cell>
+                            {/* SUPPLIER */}
+                            <Table.Cell>
+                              {product?.supplier &&
+                                typeof product?.supplier === "object" && (
+                                  <>
+                                    <UniqueCode
+                                      text={product?.supplier?.supplierCode}
+                                      codeName="Supplier"
+                                    />{" "}
+                                    ({product?.supplier?.supplierName}
+                                    {product?.supplier?.city
+                                      ? " - " + product?.supplier?.city
+                                      : ""}
+                                    )
+                                  </>
+                                )}
+                            </Table.Cell>
 
-          {/* BRAND */}
-          <Table.Cell>
-            {product?.brand && (
-              <>
-                <UniqueCode
-                  text={product?.brand?.code}
-                  codeName="Brand"
-                />{" "}
-                ({product?.brand?.desc})
-              </>
-            )}
-          </Table.Cell>
+                            {/* BRAND */}
+                            <Table.Cell>
+                              {product?.brand && (
+                                <>
+                                  <UniqueCode
+                                    text={product?.brand?.code}
+                                    codeName="Brand"
+                                  />{" "}
+                                  ({product?.brand?.desc})
+                                </>
+                              )}
+                            </Table.Cell>
 
-          {/* SEGMENT */}
-          <Table.Cell>
-            {product?.segment &&
-              (typeof product?.segment === "object" ? (
-                <>
-                  <UniqueCode
-                    text={product?.segment?.code}
-                    codeName="Segment"
-                  />{" "}
-                  ({product?.segment?.desc})
-                </>
-              ) : (
-                product?.segment
-              ))}
-          </Table.Cell>
+                            {/* SEGMENT */}
+                            <Table.Cell>
+                              {product?.segment &&
+                                (typeof product?.segment === "object" ? (
+                                  <>
+                                    <UniqueCode
+                                      text={product?.segment?.code}
+                                      codeName="Segment"
+                                    />{" "}
+                                    ({product?.segment?.desc})
+                                  </>
+                                ) : (
+                                  product?.segment
+                                ))}
+                            </Table.Cell>
 
-          {/* CATEGORY */}
-          <Table.Cell>
-            {product?.cat_id && (
-              <>
-                <UniqueCode
-                  text={product?.cat_id?.code}
-                  codeName="Category"
-                />{" "}
-                ({product?.cat_id?.name})
-              </>
-            )}
-          </Table.Cell>
+                            {/* CATEGORY */}
+                            <Table.Cell>
+                              {product?.cat_id && (
+                                <>
+                                  <UniqueCode
+                                    text={product?.cat_id?.code}
+                                    codeName="Category"
+                                  />{" "}
+                                  ({product?.cat_id?.name})
+                                </>
+                              )}
+                            </Table.Cell>
 
-          {/* COLLECTION */}
-          <Table.Cell>
-            {product?.collection_id && (
-              <>
-                <UniqueCode
-                  text={product?.collection_id?.code}
-                  codeName="Collection"
-                />{" "}
-                ({product?.collection_id?.name})
-              </>
-            )}
-          </Table.Cell>
+                            {/* COLLECTION */}
+                            <Table.Cell>
+                              {product?.collection_id && (
+                                <>
+                                  <UniqueCode
+                                    text={product?.collection_id?.code}
+                                    codeName="Collection"
+                                  />{" "}
+                                  ({product?.collection_id?.name})
+                                </>
+                              )}
+                            </Table.Cell>
 
-          {/* SKU NAME */}
-          <Table.Cell>{product?.sku_group__name || "-"}</Table.Cell>
+                            {/* SKU NAME */}
+                            <Table.Cell>{product?.sku_group__name || "-"}</Table.Cell>
 
-          {/* PRODUCT TYPE */}
-          <Table.Cell>{product?.collection_product_type || "-"}</Table.Cell>
+                            {/* PRODUCT TYPE */}
+                            <Table.Cell>{product?.collection_product_type || "-"}</Table.Cell>
 
-          {/* VALUATION */}
-          <Table.Cell>{product?.product_valuation_type || "-"}</Table.Cell>
+                            {/* VALUATION */}
+                            <Table.Cell>{product?.product_valuation_type || "-"}</Table.Cell>
 
-          {/* UOM */}
-          <Table.Cell>{product?.uom || "-"}</Table.Cell>
+                            {/* UOM */}
+                            <Table.Cell>{product?.uom || "-"}</Table.Cell>
 
-          {/* STD PKG */}
-          <Table.Cell>{product?.std_pkg_in_pc || "-"}</Table.Cell>
+                            {/* STD PKG */}
+                            <Table.Cell>{product?.std_pkg_in_pc || "-"}</Table.Cell>
 
-          {/* HSN */}
-          <Table.Cell>
-            <UniqueCode
-              text={product?.product_hsn_code || "-"}
-              codeName="HSN"
-            />
-          </Table.Cell>
+                            {/* HSN */}
+                            <Table.Cell>
+                              <UniqueCode
+                                text={product?.product_hsn_code || "-"}
+                                codeName="HSN"
+                              />
+                            </Table.Cell>
 
-          {/* TAX */}
-          <Table.Cell>{product?.cgst || "-"}</Table.Cell>
-          <Table.Cell>{product?.sgst || "-"}</Table.Cell>
-          <Table.Cell>{product?.igst || "-"}</Table.Cell>
+                            {/* TAX */}
+                            <Table.Cell>{product?.cgst || "-"}</Table.Cell>
+                            <Table.Cell>{product?.sgst || "-"}</Table.Cell>
+                            <Table.Cell>{product?.igst || "-"}</Table.Cell>
 
-          {/* BASE POINT */}
-          <Table.Cell>{product?.base_point || "-"}</Table.Cell>
+                            {/* BASE POINT */}
+                            <Table.Cell>{product?.base_point || "-"}</Table.Cell>
 
-          {/* CREATED */}
-          <Table.Cell>
-            {product?.createdAt
-              ? moment(product?.createdAt)
-                  .tz("Asia/Kolkata")
-                  .format("DD-MM-YYYY hh:mm A")
-              : "-"}
-          </Table.Cell>
+                            {/* CREATED */}
+                            <Table.Cell>
+                              {product?.createdAt
+                                ? moment(product?.createdAt)
+                                  .tz("Asia/Kolkata")
+                                  .format("DD-MM-YYYY hh:mm A")
+                                : "-"}
+                            </Table.Cell>
 
-          {/* UPDATED */}
-          <Table.Cell>
-            {product?.updatedAt
-              ? moment(product?.updatedAt)
-                  .tz("Asia/Kolkata")
-                  .format("DD-MM-YYYY hh:mm A")
-              : "-"}
-          </Table.Cell>
+                            {/* UPDATED */}
+                            <Table.Cell>
+                              {product?.updatedAt
+                                ? moment(product?.updatedAt)
+                                  .tz("Asia/Kolkata")
+                                  .format("DD-MM-YYYY hh:mm A")
+                                : "-"}
+                            </Table.Cell>
 
-          {/* STATUS */}
-          <Table.Cell>
-            <StatusIndicator
-              status={product.status}
-              onClick={
-                pagePermission?.update
-                  ? () => handleStatusUpdate(product)
-                  : undefined
-              }
-            />
-          </Table.Cell>
+                            {/* STATUS */}
+                            <Table.Cell>
+                              <StatusIndicator
+                                status={product.status}
+                                onClick={
+                                  pagePermission?.update
+                                    ? () => handleStatusUpdate(product)
+                                    : undefined
+                                }
+                              />
+                            </Table.Cell>
 
-          {/* ACTION */}
-          <Table.Cell>
-            <div className="flex gap-1 justify-center items-center">
-              {pagePermission?.update && (
-                <EditButton
-                  onClick={() => handleSetEdit(product)}
-                />
-              )}
-            </div>
-          </Table.Cell>
+                            {/* ACTION */}
+                            <Table.Cell>
+                              <div className="flex gap-1 justify-center items-center">
+                                {pagePermission?.update && (
+                                  <EditButton
+                                    onClick={() => handleSetEdit(product)}
+                                  />
+                                )}
+                              </div>
+                            </Table.Cell>
 
-        </Table.Row>
-      ))
-    ) : (
-      <Table.Row>
-        <Table.Cell colSpan="100%" className="text-center">
-          No products found
-        </Table.Cell>
-      </Table.Row>
-    )}
-  </Table.Body>
+                          </Table.Row>
+                        ))
+                      ) : (
+                        <Table.Row>
+                          <Table.Cell colSpan="100%" className="text-center">
+                            No products found
+                          </Table.Cell>
+                        </Table.Row>
+                      )}
+                    </Table.Body>
 
-</Table>
+                  </Table>
                 </div>
               )}
             </div>
@@ -1933,17 +1933,17 @@ const onCloseModal = () => {
                     <Label htmlFor="uom">Unit of Measure(UOM)</Label>
                     {/* <span className="text-red-500">*</span> */}
                   </div>
-                 <Select
-  id="uom"
-  name="uom"
-  value={formData.uom}
-  onChange={handleChange}
->
-  <option value="pcs">pcs</option>
-  <option value="bndl">bndl</option>
-  <option value="box">box</option>
-  <option value="coil">coil</option>
-</Select>
+                  <Select
+                    id="uom"
+                    name="uom"
+                    value={formData.uom}
+                    onChange={handleChange}
+                  >
+                    <option value="pcs">pcs</option>
+                    <option value="bndl">bndl</option>
+                    <option value="box">box</option>
+                    <option value="coil">coil</option>
+                  </Select>
                 </div>
               </form>
             </Modal.Body>
