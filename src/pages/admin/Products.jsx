@@ -19,10 +19,12 @@ import { IoSyncCircleSharp } from "react-icons/io5";
 import { MdDownloadForOffline, MdSimCardDownload } from "react-icons/md";
 import { RiRefreshFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
+
 import {
   addProduct,
   AllSubBrandList,
-  bulkUpload,
+  // bulkUpload,
+  bulkUploadProduct,
   getSuppliersList,
   updateProduct,
   bulkUpdateEan, //temporary import will delete after usage
@@ -60,7 +62,9 @@ const Product = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [supplierList, setSupperlierList] = useState([]);
   const [subBrandList, setSubBrandList] = useState([]);
-
+const [uploadModalOpen, setUploadModalOpen] = useState(false);
+const [uploadFile, setUploadFile] = useState(null);
+const [uploadLoading, setUploadLoading] = useState(false);
   // Pagination state
   const [paginatedProducts, setPaginatedProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -296,15 +300,15 @@ const Product = () => {
       return false;
     }
 
-    if (!formData.sku_group_id.trim()) {
-      toast.error("SKU Group Code is required");
-      return false;
-    }
+    // if (!formData.sku_group_id.trim()) {
+    //   toast.error("SKU Group Code is required");
+    //   return false;
+    // }
 
-    if (!formData.sku_group__name.trim()) {
-      toast.error("SKU Group Name is required");
-      return false;
-    }
+    // if (!formData.sku_group__name.trim()) {
+    //   toast.error("SKU Group Name is required");
+    //   return false;
+    // }
 
     return true;
   };
@@ -349,113 +353,69 @@ const Product = () => {
     });
   };
 
-  const handleCSVTemplateDownload = () => {
-    // Define headers
-    const headers = [
-      "Product Code",
-      "Product Name",
-      "Image Path",
-      "Supplier Code",
-      "Supplier Name",
-      "Brand Code",
-      "Brand Name",
-      "Sub Brand Code",
-      "Sub Brand Name",
-      "Collection Code",
-      "Collection Name",
-      "Category Code",
-      "Category Name",
-      "SKU Group Code",
-      "SKU Group Name",
-      "Product Type",
-      "Product Valuation Type",
-      "Product Size",
-      "Product Color",
-      "Product Pack",
-      "Pieces in a box",
-      "Product HSN Code",
-      "CGST",
-      "SGST",
-      "IGST",
-      "SBU",
-      "Base Points",
-      "Unit of Measure",
-    ];
+const handleCSVTemplateDownload = () => {
+  const headers = [
+    "S/4HANA Code",
+    "Description",
+    "Category Code",
+    "Collection Code",
+    "Brand Code",
+    "Segment Code",
+    "Supplier Code",
+    "SKU Group Code",
+    "SKU Group Name",
+    "Pack",
+    "Std Pkg in Pc",
+    "W/P Pc",
+    "Product Type",
+    "Product Valuation Type",
+    "HSN Code",
+    "CGST",
+    "SGST",
+    "IGST",
+    "SBU",
+    "Base Point",
+    "UOM",
+    "Image Path",
+    "EAN",
+    "Status",
+  ];
 
-    // Sample data rows
-    const sampleRows = [
-      {
-        "Product Code": "RBMBUSJRNMP0115060",
-        "Product Name": "JR FAV PRNTD BERMUDA, PRINTED, 060, P01",
-        "Image Path": "",
-        "Supplier Code": "C1011",
-        "Supplier Name": "CALCUTTA METAL CORPORATION ",
-        "Brand Code": "BM",
-        "Brand Name": "BM",
-        "Sub Brand Code": "BMBU",
-        "Sub Brand Name": "BMBU",
-        "Collection Code": "BERMUDA",
-        "Collection Name": "BERMUDA",
-        "Category Code": "BERMUDA",
-        "Category Name": "BERMUDA",
-        "SKU Group Code": "RBMBUSJRNMP0115",
-        "SKU Group Name": "JR FAV PRNTD BERMUDA PRINTED, P01",
-        "Product Type": "inner_wear",
-        "Product Valuation Type": "standard",
-        "Product Size": "60",
-        "Product Color": "white",
-        "Product Pack": "01",
-        "Pieces in a box": "10",
-        "Product HSN Code": "61034200",
-        CGST: "2.5",
-        SGST: "2.5",
-        IGST: "5",
-        SBU: "",
-        "Base Points": "40",
-        "Unit of Measure": "pcs",
-      },
-    ];
+  const exampleRow = [
+    "Example: RBMBUSJRNMP0115060",
+    "Example: Product Description",
+    "Example: BERMUDA",
+    "Example: BERMUDA",
+    "Example: BM",
+    "Example: BMBU",
+    "Example: C1011",
+    "Example: RBMBUSJRNMP0115",
+    "Example: SKU Name",
+    "Example: 01",
+    "Example: 10",
+    "Example: 5",
+    "Example: inner_wear",
+    "Example: standard",
+    "Example: 61034200",
+    "Example: 2.5",
+    "Example: 2.5",
+    "Example: 5",
+    "",
+    "Example: 40",
+    "Example: pcs",
+    "",
+    "Example: 8901234567890",
+    "Example: true",
+  ];
 
-    // Function to escape CSV values
-    const escapeCsvValue = (value) => {
-      if (value === null || value === undefined) return "";
+  const csv = [headers.join(","), exampleRow.join(",")].join("\n");
 
-      const stringValue = String(value);
-
-      // If the value contains comma, quote, or newline, wrap it in quotes and escape internal quotes
-      if (
-        stringValue.includes(",") ||
-        stringValue.includes('"') ||
-        stringValue.includes("\n")
-      ) {
-        return `"${stringValue.replace(/"/g, '""')}"`;
-      }
-
-      return stringValue;
-    };
-
-    // Create CSV rows
-    const csvRows = [
-      // Header row
-      headers.map((header) => escapeCsvValue(header)).join(","),
-      // Sample data rows
-      ...sampleRows.map((row) =>
-        headers.map((header) => escapeCsvValue(row[header] || "")).join(","),
-      ),
-    ];
-
-    const csvString = csvRows.join("\n");
-
-    // Create and download the file
-    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.setAttribute("download", "product_template.csv");
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "product_template.csv";
+  a.click();
+};
   const handleErrorLogDownload = () => {
     // Define headers
     const headers = [
@@ -549,91 +509,80 @@ const Product = () => {
     setErrorLog([]);
   };
 
-  const handleCSVImport = async (url) => {
-    try {
-      openConfirmationModel({
-        question: "Are you sure you want to import this products CSV?",
-        answer: ["Yes", "No"],
-        onClose: async (result) => {
-          if (result) {
-            try {
-              let payload = {
-                file: url,
-              };
-              setFormLoading(true);
-              const res = await bulkUpload(payload, "Product");
 
-              if (
-                res?.data?.data?.length === 0 &&
-                res?.data?.skippedRows?.length === 0
-              ) {
-                toast.error("No data found in the file to import");
-                return;
-              } else if (res?.data?.skippedRows?.length > 0) {
-                toast.error(
-                  `${res?.data?.skippedRows?.length} rows skipped, ${res?.data?.data?.length ? res?.data?.data?.length : 0
-                  } rows imported in the Product Master`,
-                );
-                setErrorLog(res?.data?.skippedRows);
-              } else {
-                toast.success(
-                  `${res?.data?.data?.length} rows imported in the Product Master`,
-                );
-              }
-              onCloseModal();
-            } catch (error) {
-              console.error(error);
-              toast.error(
-                error?.response?.data?.message ||
-                "Failed to import products, try again",
-              );
-            } finally {
-              setFormLoading(false);
-              fetchProductsPaginated();
-            }
-          } else {
-            onCloseModal();
-            return;
-          }
-        },
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+const handleCSVImport = async (file) => {
+  try {
+    if (!file) return;
 
-  const handleSetEdit = (product) => {
-    setSelectedProduct(product);
-    setModalMode("edit");
-    setFormData({
-      name: product?.name || "",
-      cat_id: product?.cat_id?._id || "",
-      supplier: product?.supplier?._id || "",
-      brand: product?.brand?._id || "",
-      subBrand: product?.subBrand?._id || "",
-      collection_id: product?.collection_id?._id || "",
-      sku_group__name: product?.sku_group__name || "", // Updated key
-      sku_group_id: product?.sku_group_id || "", // Added key
-      product_code: product?.product_code || "",
-      size: product?.size || "",
-      color: product?.color || "", // Added key
-      pack: product?.pack || "", // Added key
-      img_path: product?.img_path || "", // Added key
-      no_of_pieces_in_a_box: product?.no_of_pieces_in_a_box || "",
-      description: product?.description || "",
-      product_type: product?.product_type || "",
-      product_valuation_type: product?.product_valuation_type || "",
-      product_hsn_code: product?.product_hsn_code || "",
-      cgst: product?.cgst || "",
-      sgst: product?.sgst || "",
-      igst: product?.igst || "",
-      sbu: product?.sbu || "",
-      base_point: product?.base_point,
-      uom: product?.uom || "pcs", // Default value is "pcs"
+    // STEP 1: convert to array buffer
+    const arrayBuffer = await file.arrayBuffer();
+
+    // STEP 2: parse Excel/CSV
+    const workbook = XLSX.read(arrayBuffer, { type: "array" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+    const rows = XLSX.utils.sheet_to_json(sheet, {
+      defval: "",
     });
-    setOpenModal(true);
-  };
 
+    console.log("Parsed rows:", rows);
+
+    // STEP 3: SEND RAW DATA (NO URL)
+    const response = await bulkUploadProduct({
+      data: rows,
+    });
+
+    console.log("Upload response:", response);
+
+  } catch (error) {
+    console.error("CSV Import Error:", error);
+  }
+};
+
+
+const handleSetEdit = (product) => {
+  setSelectedProduct(product);
+  setModalMode("edit");
+
+  setFormData({
+    s4hana_code: product?.s4hana_code || "",
+    description: product?.description || "",
+
+    cat_id: product?.cat_id?._id || "",
+    collection_id: product?.collection_id?._id || "",
+    brand: product?.brand?._id || "",
+    segment: product?.segment?._id || "",
+
+    supplier: product?.supplier?._id || "",
+
+    sku_group__name: product?.sku_group__name || "",
+    sku_group_id: product?.sku_group_id || "",
+
+    size: product?.size || "",
+    color: product?.color || "",
+    pack: product?.pack || "",
+
+    img_path: product?.img_path || "",
+
+    std_pkg_in_pc: product?.std_pkg_in_pc || "",
+    wp_pc: product?.wp_pc || "",
+
+    collection_product_type: product?.collection_product_type || "",
+    product_valuation_type: product?.product_valuation_type || "",
+    product_hsn_code: product?.product_hsn_code || "",
+
+    cgst: product?.cgst || "",
+    sgst: product?.sgst || "",
+    igst: product?.igst || "",
+
+    sbu: product?.sbu || "",
+    base_point: product?.base_point || "",
+
+    uom: product?.uom || "pcs",
+  });
+
+  setOpenModal(true);
+};
   const handleAddProduct = async () => {
     try {
       if (!validate()) return;
@@ -657,60 +606,79 @@ const Product = () => {
     }
   };
 
-  const handleEditProduct = async () => {
-    openConfirmationModel({
-      question: "Are you sure you want to update this product?",
-      answer: ["Yes", "No"],
-      onClose: async (result) => {
-        if (result) {
-          try {
-            if (!validate()) return;
-            setFormLoading(true);
-            const payload = {
-              name: formData.name,
-              cat_id: formData.cat_id,
-              supplier: formData.supplier,
-              brand: formData.brand,
-              collection_id: formData.collection_id,
-              img_path: formData.img_path,
-              sku_group_id: formData.sku_group_id,
-              sku_group__name: formData.sku_group__name,
-              product_code: formData.product_code,
-              size: formData.size,
-              color: formData.color,
-              pack: formData.pack,
-              no_of_pieces_in_a_box: formData.no_of_pieces_in_a_box,
-              description: formData.description,
-              product_type: formData.product_type,
-              product_valuation_type: formData.product_valuation_type,
-              product_hsn_code: formData.product_hsn_code,
-              cgst: formData.cgst,
-              sgst: formData.sgst,
-              igst: formData.igst,
-              sbu: formData.sbu,
-              base_point: formData?.base_point,
-              uom: formData.uom,
-            };
-            await updateProduct(payload, selectedProduct._id);
-            fetchProductsPaginated();
-            toast.success("Product updated successfully");
-            onCloseModal();
-          } catch (error) {
-            console.error(error);
-            toast.error(
-              error?.response?.data?.message ||
-              "Failed to update product, try again",
-            );
-          } finally {
-            setFormLoading(false);
-          }
-        } else {
+ const handleEditProduct = async () => {
+  openConfirmationModel({
+    question: "Are you sure you want to update this product?",
+    answer: ["Yes", "No"],
+    onClose: async (result) => {
+      console.log("CONFIRM RESULT:", result);
+
+      if (result === true || result === "Yes") {
+        try {
+          if (!validate()) return;
+
+          setFormLoading(true);
+
+          const payload = {
+            description: formData.description,
+
+            cat_id: formData.cat_id,
+            collection_id: formData.collection_id,
+            brand: formData.brand,
+            segment: formData.segment,
+
+            supplier: formData.supplier,
+
+            sku_group_id: formData.sku_group_id,
+            sku_group__name: formData.sku_group__name,
+
+            size: formData.size,
+            color: formData.color,
+            pack: formData.pack,
+
+            img_path: formData.img_path,
+
+            std_pkg_in_pc: formData.std_pkg_in_pc,
+            wp_pc: formData.wp_pc,
+
+            collection_product_type: formData.collection_product_type,
+            product_valuation_type: formData.product_valuation_type,
+            product_hsn_code: formData.product_hsn_code,
+
+            cgst: formData.cgst,
+            sgst: formData.sgst,
+            igst: formData.igst,
+
+            sbu: formData.sbu,
+            base_point: formData.base_point,
+
+            uom: formData.uom,
+          };
+
+          console.log("PAYLOAD:", payload);
+          console.log("ID:", selectedProduct?._id);
+
+          await updateProduct(payload, selectedProduct._id);
+
+          toast.success("Product updated successfully");
           onCloseModal();
-          return;
+          fetchProductsPaginated();
+
+        } catch (error) {
+          console.error(error);
+          toast.error(
+            error?.response?.data?.message ||
+            "Failed to update product"
+          );
+        } finally {
+          setFormLoading(false);
         }
-      },
-    });
-  };
+      } else {
+        onCloseModal();
+      }
+    },
+  });
+};
 
   const onCloseModal = () => {
     setOpenModal(false);
@@ -962,6 +930,72 @@ const Product = () => {
   // // Flatten the sorted groups back into a single array
   // filteredProducts = Object.values(multiProductArray).flat();
 
+const handleUploadSubmit = async () => {
+  try {
+    if (!uploadFile) {
+      toast.error("Please select a file");
+      return;
+    }
+
+    setUploadLoading(true);
+    toast.loading("Uploading...");
+
+    const arrayBuffer = await uploadFile.arrayBuffer();
+
+    const workbook = XLSX.read(arrayBuffer, { type: "array" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+    const rows = XLSX.utils.sheet_to_json(sheet, {
+      defval: "",
+    });
+
+    if (!rows.length) {
+      toast.dismiss();
+      toast.error("File is empty");
+      return;
+    }
+
+    // ✅ GET RESPONSE
+    const res = await bulkUploadProduct({
+      data: rows,
+    });
+
+    toast.dismiss();
+
+    console.log("Backend Response:", res);
+
+    // ✅ SHOW REAL RESULT (NOT FAKE SUCCESS)
+    const inserted = res?.data?.insertedCount || 0;
+    const skipped = res?.data?.skippedCount || 0;
+
+    toast.success(
+      `Inserted: ${inserted}, Skipped: ${skipped}`,
+      { duration: 6000 }
+    );
+
+    // ✅ SET ERROR LOG (VERY IMPORTANT)
+    if (res?.data?.skippedRows?.length > 0) {
+      setErrorLog(res.data.skippedRows);
+    }
+
+    // reset
+    setUploadModalOpen(false);
+    setUploadFile(null);
+
+    // refresh table
+    fetchProductsPaginated();
+
+  } catch (error) {
+    toast.dismiss();
+    console.error("Upload failed:", error);
+
+    toast.error(
+      error?.response?.data?.message || "Upload failed"
+    );
+  } finally {
+    setUploadLoading(false);
+  }
+};
   return (
     <>
       {pagePermission?.view && (
@@ -1236,12 +1270,13 @@ const Product = () => {
                     </Button>)}
 
                   {pagePermission?.create && (
-                    <FileUpload
-                      type="single-file"
-                      page="bulk-import"
-                      size="xs"
-                      onSetFileUrl={(url) => handleCSVImport(url)}
-                    />
+            <Button
+  size="xs"
+  color="purple"
+  onClick={() => setUploadModalOpen(true)}
+>
+  Upload File
+</Button>
                   )}
 
 
@@ -1508,11 +1543,13 @@ const Product = () => {
                             <Table.Cell>
                               <StatusIndicator
                                 status={product.status}
-                                onClick={
-                                  pagePermission?.update
-                                    ? () => handleStatusUpdate(product)
-                                    : undefined
-                                }
+                                // onClick={
+                                //   pagePermission?.update
+                                //     ? () => handleStatusUpdate(product)
+                                //     : undefined
+                                // }
+
+                                onClick={() => handleSetEdit(product)}
                               />
                             </Table.Cell>
 
@@ -1717,7 +1754,7 @@ const Product = () => {
                 <div className="mb-4">
                   <div className="mb-2 block text-gray-700 dark:text-gray-100">
                     <Label htmlFor="sku_group__name">SKU Group Name</Label>
-                    <span className="text-red-500">*</span>
+                    <span className="text-red-500"></span>
                   </div>
 
                   <TextInput
@@ -1732,7 +1769,7 @@ const Product = () => {
                 <div className="mb-4">
                   <div className="mb-2 block text-gray-700 dark:text-gray-100">
                     <Label htmlFor="sku_group_id">SKU Group Code</Label>
-                    <span className="text-red-500">*</span>
+                    <span className="text-red-500"></span>
                   </div>
 
                   <TextInput
@@ -1983,6 +2020,48 @@ const Product = () => {
               )}
             </Modal.Footer>
           </Modal>
+          <Modal show={uploadModalOpen} onClose={() => setUploadModalOpen(false)}>
+  <Modal.Header>Upload Product File</Modal.Header>
+
+  <Modal.Body>
+    <div className="flex flex-col gap-4">
+
+      {/* File Input */}
+      <input
+        type="file"
+        accept=".xlsx,.csv"
+        onChange={(e) => setUploadFile(e.target.files[0])}
+      />
+
+      {/* Show file name */}
+      {uploadFile && (
+        <p className="text-sm text-green-600">
+          Selected: {uploadFile.name}
+        </p>
+      )}
+
+    </div>
+  </Modal.Body>
+
+  <Modal.Footer>
+    <Button
+      color="gray"
+      onClick={() => {
+        setUploadModalOpen(false);
+        setUploadFile(null);
+      }}
+    >
+      Cancel
+    </Button>
+
+    <Button
+      onClick={handleUploadSubmit}
+      disabled={uploadLoading}
+    >
+      {uploadLoading ? <Spinner size="sm" /> : "Upload"}
+    </Button>
+  </Modal.Footer>
+</Modal>
 
         </>
       )}
