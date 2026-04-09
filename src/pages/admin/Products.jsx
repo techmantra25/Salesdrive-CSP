@@ -149,7 +149,7 @@ const [uploadLoading, setUploadLoading] = useState(false);
       }
 
       if (selectedSubBrand !== "default") {
-        queryParams.segment = selectedSubBrand;
+        queryParams.subBrand = selectedSubBrand;
       }
 
       if (searchQuery.trim() !== "") {
@@ -240,7 +240,7 @@ const [uploadLoading, setUploadLoading] = useState(false);
     cat_id: "",
     supplier: "",
     brand: "",
-    segment: "",
+    subBrand: "",
     collection_id: "",
     sku_group__name: "",
     sku_group_id: "",
@@ -248,9 +248,9 @@ const [uploadLoading, setUploadLoading] = useState(false);
     size: "",
     color: "",
     img_path: "",
-    std_pkg_in_pc: "",
+    no_of_pieces_in_a_box: "",
     wp_pc: "", // ✅ NEW
-    collection_product_type: "",
+    product_type: "",
     product_valuation_type: "",
     product_hsn_code: "",
     cgst: "",
@@ -265,8 +265,8 @@ const [uploadLoading, setUploadLoading] = useState(false);
   const { openConfirmationModel } = useContext(ConfirmationModelContext);
 
   const validate = () => {
-    if (!formData.s4hana_code.trim()) {
-      toast.error("S/4HANA Code is required");
+    if (!formData.product_code.trim()) {
+      toast.error("product_code is required");
       return false;
     }
 
@@ -280,8 +280,8 @@ const [uploadLoading, setUploadLoading] = useState(false);
     //   return false;
     // }
 
-    if (!formData.segment.trim()) {
-      toast.error("Segment is required");
+    if (!formData.subBrand.trim()) {
+      toast.error("subBrand is required");
       return false;
     }
 
@@ -355,12 +355,12 @@ const [uploadLoading, setUploadLoading] = useState(false);
 
 const handleCSVTemplateDownload = () => {
   const headers = [
-    "S/4HANA Code",
+    "product_code",
     "Name",
     "Category Code",
     "Collection Code",
     "Brand Code",
-    "Segment Code",
+    "subBrand Code",
     "Supplier Code",
     "SKU Group Code",
     "SKU Group Name",
@@ -551,7 +551,7 @@ const handleSetEdit = (product) => {
     cat_id: product?.cat_id?._id || "",
     collection_id: product?.collection_id?._id || "",
     brand: product?.brand?._id || "",
-    segment: product?.segment?._id || "",
+    subBrand: product?.subBrand?._id || "",
 
     supplier: product?.supplier?._id || "",
 
@@ -564,10 +564,10 @@ const handleSetEdit = (product) => {
 
     img_path: product?.img_path || "",
 
-    std_pkg_in_pc: product?.std_pkg_in_pc || "",
+    no_of_pieces_in_a_box: product?.no_of_pieces_in_a_box || "",
     wp_pc: product?.wp_pc || "",
 
-    collection_product_type: product?.collection_product_type || "",
+    product_type: product?.product_type || "",
     product_valuation_type: product?.product_valuation_type || "",
     product_hsn_code: product?.product_hsn_code || "",
 
@@ -625,7 +625,7 @@ const handleSetEdit = (product) => {
             cat_id: formData.cat_id,
             collection_id: formData.collection_id,
             brand: formData.brand,
-            segment: formData.segment,
+            subBrand: formData.subBrand,
 
             supplier: formData.supplier,
 
@@ -638,10 +638,10 @@ const handleSetEdit = (product) => {
 
             img_path: formData.img_path,
 
-            std_pkg_in_pc: formData.std_pkg_in_pc,
+            no_of_pieces_in_a_box: formData.no_of_pieces_in_a_box,
             wp_pc: formData.wp_pc,
 
-            collection_product_type: formData.collection_product_type,
+            product_type: formData.product_type,
             product_valuation_type: formData.product_valuation_type,
             product_hsn_code: formData.product_hsn_code,
 
@@ -690,7 +690,7 @@ const handleSetEdit = (product) => {
       cat_id: "",
       supplier: "",
       brand: "",
-      segment: "",
+      subBrand: "",
       collection_id: "",
       sku_group__name: "",
       sku_group_id: "",
@@ -698,9 +698,9 @@ const handleSetEdit = (product) => {
       size: "",
       color: "",
       img_path: "",
-      std_pkg_in_pc: "",
+      no_of_pieces_in_a_box: "",
       wp_pc: "",
-      collection_product_type: "",
+      product_type: "",
       product_valuation_type: "",
       product_hsn_code: "",
       cgst: "",
@@ -1350,7 +1350,7 @@ const handleUploadSubmit = async () => {
                     {/* ================= HEAD ================= */}
                     <Table.Head className="text-center text-sm">
                       <Table.HeadCell>SKU Group</Table.HeadCell>
-                      <Table.HeadCell>S/4HANA Code</Table.HeadCell>
+                      <Table.HeadCell>product_code</Table.HeadCell>
                       <Table.HeadCell>EAN</Table.HeadCell>
                       <Table.HeadCell>Description</Table.HeadCell>
                       <Table.HeadCell>Size</Table.HeadCell>
@@ -1358,7 +1358,7 @@ const handleUploadSubmit = async () => {
                       <Table.HeadCell>Pack</Table.HeadCell>
                       <Table.HeadCell>Supplier</Table.HeadCell>
                       <Table.HeadCell>Brand</Table.HeadCell>
-                      <Table.HeadCell>Segment</Table.HeadCell>
+                      <Table.HeadCell>subBrand</Table.HeadCell>
                       <Table.HeadCell>Category</Table.HeadCell>
                       <Table.HeadCell>Collection</Table.HeadCell>
                       <Table.HeadCell>SKU GROUPE NAME</Table.HeadCell>
@@ -1448,19 +1448,19 @@ const handleUploadSubmit = async () => {
                               )}
                             </Table.Cell>
 
-                            {/* SEGMENT */}
+                            {/* subBrand */}
                             <Table.Cell>
-                              {product?.segment &&
-                                (typeof product?.segment === "object" ? (
+                              {product?.subBrand &&
+                                (typeof product?.subBrand === "object" ? (
                                   <>
                                     <UniqueCode
-                                      text={product?.segment?.code}
-                                      codeName="Segment"
+                                      text={product?.subBrand?.code}
+                                      codeName="subBrand"
                                     />{" "}
-                                    ({product?.segment?.desc})
+                                    ({product?.subBrand?.desc})
                                   </>
                                 ) : (
-                                  product?.segment
+                                  product?.subBrand
                                 ))}
                             </Table.Cell>
 
@@ -1494,7 +1494,7 @@ const handleUploadSubmit = async () => {
                             <Table.Cell>{product?.sku_group__name || "-"}</Table.Cell>
 
                             {/* PRODUCT TYPE */}
-                            <Table.Cell>{product?.collection_product_type || "-"}</Table.Cell>
+                            <Table.Cell>{product?.product_type || "-"}</Table.Cell>
 
                             {/* VALUATION */}
                             <Table.Cell>{product?.product_valuation_type || "-"}</Table.Cell>
@@ -1503,7 +1503,7 @@ const handleUploadSubmit = async () => {
                             <Table.Cell>{product?.uom || "-"}</Table.Cell>
 
                             {/* STD PKG */}
-                            <Table.Cell>{product?.std_pkg_in_pc || "-"}</Table.Cell>
+                            <Table.Cell>{product?.no_of_pieces_in_a_box || "-"}</Table.Cell>
 
                             {/* HSN */}
                             <Table.Cell>
@@ -1590,7 +1590,7 @@ const handleUploadSubmit = async () => {
               <form>
                 <div className="mb-4">
                   <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                    <Label htmlFor="s4hana_code">S/4HANA Code</Label>
+                    <Label htmlFor="s4hana_code">product_code</Label>
                     <span className="text-red-500">*</span>
                   </div>
                   <TextInput
@@ -1598,7 +1598,7 @@ const handleUploadSubmit = async () => {
                     name="s4hana_code"
                     value={formData.s4hana_code}
                     onChange={handleChange}
-                    placeholder="Enter S/4HANA Code"
+                    placeholder="Enter product_code"
                     required
                     readOnly={modalMode !== "add" ? true : false}
                     disabled={modalMode !== "add" ? true : false}
@@ -1665,13 +1665,13 @@ const handleUploadSubmit = async () => {
                 {formData?.brand ? (
                   <div className="mb-4">
                     <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                      <Label htmlFor="brand">Segment</Label>
+                      <Label htmlFor="brand">subBrand</Label>
                       <span className="text-red-500">*</span>
                     </div>
                     <Select
-                      id="segment"
-                      name="segment"
-                      value={formData.segment}
+                      id="subBrand"
+                      name="subBrand"
+                      value={formData.subBrand}
                       onChange={handleChange}
                       disabled={formData.brand_id}
                     >
@@ -1788,9 +1788,9 @@ const handleUploadSubmit = async () => {
                     {/* <span className="text-red-500">*</span> */}
                   </div>
                   <TextInput
-                    id="collection_product_type"
-                    name="collection_product_type"
-                    value={formData.collection_product_type}
+                    id="product_type"
+                    name="product_type"
+                    value={formData.product_type}
                     onChange={handleChange}
                     placeholder="Enter Collection / Product Type"
                   />
@@ -1872,9 +1872,9 @@ const handleUploadSubmit = async () => {
                     <Label htmlFor="no_of_pieces_in_a_box">Std Pkg in Pc</Label>
                   </div>
                   <TextInput
-                    id="std_pkg_in_pc"
-                    name="std_pkg_in_pc"
-                    value={formData.std_pkg_in_pc}
+                    id="no_of_pieces_in_a_box"
+                    name="no_of_pieces_in_a_box"
+                    value={formData.no_of_pieces_in_a_box}
                     onChange={handleChange}
                     type="number"
                   />
