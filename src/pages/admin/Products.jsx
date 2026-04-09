@@ -235,7 +235,7 @@ const [uploadLoading, setUploadLoading] = useState(false);
   };
 
   const [formData, setFormData] = useState({
-    s4hana_code: "",
+    product_code: "",
     description: "",
     cat_id: "",
     supplier: "",
@@ -265,7 +265,7 @@ const [uploadLoading, setUploadLoading] = useState(false);
   const { openConfirmationModel } = useContext(ConfirmationModelContext);
 
   const validate = () => {
-    if (!formData.s4hana_code.trim()) {
+    if (!formData.product_code.trim()) {
       toast.error("S/4HANA Code is required");
       return false;
     }
@@ -545,7 +545,7 @@ const handleSetEdit = (product) => {
   setModalMode("edit");
 
   setFormData({
-    s4hana_code: product?.s4hana_code || "",
+    product_code: product?.product_code || "",
     description: product?.description || "",
 
     cat_id: product?.cat_id?._id || "",
@@ -685,7 +685,7 @@ const handleSetEdit = (product) => {
     setModalMode("add");
 
     setFormData({
-      s4hana_code: "",
+      product_code: "",
       description: "",
       cat_id: "",
       supplier: "",
@@ -1397,7 +1397,7 @@ const handleUploadSubmit = async () => {
                             {/* S4HANA */}
                             <Table.Cell className="px-2 py-1">
                               <UniqueCode
-                                text={product?.s4hana_code || "-"}
+                                text={product?.product_code || "-"}
                                 codeName="Product"
                               />
                             </Table.Cell>
@@ -1590,13 +1590,13 @@ const handleUploadSubmit = async () => {
               <form>
                 <div className="mb-4">
                   <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                    <Label htmlFor="s4hana_code">S/4HANA Code</Label>
+                    <Label htmlFor="product_code">S/4HANA Code</Label>
                     <span className="text-red-500">*</span>
                   </div>
                   <TextInput
-                    id="s4hana_code"
-                    name="s4hana_code"
-                    value={formData.s4hana_code}
+                    id="product_code"
+                    name="product_code"
+                    value={formData.product_code}
                     onChange={handleChange}
                     placeholder="Enter S/4HANA Code"
                     required
