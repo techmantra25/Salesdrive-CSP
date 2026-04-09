@@ -355,7 +355,7 @@ const Product = () => {
 
   const handleCSVTemplateDownload = () => {
     const headers = [
-      "Product code",
+      "Product Code",
       "Product Name",
       "Category Code",
       "Collection Code",
