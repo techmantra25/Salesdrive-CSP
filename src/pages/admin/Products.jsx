@@ -236,7 +236,7 @@ const [uploadLoading, setUploadLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     s4hana_code: "",
-    description: "",
+    name: "",
     cat_id: "",
     supplier: "",
     brand: "",
@@ -270,7 +270,7 @@ const [uploadLoading, setUploadLoading] = useState(false);
       return false;
     }
 
-    if (!formData.description.trim()) {
+    if (!formData.name.trim()) {
       toast.error("Description is required");
       return false;
     }
@@ -356,7 +356,7 @@ const [uploadLoading, setUploadLoading] = useState(false);
 const handleCSVTemplateDownload = () => {
   const headers = [
     "S/4HANA Code",
-    "Description",
+    "Name",
     "Category Code",
     "Collection Code",
     "Brand Code",
@@ -546,7 +546,7 @@ const handleSetEdit = (product) => {
 
   setFormData({
     s4hana_code: product?.s4hana_code || "",
-    description: product?.description || "",
+    name: product?.name || "",
 
     cat_id: product?.cat_id?._id || "",
     collection_id: product?.collection_id?._id || "",
@@ -620,7 +620,7 @@ const handleSetEdit = (product) => {
           setFormLoading(true);
 
           const payload = {
-            description: formData.description,
+            name: formData.name,
 
             cat_id: formData.cat_id,
             collection_id: formData.collection_id,
@@ -686,7 +686,7 @@ const handleSetEdit = (product) => {
 
     setFormData({
       s4hana_code: "",
-      description: "",
+      name: "",
       cat_id: "",
       supplier: "",
       brand: "",
@@ -1406,7 +1406,7 @@ const handleUploadSubmit = async () => {
                             <Table.Cell>{product?.ean11 || "-"}</Table.Cell>
 
                             {/* DESCRIPTION */}
-                            <Table.Cell>{product?.description || "-"}</Table.Cell>
+                            <Table.Cell>{product?.name || "-"}</Table.Cell>
 
                             {/* SIZE */}
                             <Table.Cell>{product?.size || "-"}</Table.Cell>
@@ -1606,13 +1606,13 @@ const handleUploadSubmit = async () => {
                 </div>
                 <div className="mb-4">
                   <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                    <Label htmlFor="description">Description</Label>
+                    <Label htmlFor="name">Description</Label>
                     <span className="text-red-500">*</span>
                   </div>
                   <TextInput
-                    id="description"
-                    name="description"
-                    value={formData.description}
+                    id="name"
+                    name="name"
+                    value={formData.name}
                     onChange={handleChange}
                     placeholder="Enter Description"
                     required
