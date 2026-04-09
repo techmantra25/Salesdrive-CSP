@@ -62,9 +62,9 @@ const Product = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [supplierList, setSupperlierList] = useState([]);
   const [subBrandList, setSubBrandList] = useState([]);
-const [uploadModalOpen, setUploadModalOpen] = useState(false);
-const [uploadFile, setUploadFile] = useState(null);
-const [uploadLoading, setUploadLoading] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploadLoading, setUploadLoading] = useState(false);
   // Pagination state
   const [paginatedProducts, setPaginatedProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -149,7 +149,7 @@ const [uploadLoading, setUploadLoading] = useState(false);
       }
 
       if (selectedSubBrand !== "default") {
-        queryParams.segment = selectedSubBrand;
+        queryParams.subBrand = selectedSubBrand;
       }
 
       if (searchQuery.trim() !== "") {
@@ -236,11 +236,11 @@ const [uploadLoading, setUploadLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     product_code: "",
-    description: "",
+    name: "",
     cat_id: "",
     supplier: "",
     brand: "",
-    segment: "",
+    subBrand: "",
     collection_id: "",
     sku_group__name: "",
     sku_group_id: "",
@@ -248,9 +248,9 @@ const [uploadLoading, setUploadLoading] = useState(false);
     size: "",
     color: "",
     img_path: "",
-    std_pkg_in_pc: "",
+    no_of_pieces_in_a_box: "",
     wp_pc: "", // ✅ NEW
-    collection_product_type: "",
+    product_type: "",
     product_valuation_type: "",
     product_hsn_code: "",
     cgst: "",
@@ -266,11 +266,11 @@ const [uploadLoading, setUploadLoading] = useState(false);
 
   const validate = () => {
     if (!formData.product_code.trim()) {
-      toast.error("S/4HANA Code is required");
+      toast.error("product_code is required");
       return false;
     }
 
-    if (!formData.description.trim()) {
+    if (!formData.name.trim()) {
       toast.error("Description is required");
       return false;
     }
@@ -280,8 +280,8 @@ const [uploadLoading, setUploadLoading] = useState(false);
     //   return false;
     // }
 
-    if (!formData.segment.trim()) {
-      toast.error("Segment is required");
+    if (!formData.subBrand.trim()) {
+      toast.error("subBrand is required");
       return false;
     }
 
@@ -353,69 +353,69 @@ const [uploadLoading, setUploadLoading] = useState(false);
     });
   };
 
-const handleCSVTemplateDownload = () => {
-  const headers = [
-    "S/4HANA Code",
-    "Description",
-    "Category Code",
-    "Collection Code",
-    "Brand Code",
-    "Segment Code",
-    "Supplier Code",
-    "SKU Group Code",
-    "SKU Group Name",
-    "Pack",
-    "Std Pkg in Pc",
-    "W/P Pc",
-    "Product Type",
-    "Product Valuation Type",
-    "HSN Code",
-    "CGST",
-    "SGST",
-    "IGST",
-    "SBU",
-    "Base Point",
-    "UOM",
-    "Image Path",
-    "EAN",
-    "Status",
-  ];
+  const handleCSVTemplateDownload = () => {
+    const headers = [
+      "Product code",
+      "Product Name",
+      "Category Code",
+      "Collection Code",
+      "Brand Code",
+      "subBrand Code",
+      "Supplier Code",
+      "SKU Group Code",
+      "SKU Group Name",
+      "Pack",
+      "Std Pkg in Pc",
+      "W/P Pc",
+      "Product Type",
+      "Product Valuation Type",
+      "HSN Code",
+      "CGST",
+      "SGST",
+      "IGST",
+      "SBU",
+      "Base Point",
+      "UOM",
+      "Image Path",
+      "EAN",
+      "Status",
+    ];
 
-  const exampleRow = [
-    "Example: RBMBUSJRNMP0115060",
-    "Example: Product Description",
-    "Example: BERMUDA",
-    "Example: BERMUDA",
-    "Example: BM",
-    "Example: BMBU",
-    "Example: C1011",
-    "Example: RBMBUSJRNMP0115",
-    "Example: SKU Name",
-    "Example: 01",
-    "Example: 10",
-    "Example: 5",
-    "Example: inner_wear",
-    "Example: standard",
-    "Example: 61034200",
-    "Example: 2.5",
-    "Example: 2.5",
-    "Example: 5",
-    "",
-    "Example: 40",
-    "Example: pcs",
-    "",
-    "Example: 8901234567890",
-    "Example: true",
-  ];
+    const exampleRow = [
+      "Example: RBMBUSJRNMP0115060",
+      "Example: Product Description",
+      "Example: BERMUDA",
+      "Example: BERMUDA",
+      "Example: BM",
+      "Example: BMBU",
+      "Example: C1011",
+      "Example: RBMBUSJRNMP0115",
+      "Example: SKU Name",
+      "Example: 01",
+      "Example: 10",
+      "Example: 5",
+      "Example: inner_wear",
+      "Example: standard",
+      "Example: 61034200",
+      "Example: 2.5",
+      "Example: 2.5",
+      "Example: 5",
+      "",
+      "Example: 40",
+      "Example: pcs",
+      "",
+      "Example: 8901234567890",
+      "Example: true",
+    ];
 
-  const csv = [headers.join(","), exampleRow.join(",")].join("\n");
+    const csv = [headers.join(","), exampleRow.join(",")].join("\n");
 
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "product_template.csv";
-  a.click();
-};
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "product_template.csv";
+    a.click();
+  };
   const handleErrorLogDownload = () => {
     // Define headers
     const headers = [
@@ -510,79 +510,79 @@ const handleCSVTemplateDownload = () => {
   };
 
 
-const handleCSVImport = async (file) => {
-  try {
-    if (!file) return;
+  const handleCSVImport = async (file) => {
+    try {
+      if (!file) return;
 
-    // STEP 1: convert to array buffer
-    const arrayBuffer = await file.arrayBuffer();
+      // STEP 1: convert to array buffer
+      const arrayBuffer = await file.arrayBuffer();
 
-    // STEP 2: parse Excel/CSV
-    const workbook = XLSX.read(arrayBuffer, { type: "array" });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      // STEP 2: parse Excel/CSV
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-    const rows = XLSX.utils.sheet_to_json(sheet, {
-      defval: "",
+      const rows = XLSX.utils.sheet_to_json(sheet, {
+        defval: "",
+      });
+
+      console.log("Parsed rows:", rows);
+
+      // STEP 3: SEND RAW DATA (NO URL)
+      const response = await bulkUploadProduct({
+        data: rows,
+      });
+
+      console.log("Upload response:", response);
+
+    } catch (error) {
+      console.error("CSV Import Error:", error);
+    }
+  };
+
+
+  const handleSetEdit = (product) => {
+    setSelectedProduct(product);
+    setModalMode("edit");
+
+    setFormData({
+      product_code: product?.product_code || "",
+      name: product?.name || "",
+
+      cat_id: product?.cat_id?._id || "",
+      collection_id: product?.collection_id?._id || "",
+      brand: product?.brand?._id || "",
+      subBrand: product?.subBrand?._id || "",
+
+      supplier: product?.supplier?._id || "",
+
+      sku_group__name: product?.sku_group__name || "",
+      sku_group_id: product?.sku_group_id || "",
+
+      size: product?.size || "",
+      color: product?.color || "",
+      pack: product?.pack || "",
+
+      img_path: product?.img_path || "",
+
+      no_of_pieces_in_a_box: product?.no_of_pieces_in_a_box || "",
+      wp_pc: product?.wp_pc || "",
+
+      product_type: product?.product_type || "",
+      product_valuation_type: product?.product_valuation_type || "",
+      product_hsn_code: product?.product_hsn_code || "",
+
+      cgst: product?.cgst || "",
+      sgst: product?.sgst || "",
+      igst: product?.igst || "",
+
+      sbu: product?.sbu || "",
+      base_point: product?.base_point || "",
+
+      uom: product?.uom || "pcs",
     });
 
-    console.log("Parsed rows:", rows);
-
-    // STEP 3: SEND RAW DATA (NO URL)
-    const response = await bulkUploadProduct({
-      data: rows,
-    });
-
-    console.log("Upload response:", response);
-
-  } catch (error) {
-    console.error("CSV Import Error:", error);
-  }
-};
-
-
-const handleSetEdit = (product) => {
-  setSelectedProduct(product);
-  setModalMode("edit");
-
-  setFormData({
-    product_code: product?.product_code || "",
-    description: product?.description || "",
-
-    cat_id: product?.cat_id?._id || "",
-    collection_id: product?.collection_id?._id || "",
-    brand: product?.brand?._id || "",
-    segment: product?.segment?._id || "",
-
-    supplier: product?.supplier?._id || "",
-
-    sku_group__name: product?.sku_group__name || "",
-    sku_group_id: product?.sku_group_id || "",
-
-    size: product?.size || "",
-    color: product?.color || "",
-    pack: product?.pack || "",
-
-    img_path: product?.img_path || "",
-
-    std_pkg_in_pc: product?.std_pkg_in_pc || "",
-    wp_pc: product?.wp_pc || "",
-
-    collection_product_type: product?.collection_product_type || "",
-    product_valuation_type: product?.product_valuation_type || "",
-    product_hsn_code: product?.product_hsn_code || "",
-
-    cgst: product?.cgst || "",
-    sgst: product?.sgst || "",
-    igst: product?.igst || "",
-
-    sbu: product?.sbu || "",
-    base_point: product?.base_point || "",
-
-    uom: product?.uom || "pcs",
-  });
-
-  setOpenModal(true);
-};
+    setOpenModal(true);
+  };
   const handleAddProduct = async () => {
     try {
       if (!validate()) return;
@@ -606,79 +606,79 @@ const handleSetEdit = (product) => {
     }
   };
 
- const handleEditProduct = async () => {
-  openConfirmationModel({
-    question: "Are you sure you want to update this product?",
-    answer: ["Yes", "No"],
-    onClose: async (result) => {
-      console.log("CONFIRM RESULT:", result);
+  const handleEditProduct = async () => {
+    openConfirmationModel({
+      question: "Are you sure you want to update this product?",
+      answer: ["Yes", "No"],
+      onClose: async (result) => {
+        console.log("CONFIRM RESULT:", result);
 
-      if (result === true || result === "Yes") {
-        try {
-          if (!validate()) return;
+        if (result === true || result === "Yes") {
+          try {
+            if (!validate()) return;
 
-          setFormLoading(true);
+            setFormLoading(true);
 
-          const payload = {
-            description: formData.description,
+            const payload = {
+              name: formData.name,
 
-            cat_id: formData.cat_id,
-            collection_id: formData.collection_id,
-            brand: formData.brand,
-            segment: formData.segment,
+              cat_id: formData.cat_id,
+              collection_id: formData.collection_id,
+              brand: formData.brand,
+              subBrand: formData.subBrand,
 
-            supplier: formData.supplier,
+              supplier: formData.supplier,
 
-            sku_group_id: formData.sku_group_id,
-            sku_group__name: formData.sku_group__name,
+              sku_group_id: formData.sku_group_id,
+              sku_group__name: formData.sku_group__name,
 
-            size: formData.size,
-            color: formData.color,
-            pack: formData.pack,
+              size: formData.size,
+              color: formData.color,
+              pack: formData.pack,
 
-            img_path: formData.img_path,
+              img_path: formData.img_path,
 
-            std_pkg_in_pc: formData.std_pkg_in_pc,
-            wp_pc: formData.wp_pc,
+              no_of_pieces_in_a_box: formData.no_of_pieces_in_a_box,
+              wp_pc: formData.wp_pc,
 
-            collection_product_type: formData.collection_product_type,
-            product_valuation_type: formData.product_valuation_type,
-            product_hsn_code: formData.product_hsn_code,
+              product_type: formData.product_type,
+              product_valuation_type: formData.product_valuation_type,
+              product_hsn_code: formData.product_hsn_code,
 
-            cgst: formData.cgst,
-            sgst: formData.sgst,
-            igst: formData.igst,
+              cgst: formData.cgst,
+              sgst: formData.sgst,
+              igst: formData.igst,
 
-            sbu: formData.sbu,
-            base_point: formData.base_point,
+              sbu: formData.sbu,
+              base_point: formData.base_point,
 
-            uom: formData.uom,
-          };
+              uom: formData.uom,
+            };
 
-          console.log("PAYLOAD:", payload);
-          console.log("ID:", selectedProduct?._id);
+            console.log("PAYLOAD:", payload);
+            console.log("ID:", selectedProduct?._id);
 
-          await updateProduct(payload, selectedProduct._id);
+            await updateProduct(payload, selectedProduct._id);
 
-          toast.success("Product updated successfully");
+            toast.success("Product updated successfully");
+            onCloseModal();
+            fetchProductsPaginated();
+
+          } catch (error) {
+            console.error(error);
+            toast.error(
+              error?.response?.data?.message ||
+              "Failed to update product"
+            );
+          } finally {
+            setFormLoading(false);
+          }
+        } else {
           onCloseModal();
-          fetchProductsPaginated();
-
-        } catch (error) {
-          console.error(error);
-          toast.error(
-            error?.response?.data?.message ||
-            "Failed to update product"
-          );
-        } finally {
-          setFormLoading(false);
         }
-      } else {
-        onCloseModal();
-      }
-    },
-  });
-};
+      },
+    });
+  };
 
   const onCloseModal = () => {
     setOpenModal(false);
@@ -686,11 +686,11 @@ const handleSetEdit = (product) => {
 
     setFormData({
       product_code: "",
-      description: "",
+      name: "",
       cat_id: "",
       supplier: "",
       brand: "",
-      segment: "",
+      subBrand: "",
       collection_id: "",
       sku_group__name: "",
       sku_group_id: "",
@@ -698,9 +698,9 @@ const handleSetEdit = (product) => {
       size: "",
       color: "",
       img_path: "",
-      std_pkg_in_pc: "",
+      no_of_pieces_in_a_box: "",
       wp_pc: "",
-      collection_product_type: "",
+      product_type: "",
       product_valuation_type: "",
       product_hsn_code: "",
       cgst: "",
@@ -930,72 +930,72 @@ const handleSetEdit = (product) => {
   // // Flatten the sorted groups back into a single array
   // filteredProducts = Object.values(multiProductArray).flat();
 
-const handleUploadSubmit = async () => {
-  try {
-    if (!uploadFile) {
-      toast.error("Please select a file");
-      return;
-    }
+  const handleUploadSubmit = async () => {
+    try {
+      if (!uploadFile) {
+        toast.error("Please select a file");
+        return;
+      }
 
-    setUploadLoading(true);
-    toast.loading("Uploading...");
+      setUploadLoading(true);
+      toast.loading("Uploading...");
 
-    const arrayBuffer = await uploadFile.arrayBuffer();
+      const arrayBuffer = await uploadFile.arrayBuffer();
 
-    const workbook = XLSX.read(arrayBuffer, { type: "array" });
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-    const rows = XLSX.utils.sheet_to_json(sheet, {
-      defval: "",
-    });
+      const rows = XLSX.utils.sheet_to_json(sheet, {
+        defval: "",
+      });
 
-    if (!rows.length) {
+      if (!rows.length) {
+        toast.dismiss();
+        toast.error("File is empty");
+        return;
+      }
+
+      // ✅ GET RESPONSE
+      const res = await bulkUploadProduct({
+        data: rows,
+      });
+
       toast.dismiss();
-      toast.error("File is empty");
-      return;
+
+      console.log("Backend Response:", res);
+
+      // ✅ SHOW REAL RESULT (NOT FAKE SUCCESS)
+      const inserted = res?.data?.insertedCount || 0;
+      const skipped = res?.data?.skippedCount || 0;
+
+      toast.success(
+        `Inserted: ${inserted}, Skipped: ${skipped}`,
+        { duration: 6000 }
+      );
+
+      // ✅ SET ERROR LOG (VERY IMPORTANT)
+      if (res?.data?.skippedRows?.length > 0) {
+        setErrorLog(res.data.skippedRows);
+      }
+
+      // reset
+      setUploadModalOpen(false);
+      setUploadFile(null);
+
+      // refresh table
+      fetchProductsPaginated();
+
+    } catch (error) {
+      toast.dismiss();
+      console.error("Upload failed:", error);
+
+      toast.error(
+        error?.response?.data?.message || "Upload failed"
+      );
+    } finally {
+      setUploadLoading(false);
     }
-
-    // ✅ GET RESPONSE
-    const res = await bulkUploadProduct({
-      data: rows,
-    });
-
-    toast.dismiss();
-
-    console.log("Backend Response:", res);
-
-    // ✅ SHOW REAL RESULT (NOT FAKE SUCCESS)
-    const inserted = res?.data?.insertedCount || 0;
-    const skipped = res?.data?.skippedCount || 0;
-
-    toast.success(
-      `Inserted: ${inserted}, Skipped: ${skipped}`,
-      { duration: 6000 }
-    );
-
-    // ✅ SET ERROR LOG (VERY IMPORTANT)
-    if (res?.data?.skippedRows?.length > 0) {
-      setErrorLog(res.data.skippedRows);
-    }
-
-    // reset
-    setUploadModalOpen(false);
-    setUploadFile(null);
-
-    // refresh table
-    fetchProductsPaginated();
-
-  } catch (error) {
-    toast.dismiss();
-    console.error("Upload failed:", error);
-
-    toast.error(
-      error?.response?.data?.message || "Upload failed"
-    );
-  } finally {
-    setUploadLoading(false);
-  }
-};
+  };
   return (
     <>
       {pagePermission?.view && (
@@ -1270,13 +1270,13 @@ const handleUploadSubmit = async () => {
                     </Button>)}
 
                   {pagePermission?.create && (
-            <Button
-  size="xs"
-  color="purple"
-  onClick={() => setUploadModalOpen(true)}
->
-  Upload File
-</Button>
+                    <Button
+                      size="xs"
+                      color="purple"
+                      onClick={() => setUploadModalOpen(true)}
+                    >
+                      Upload File
+                    </Button>
                   )}
 
 
@@ -1350,7 +1350,7 @@ const handleUploadSubmit = async () => {
                     {/* ================= HEAD ================= */}
                     <Table.Head className="text-center text-sm">
                       <Table.HeadCell>SKU Group</Table.HeadCell>
-                      <Table.HeadCell>S/4HANA Code</Table.HeadCell>
+                      <Table.HeadCell>product_code</Table.HeadCell>
                       <Table.HeadCell>EAN</Table.HeadCell>
                       <Table.HeadCell>Description</Table.HeadCell>
                       <Table.HeadCell>Size</Table.HeadCell>
@@ -1358,7 +1358,7 @@ const handleUploadSubmit = async () => {
                       <Table.HeadCell>Pack</Table.HeadCell>
                       <Table.HeadCell>Supplier</Table.HeadCell>
                       <Table.HeadCell>Brand</Table.HeadCell>
-                      <Table.HeadCell>Segment</Table.HeadCell>
+                      <Table.HeadCell>subBrand</Table.HeadCell>
                       <Table.HeadCell>Category</Table.HeadCell>
                       <Table.HeadCell>Collection</Table.HeadCell>
                       <Table.HeadCell>SKU GROUPE NAME</Table.HeadCell>
@@ -1395,7 +1395,7 @@ const handleUploadSubmit = async () => {
                             </Table.Cell>
 
                             {/* S4HANA */}
-                            <Table.Cell className="px-2 py-1">
+                            <Table.Cell>
                               <UniqueCode
                                 text={product?.product_code || "-"}
                                 codeName="Product"
@@ -1406,7 +1406,7 @@ const handleUploadSubmit = async () => {
                             <Table.Cell>{product?.ean11 || "-"}</Table.Cell>
 
                             {/* DESCRIPTION */}
-                            <Table.Cell>{product?.description || "-"}</Table.Cell>
+                            <Table.Cell>{product?.name || "-"}</Table.Cell>
 
                             {/* SIZE */}
                             <Table.Cell>{product?.size || "-"}</Table.Cell>
@@ -1448,19 +1448,19 @@ const handleUploadSubmit = async () => {
                               )}
                             </Table.Cell>
 
-                            {/* SEGMENT */}
+                            {/* subBrand */}
                             <Table.Cell>
-                              {product?.segment &&
-                                (typeof product?.segment === "object" ? (
+                              {product?.subBrand &&
+                                (typeof product?.subBrand === "object" ? (
                                   <>
                                     <UniqueCode
-                                      text={product?.segment?.code}
-                                      codeName="Segment"
+                                      text={product?.subBrand?.code}
+                                      codeName="subBrand"
                                     />{" "}
-                                    ({product?.segment?.desc})
+                                    ({product?.subBrand?.desc})
                                   </>
                                 ) : (
-                                  product?.segment
+                                  product?.subBrand
                                 ))}
                             </Table.Cell>
 
@@ -1494,7 +1494,7 @@ const handleUploadSubmit = async () => {
                             <Table.Cell>{product?.sku_group__name || "-"}</Table.Cell>
 
                             {/* PRODUCT TYPE */}
-                            <Table.Cell>{product?.collection_product_type || "-"}</Table.Cell>
+                            <Table.Cell>{product?.product_type || "-"}</Table.Cell>
 
                             {/* VALUATION */}
                             <Table.Cell>{product?.product_valuation_type || "-"}</Table.Cell>
@@ -1503,7 +1503,7 @@ const handleUploadSubmit = async () => {
                             <Table.Cell>{product?.uom || "-"}</Table.Cell>
 
                             {/* STD PKG */}
-                            <Table.Cell>{product?.std_pkg_in_pc || "-"}</Table.Cell>
+                            <Table.Cell>{product?.no_of_pieces_in_a_box || "-"}</Table.Cell>
 
                             {/* HSN */}
                             <Table.Cell>
@@ -1590,7 +1590,7 @@ const handleUploadSubmit = async () => {
               <form>
                 <div className="mb-4">
                   <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                    <Label htmlFor="product_code">S/4HANA Code</Label>
+                    <Label htmlFor="product_code">Product Code</Label>
                     <span className="text-red-500">*</span>
                   </div>
                   <TextInput
@@ -1598,7 +1598,7 @@ const handleUploadSubmit = async () => {
                     name="product_code"
                     value={formData.product_code}
                     onChange={handleChange}
-                    placeholder="Enter S/4HANA Code"
+                    placeholder="Enter product_code"
                     required
                     readOnly={modalMode !== "add" ? true : false}
                     disabled={modalMode !== "add" ? true : false}
@@ -1606,13 +1606,13 @@ const handleUploadSubmit = async () => {
                 </div>
                 <div className="mb-4">
                   <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                    <Label htmlFor="description">Description</Label>
+                    <Label htmlFor="name">Description</Label>
                     <span className="text-red-500">*</span>
                   </div>
                   <TextInput
-                    id="description"
-                    name="description"
-                    value={formData.description}
+                    id="name"
+                    name="name"
+                    value={formData.name}
                     onChange={handleChange}
                     placeholder="Enter Description"
                     required
@@ -1665,13 +1665,13 @@ const handleUploadSubmit = async () => {
                 {formData?.brand ? (
                   <div className="mb-4">
                     <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                      <Label htmlFor="brand">Segment</Label>
+                      <Label htmlFor="brand">subBrand</Label>
                       <span className="text-red-500">*</span>
                     </div>
                     <Select
-                      id="segment"
-                      name="segment"
-                      value={formData.segment}
+                      id="subBrand"
+                      name="subBrand"
+                      value={formData.subBrand}
                       onChange={handleChange}
                       disabled={formData.brand_id}
                     >
@@ -1788,9 +1788,9 @@ const handleUploadSubmit = async () => {
                     {/* <span className="text-red-500">*</span> */}
                   </div>
                   <TextInput
-                    id="collection_product_type"
-                    name="collection_product_type"
-                    value={formData.collection_product_type}
+                    id="product_type"
+                    name="product_type"
+                    value={formData.product_type}
                     onChange={handleChange}
                     placeholder="Enter Collection / Product Type"
                   />
@@ -1872,9 +1872,9 @@ const handleUploadSubmit = async () => {
                     <Label htmlFor="no_of_pieces_in_a_box">Std Pkg in Pc</Label>
                   </div>
                   <TextInput
-                    id="std_pkg_in_pc"
-                    name="std_pkg_in_pc"
-                    value={formData.std_pkg_in_pc}
+                    id="no_of_pieces_in_a_box"
+                    name="no_of_pieces_in_a_box"
+                    value={formData.no_of_pieces_in_a_box}
                     onChange={handleChange}
                     type="number"
                   />
@@ -2021,47 +2021,47 @@ const handleUploadSubmit = async () => {
             </Modal.Footer>
           </Modal>
           <Modal show={uploadModalOpen} onClose={() => setUploadModalOpen(false)}>
-  <Modal.Header>Upload Product File</Modal.Header>
+            <Modal.Header>Upload Product File</Modal.Header>
 
-  <Modal.Body>
-    <div className="flex flex-col gap-4">
+            <Modal.Body>
+              <div className="flex flex-col gap-4">
 
-      {/* File Input */}
-      <input
-        type="file"
-        accept=".xlsx,.csv"
-        onChange={(e) => setUploadFile(e.target.files[0])}
-      />
+                {/* File Input */}
+                <input
+                  type="file"
+                  accept=".xlsx,.csv"
+                  onChange={(e) => setUploadFile(e.target.files[0])}
+                />
 
-      {/* Show file name */}
-      {uploadFile && (
-        <p className="text-sm text-green-600">
-          Selected: {uploadFile.name}
-        </p>
-      )}
+                {/* Show file name */}
+                {uploadFile && (
+                  <p className="text-sm text-green-600">
+                    Selected: {uploadFile.name}
+                  </p>
+                )}
 
-    </div>
-  </Modal.Body>
+              </div>
+            </Modal.Body>
 
-  <Modal.Footer>
-    <Button
-      color="gray"
-      onClick={() => {
-        setUploadModalOpen(false);
-        setUploadFile(null);
-      }}
-    >
-      Cancel
-    </Button>
+            <Modal.Footer>
+              <Button
+                color="gray"
+                onClick={() => {
+                  setUploadModalOpen(false);
+                  setUploadFile(null);
+                }}
+              >
+                Cancel
+              </Button>
 
-    <Button
-      onClick={handleUploadSubmit}
-      disabled={uploadLoading}
-    >
-      {uploadLoading ? <Spinner size="sm" /> : "Upload"}
-    </Button>
-  </Modal.Footer>
-</Modal>
+              <Button
+                onClick={handleUploadSubmit}
+                disabled={uploadLoading}
+              >
+                {uploadLoading ? <Spinner size="sm" /> : "Upload"}
+              </Button>
+            </Modal.Footer>
+          </Modal>
 
         </>
       )}

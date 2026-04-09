@@ -88,8 +88,8 @@ const PriceUpdate = () => {
       // Extract filename from URL
       const urlObj = new URL(url);
       const pathname = urlObj.pathname;
-      const lastSegment = pathname.substring(pathname.lastIndexOf("/") + 1);
-      const filename = decodeURIComponent(lastSegment.split("?")[0]);
+      const lastsubBrand = pathname.substring(pathname.lastIndexOf("/") + 1);
+      const filename = decodeURIComponent(lastsubBrand.split("?")[0]);
 
       const a = document.createElement("a");
       a.href = url;
