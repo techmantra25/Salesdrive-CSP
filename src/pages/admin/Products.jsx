@@ -355,7 +355,7 @@ const [uploadLoading, setUploadLoading] = useState(false);
 
 const handleCSVTemplateDownload = () => {
   const headers = [
-    "product_code",
+    "Product code",
     "Name",
     "Category Code",
     "Collection Code",
