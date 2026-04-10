@@ -162,18 +162,18 @@ export const SignIn = () => {
           {/* Main Content */}
           <div className="space-y-8">
             <div className="space-y-4">
-              <h1 className="text-5xl font-bold leading-tight">
+              <h1 className="text-3xl font-bold leading-tight">
                 Streamline Your
                 <br />
                 Sales Operations
               </h1>
-              <p className="text-lg text-blue-100 leading-relaxed max-w-md">
+              <p className="text-md text-blue-100 leading-relaxed max-w-md">
                 Empower your team with real-time insights, automated workflows, and intelligent analytics to drive revenue growth.
               </p>
             </div>
 
             {/* Feature Cards */}
-            <div className="space-y-4">
+            <div className="space-y-2">
               <div className="flex items-start gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                 <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
                   <svg
@@ -439,7 +439,7 @@ export const SignIn = () => {
             </form>
 
             {/* Divider */}
-            <div className="relative my-6">
+            {/* <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
               </div>
@@ -448,17 +448,17 @@ export const SignIn = () => {
                   Need help?
                 </span>
               </div>
-            </div>
+            </div> */}
 
             {/* Support Link */}
-            <div className="text-center">
+            {/* <div className="text-center">
               <Link
                 to="/support"
                 className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 font-medium transition-colors"
               >
                 Contact Support →
               </Link>
-            </div>
+            </div> */}
           </div>
 
           {/* Footer */}

@@ -12,7 +12,7 @@ export const ContextProvider = ({ children }) => {
     localStorage.setItem("theme", "dark");
     setMode("dark");
   }
-  const [theme, setTheme] = useState(getThemeFromLocalStorage || "dark");
+  const [theme, setTheme] = useState("dark");
   const toggleTheme = () => {
     if (theme === "dark") {
       setTheme("light");
