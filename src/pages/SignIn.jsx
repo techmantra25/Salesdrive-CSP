@@ -163,11 +163,11 @@ export const SignIn = () => {
           <div className="space-y-5">
             <div className="space-y-4">
               <h1 className="text-3xl font-bold leading-tight">
-                Streamline Your
+                <span className="inline-block animate-slide-up">Streamline Your</span>
                 <br />
-                Sales Operations
+                <span className="inline-block animate-slide-up animation-delay-300">Sales Operations</span>
               </h1>
-              <p className="text-md text-blue-100 leading-relaxed max-w-md">
+              <p className="text-md text-blue-100 leading-relaxed max-w-md animate-slide-up animation-delay-500">
                 Empower your team with real-time insights, automated workflows, and intelligent analytics to drive revenue growth.
               </p>
             </div>
