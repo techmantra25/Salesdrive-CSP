@@ -1344,7 +1344,7 @@ const Product = () => {
                   <Spinner aria-label="Loading data" size="xl" />
                 </div>
               ) : (
-                <div className="overflow-x-auto w-full overflow-y-auto">
+                <div className="overflow-x-auto w-full overflow-y-auto relative">
                   <Table className="text-sm whitespace-nowrap bg-white dark:bg-gray-800">
 
                     {/* ================= HEAD ================= */}
