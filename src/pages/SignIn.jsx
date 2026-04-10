@@ -204,7 +204,7 @@ export const SignIn = () => {
             </div>
 
             {/* Feature Cards */}
-            <div className="space-y-2">
+            <div className="space-y-8 animate-slide-up animation-delay-1000 pt-6 ">
               <div className="flex items-start gap-3 bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
                 <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
                   <svg
