@@ -1,7 +1,12 @@
-import { Sidebar } from "flowbite-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { FaSearch, FaTimes } from "react-icons/fa";
+import {
+  FaSearch,
+  FaTimes,
+  FaSignOutAlt,
+  FaChevronDown,
+  FaChevronRight,
+} from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -21,14 +26,14 @@ export const DashboardSidebar = ({ sidebarOpen, onSidebarClose }) => {
   const navigate = useNavigate();
   const { userInfo } = useSelector((state) => state.user);
   const role = useSelector((state) => state.permission?.data?.role);
-  const permissionData = useSelector((state) => state.permission?.data?.data); // ✅
+  const permissionData = useSelector((state) => state.permission?.data?.data);
 
   const sidebarMap = {
-    "admin": adminSidebarConfig,
-    "user": usersidebarconfig,
+    admin: adminSidebarConfig,
+    user: usersidebarconfig,
     "sub-admins": subadminssidebarconfig,
-    "sales": salessidebarconfig,
-    "admine": aaadminsesidebarconfig, // ✅ fixed typo
+    sales: salessidebarconfig,
+    admine: aaadminsesidebarconfig,
   };
 
   const sidebarConfig = sidebarMap[role] ?? adminSidebarConfig;
@@ -41,24 +46,19 @@ export const DashboardSidebar = ({ sidebarOpen, onSidebarClose }) => {
   const need_employee_approval_for_po =
     config?.functionalSettings?.need_employee_approval_for_po;
 
-  // ✅ Core permission check function
   const hasViewPermission = (slug) => {
-    if (role === "admin") return true;  // super admin sees everything
-    if (!slug) return true;             // no slug = Dashboard, Logout = always show
-
+    if (role === "admin") return true;
+    if (!slug) return true;
     if (!permissionData) return false;
 
-    // Loop through all permission groups (Geo Hierarchy, Reports, etc.)
     for (const group of Object.values(permissionData)) {
-      // Each group has entries keyed by mongo ID
       for (const page of Object.values(group)) {
         if (page?.pageSlug === slug) {
           return page?.view === true;
         }
       }
     }
-
-    return false; // slug not found = no access
+    return false;
   };
 
   const highlightText = (text, query) => {
@@ -74,7 +74,7 @@ export const DashboardSidebar = ({ sidebarOpen, onSidebarClose }) => {
           regex.test(part) ? (
             <mark
               key={index}
-              className="bg-yellow-200 dark:bg-yellow-600 px-1 rounded text-gray-900 dark:text-gray-100"
+              className="bg-yellow-200 dark:bg-yellow-600 px-0.5 rounded text-gray-900 dark:text-gray-100"
             >
               {part}
             </mark>
@@ -86,7 +86,6 @@ export const DashboardSidebar = ({ sidebarOpen, onSidebarClose }) => {
     );
   };
 
-  // ✅ Auto-expand only groups with permitted + matching children
   useEffect(() => {
     if (searchQuery.trim()) {
       const groupsToExpand = new Set();
@@ -122,7 +121,9 @@ export const DashboardSidebar = ({ sidebarOpen, onSidebarClose }) => {
             child.label.toLowerCase().includes(query.toLowerCase()) &&
             hasViewPermission(child.slug)
         );
-        const parentMatch = item.label.toLowerCase().includes(query.toLowerCase());
+        const parentMatch = item.label
+          .toLowerCase()
+          .includes(query.toLowerCase());
         return parentMatch || childrenMatch;
       }
       return false;
@@ -137,45 +138,46 @@ export const DashboardSidebar = ({ sidebarOpen, onSidebarClose }) => {
   };
 
   const handleLogOut = async () => {
-    const confirmLogout = window.confirm("Are you sure you want to logout ?");
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
     if (!confirmLogout) return;
-    
+
     try {
-      // Call logout API to clear cookie on backend
       await logout().unwrap();
-      
-      // Dispatch to clear Redux state and localStorage
       dispatch(logoutAction());
-      
       if (role === "admin") {
         navigate("/sign-in?mode=admin");
-        toast.success("Logout Successful!");
       } else if (role === "employee") {
         navigate("/sign-in?mode=employee");
-        toast.success("Logout Successful!");
       } else {
         navigate("/sign-in");
-        toast.success("Logout Successful!");
       }
+      toast.success("Logout Successful!");
     } catch (error) {
-      // Even if API fails, still logout locally
       dispatch(logoutAction());
-      
       if (role === "admin") {
         navigate("/sign-in?mode=admin");
-        toast.success("Logout Successful!");
       } else if (role === "employee") {
         navigate("/sign-in?mode=employee");
-        toast.success("Logout Successful!");
       } else {
         navigate("/sign-in");
-        toast.success("Logout Successful!");
       }
+      toast.success("Logout Successful!");
     }
   };
 
-  const renderSidebarItem = (item) => {
-    // ✅ Hide item if user has no view permission
+  const toggleGroup = (label) => {
+    setExpandedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(label)) {
+        next.delete(label);
+      } else {
+        next.add(label);
+      }
+      return next;
+    });
+  };
+
+  const renderSidebarItem = (item, isChild = false) => {
     if (!hasViewPermission(item.slug)) return null;
 
     if (
@@ -186,7 +188,7 @@ export const DashboardSidebar = ({ sidebarOpen, onSidebarClose }) => {
     }
 
     if (
-      need_employee_approval_for_po == "admin approval" &&
+      need_employee_approval_for_po === "admin approval" &&
       no_need_employee_approval_for_po_paths_for_admin.includes(item.path)
     ) {
       return null;
@@ -194,49 +196,58 @@ export const DashboardSidebar = ({ sidebarOpen, onSidebarClose }) => {
 
     if (item.isLogout) {
       return (
-        <Sidebar.Item icon={item.icon} key={item.label}>
-          <button
-            className="flex w-full items-center text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group cursor-pointer"
-            onClick={() => {
-              handleLogOut();
-              onSidebarClose();
-            }}
-          >
-            <span>{highlightText(item.label, searchQuery)}</span>
-          </button>
-        </Sidebar.Item>
+        <button
+          onClick={() => {
+            handleLogOut();
+            onSidebarClose?.();
+          }}
+          className="flex items-center w-full gap-3 px-3 py-2.5 text-sm text-red-500 dark:text-red-400 rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10 transition-all duration-200 group"
+        >
+          <FaSignOutAlt className="w-4 h-4 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
+          <span className="font-medium">{highlightText(item.label, searchQuery)}</span>
+        </button>
       );
     }
 
     return (
       <NavLink
         to={item.path}
-        key={item.label}
+        end={!item.path.endsWith("/*")}
         className={({ isActive }) =>
-          `flex items-center text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 p-2 pl-4 ${
-            isActive ? "bg-gray-200 dark:bg-gray-900" : ""
+          `flex items-center gap-3 px-3 py-2.5 text-sm rounded-xl transition-all duration-200 group ${
+            isActive
+              ? isChild
+                ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium"
+                : "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md shadow-blue-500/25 font-medium"
+              : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-gray-200"
           }`
         }
-        onClick={() => onSidebarClose()}
+        onClick={() => onSidebarClose?.()}
       >
-        <item.icon size={20} />
-        <span className="ms-3">{highlightText(item.label, searchQuery)}</span>
+        {({ isActive }) => (
+          <>
+            {item.icon && (
+              <item.icon
+                className={`w-4 h-4 flex-shrink-0 transition-colors ${
+                  isActive ? "text-white" : "text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"
+                }`}
+              />
+            )}
+            <span className="truncate">{highlightText(item.label, searchQuery)}</span>
+          </>
+        )}
       </NavLink>
     );
   };
 
   const renderSidebarCollapse = (collapse) => {
     let children = collapse.children;
-
-    // ✅ 1. Filter by permission first
     children = children.filter((child) => hasViewPermission(child.slug));
 
-    // 2. Filter by search query
     if (searchQuery.trim()) {
       children = filterChildren(children, searchQuery);
     }
 
-    // 3. Filter by approval setting
     children = children.filter((child) => {
       if (
         need_employee_approval_for_po !== "admin approval" &&
@@ -247,21 +258,38 @@ export const DashboardSidebar = ({ sidebarOpen, onSidebarClose }) => {
       return true;
     });
 
-    // ✅ Hide entire group if no accessible children
     if (children.length === 0) return null;
 
     const isExpanded = expandedGroups.has(collapse.label);
 
     return (
-      <Sidebar.Collapse
-        icon={collapse.icon}
-        label={highlightText(collapse.label, searchQuery)}
-        key={collapse.label}
-        open={isExpanded}
-        className="text-xs"
-      >
-        {children.map((child) => renderSidebarItem(child))}
-      </Sidebar.Collapse>
+      <div key={collapse.label} className="space-y-1">
+        <button
+          onClick={() => toggleGroup(collapse.label)}
+          className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-gray-600 dark:text-gray-400 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-200 group"
+        >
+          {collapse.icon && (
+            <collapse.icon className="w-4 h-4 flex-shrink-0 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
+          )}
+          <span className="flex-1 text-left font-medium truncate">
+            {highlightText(collapse.label, searchQuery)}
+          </span>
+          {isExpanded ? (
+            <FaChevronDown className="w-3 h-3 text-gray-400 transition-transform" />
+          ) : (
+            <FaChevronRight className="w-3 h-3 text-gray-400 transition-transform" />
+          )}
+        </button>
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="ml-4 pl-4 border-l border-gray-200 dark:border-gray-700 space-y-1">
+            {children.map((child) => renderSidebarItem(child, true))}
+          </div>
+        </div>
+      </div>
     );
   };
 
@@ -269,58 +297,80 @@ export const DashboardSidebar = ({ sidebarOpen, onSidebarClose }) => {
     <>
       {sidebarOpen && (
         <aside
-          className="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700 text-xs"
+          className="fixed top-0 left-0 z-40 w-64 h-screen bg-white dark:bg-gray-800 border-r border-gray-100 dark:border-gray-700 flex flex-col"
           aria-label="Sidebar"
         >
-          <Sidebar aria-label="Sidebar with multi-level dropdown example">
-            <Sidebar.Items>
-              <Sidebar.ItemGroup>
-                <div className="mb-4 relative">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <FaSearch className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+          {/* Logo / Header */}
+          <div className="flex items-center justify-between px-5 py-5 border-b border-gray-100 dark:border-gray-700">
+            <NavLink to="/" className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md">
+                <span className="text-white font-bold text-sm">S</span>
+              </div>
+              <span className="text-lg font-bold text-gray-900 dark:text-white">
+                Salesdrive
+              </span>
+            </NavLink>
+            <button
+              onClick={onSidebarClose}
+              className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Close sidebar"
+            >
+              <FaTimes className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Search */}
+          <div className="px-4 py-4">
+            <div className="relative">
+              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search..."
+                className="w-full pl-9 pr-9 py-2.5 text-sm bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setExpandedGroups(new Set());
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                  aria-label="Clear search"
+                >
+                  <FaTimes className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 overflow-y-auto px-3 pb-4 space-y-1">
+            {(() => {
+              const filteredItems = filterItems(sidebarConfig, searchQuery);
+              if (filteredItems.length === 0 && searchQuery.trim()) {
+                return (
+                  <div className="px-3 py-8 text-xs text-gray-400 dark:text-gray-500 text-center">
+                    <FaSearch className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                    <p>No results for &quot;{searchQuery}&quot;</p>
                   </div>
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search menu items..."
-                    className="w-full pl-10 pr-10 py-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={() => {
-                        setSearchQuery("");
-                        setExpandedGroups(new Set());
-                      }}
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                      aria-label="Clear search"
-                    >
-                      <FaTimes className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              </Sidebar.ItemGroup>
-            </Sidebar.Items>
-            <Sidebar.Items>
-              <Sidebar.ItemGroup>
-                {(() => {
-                  const filteredItems = filterItems(sidebarConfig, searchQuery);
-                  if (filteredItems.length === 0 && searchQuery.trim()) {
-                    return (
-                      <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center">
-                        No results found for "{searchQuery}"
-                      </div>
-                    );
-                  }
-                  return filteredItems.map((item) =>
-                    item.type === "item"
-                      ? renderSidebarItem(item)
-                      : renderSidebarCollapse(item)
-                  );
-                })()}
-              </Sidebar.ItemGroup>
-            </Sidebar.Items>
-          </Sidebar>
+                );
+              }
+              return filteredItems.map((item) =>
+                item.type === "item"
+                  ? renderSidebarItem(item)
+                  : renderSidebarCollapse(item)
+              );
+            })()}
+          </nav>
+
+          {/* Bottom spacer */}
+          <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
+              © 2026 Salesdrive CSP
+            </p>
+          </div>
         </aside>
       )}
     </>
