@@ -361,8 +361,7 @@ export const MainRoutes = () => {
               {
                 path: "create-page",
                 element: <CreateNewPage />,
-
-              }
+              },
             ],
           },
         ]
@@ -1465,7 +1464,8 @@ export const MainRoutes = () => {
       path: "/",
       element: <RootLayout />,
       children: [
-        { path: "", element: <HomePage /> },
+        //{ path: "", element: <HomePage /> },
+        { path: "", element: <SignIn /> },
         { path: "sign-in", element: <SignIn /> },
         { path: "form/outlet-form", element: <OutletForm /> },
         { path: "reset-password/:resetToken", element: <ResetPass /> },
@@ -1478,5 +1478,3 @@ export const MainRoutes = () => {
 
   return useRoutes(routes);
 };
-
-
