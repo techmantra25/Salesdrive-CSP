@@ -25,6 +25,29 @@ export const SignIn = () => {
   const [password, setPassword] = useState(sanitizeInput(passwordQuery) ?? "");
   const [showPassword, setShowPassword] = useState(false);
 
+  // Typewriter effect
+  const [displayedText, setDisplayedText] = useState("");
+  const [showCursor, setShowCursor] = useState(true);
+  const firstLine = "Streamline Your";
+  const secondLine = "Sales Operations";
+  const fullText = firstLine + " " + secondLine;
+
+  useEffect(() => {
+    let index = 0;
+    setDisplayedText("");
+    const typingInterval = setInterval(() => {
+      if (index < fullText.length) {
+        setDisplayedText(fullText.slice(0, index + 1));
+        index++;
+      } else {
+        clearInterval(typingInterval);
+        // Keep cursor blinking after typing completes
+        setTimeout(() => setShowCursor(false), 1500);
+      }
+    }, 60);
+    return () => clearInterval(typingInterval);
+  }, []);
+
   const [login, { isLoading }] = useLoginMutation();
   const [forgotPassword, { isLoading: isLoadingPassword }] =
     useForgotPasswordMutation();
@@ -162,10 +185,18 @@ export const SignIn = () => {
           {/* Main Content */}
           <div className="space-y-5">
             <div className="space-y-4">
-              <h1 className="text-3xl font-bold leading-tight">
-                <span className="inline-block animate-slide-up">Streamline Your</span>
-                <br />
-                <span className="inline-block animate-slide-up animation-delay-300">Sales Operations</span>
+              <h1 className="text-3xl font-bold leading-tight min-h-[5.5rem] flex items-center">
+                <span>
+                  {displayedText.length <= firstLine.length
+                    ? displayedText
+                    : firstLine}
+                  <br />
+                  {displayedText.length > firstLine.length &&
+                    displayedText.slice(firstLine.length + 1)}
+                  {showCursor && (
+                    <span className="inline-block w-0.5 h-8 bg-white ml-0.5 animate-blink"></span>
+                  )}
+                </span>
               </h1>
               <p className="text-md text-blue-100 leading-relaxed max-w-md animate-slide-up animation-delay-500">
                 Empower your team with real-time insights, automated workflows, and intelligent analytics to drive revenue growth.
