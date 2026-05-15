@@ -350,6 +350,7 @@ const OutletRequestList = () => {
       "GSTIN",
       "Retailer Class",
       "Brand Code",
+      "Google Map Link",
     ];
 
     const descriptions = [
@@ -375,6 +376,7 @@ const OutletRequestList = () => {
       "(Optional)",
       '(Optional)[Example: A][Valid: "A", "B", "C", "D"]',
       "(Optional) [Exmaple: BRAND001,BRAND002]",
+      "(Optional)",
     ];
 
     // Escape and join
