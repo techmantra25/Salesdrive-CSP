@@ -280,6 +280,7 @@ const OutletList = () => {
       massistRefIds: Array.isArray(outlet?.massistRefIds)
         ? outlet.massistRefIds
         : [],
+      googleMapLink: outlet?.googleMapLink || "",
     });
     setSelectedOutletDetails(outlet);
     setOpenEditModal(true);
@@ -2128,6 +2129,22 @@ const OutletList = () => {
                     setEditOutletData({
                       ...editOutletData,
                       shipToPincode: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="mt-4">
+                <Label htmlFor="googleMapLink" value="Google Map Link" />
+                <textarea
+                  id="googleMapLink"
+                  rows={3}
+                  className="w-full px-3 py-2 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-1 focus:border-cyan-500 focus:outline-none"
+                  placeholder="Paste Google Maps link here..."
+                  value={editOutletData?.googleMapLink || ""}
+                  onChange={(e) =>
+                    setEditOutletData({
+                      ...editOutletData,
+                      googleMapLink: e.target.value,
                     })
                   }
                 />

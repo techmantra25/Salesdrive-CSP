@@ -886,6 +886,10 @@ const OutletRequestList = () => {
                                 : "N/A",
                             ],
                             [
+                              "Google Map Link",
+                              selectedOutletDetails?.googleMapLink || "N/A",
+                            ],
+                            [
                               "Created At",
                               selectedOutletDetails?.createdAt
                                 ? new Date(
