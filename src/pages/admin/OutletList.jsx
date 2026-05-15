@@ -526,7 +526,7 @@ const OutletList = () => {
     //window.open(url, "_blank");
     downloadFile({
       url,
-      queryParams: query,
+      //queryParams: query,
       fileName: "OutletReport",
       showToast: false,
     });
@@ -980,7 +980,7 @@ const OutletList = () => {
     <div className="flex flex-col gap-4 w-full">
       {/* Header */}
       <div className="flex justify-between w-full items-center border-b-2 py-4">
-        <h1 className="text-2xl font-bold">Outlet Master List new</h1>
+        <h1 className="text-2xl font-bold">Outlet Master List </h1>
       </div>
 
       {/* Filters */}
