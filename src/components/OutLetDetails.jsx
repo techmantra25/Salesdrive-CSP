@@ -345,6 +345,16 @@ const OutLetDetails = ({
                       {formData?.location}
                     </p>
                   </div>
+                  {formData?.googleMapLink && (
+                    <div>
+                      <h3 className="font-bold whitespace-nowrap text-gray-900 dark:text-teal-400">
+                        Google Map Link
+                      </h3>
+                      <p className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200 text-wrap">
+                        {formData?.googleMapLink}
+                      </p>
+                    </div>
+                  )}
                   <div>
                     <h3 className="font-bold whitespace-nowrap text-gray-900 dark:text-teal-400">
                       Tele Calling Slot

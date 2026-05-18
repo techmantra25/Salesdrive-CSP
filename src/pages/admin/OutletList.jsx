@@ -280,6 +280,7 @@ const OutletList = () => {
       massistRefIds: Array.isArray(outlet?.massistRefIds)
         ? outlet.massistRefIds
         : [],
+      googleMapLink: outlet?.googleMapLink || "",
     });
     setSelectedOutletDetails(outlet);
     setOpenEditModal(true);
@@ -525,7 +526,7 @@ const OutletList = () => {
     //window.open(url, "_blank");
     downloadFile({
       url,
-      queryParams: query,
+      //queryParams: query,
       fileName: "OutletReport",
       showToast: false,
     });
@@ -979,7 +980,7 @@ const OutletList = () => {
     <div className="flex flex-col gap-4 w-full">
       {/* Header */}
       <div className="flex justify-between w-full items-center border-b-2 py-4">
-        <h1 className="text-2xl font-bold">Outlet Master List new</h1>
+        <h1 className="text-2xl font-bold">Outlet Master List </h1>
       </div>
 
       {/* Filters */}
@@ -2128,6 +2129,22 @@ const OutletList = () => {
                     setEditOutletData({
                       ...editOutletData,
                       shipToPincode: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="mt-4">
+                <Label htmlFor="googleMapLink" value="Google Map Link" />
+                <textarea
+                  id="googleMapLink"
+                  rows={3}
+                  className="w-full px-3 py-2 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-1 focus:border-cyan-500 focus:outline-none"
+                  placeholder="Paste Google Maps link here..."
+                  value={editOutletData?.googleMapLink || ""}
+                  onChange={(e) =>
+                    setEditOutletData({
+                      ...editOutletData,
+                      googleMapLink: e.target.value,
                     })
                   }
                 />
