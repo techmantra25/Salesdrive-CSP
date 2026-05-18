@@ -1006,290 +1006,290 @@ const OutletRequestList = () => {
           </Modal>
 
 
-          
-       {/* Add Outlet Modal - Compact Dark Theme */}
-<Modal
-  show={openAddOutletModal}
-  onClose={() => setOpenAddOutletModal(false)}
-  size="4xl"
-  popup
->
-  <Modal.Body className="p-0 bg-transparent">
-    <div className="relative overflow-hidden rounded-2xl bg-[#0f172a] border border-slate-700 shadow-2xl">
 
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-gradient-to-r from-[#111827] to-[#1e293b] border-b border-slate-700 px-5 py-4 flex items-center justify-between">
+          {/* Add Outlet Modal - Compact Dark Theme */}
+          <Modal
+            show={openAddOutletModal}
+            onClose={() => setOpenAddOutletModal(false)}
+            size="4xl"
+            popup
+          >
+            <Modal.Body className="p-0 bg-transparent">
+              <div className="relative overflow-hidden rounded-2xl bg-[#0f172a] border border-slate-700 shadow-2xl">
 
-        <div>
-          <h2 className="text-2xl font-bold text-white tracking-wide">
-            Add New Outlet
-          </h2>
+                {/* Header */}
+                <div className="sticky top-0 z-10 bg-gradient-to-r from-[#111827] to-[#1e293b] border-b border-slate-700 px-5 py-4 flex items-center justify-between">
 
-          <p className="text-slate-400 text-sm mt-1">
-            Create outlet with complete retailer information
-          </p>
-        </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-white tracking-wide">
+                      Add New Outlet
+                    </h2>
 
-        <button
-          onClick={() => setOpenAddOutletModal(false)}
-          className="text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-200 rounded-full p-2"
-        >
-          <FaTimesCircle size={20} />
-        </button>
-      </div>
+                    <p className="text-slate-400 text-sm mt-1">
+                      Create outlet with complete retailer information
+                    </p>
+                  </div>
 
-      {/* Body */}
-      <div className="max-h-[72vh] overflow-y-auto px-5 py-5 bg-[#0f172a]">
+                  <button
+                    onClick={() => setOpenAddOutletModal(false)}
+                    className="text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-200 rounded-full p-2"
+                  >
+                    <FaTimesCircle size={20} />
+                  </button>
+                </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Body */}
+                <div className="max-h-[72vh] overflow-y-auto px-5 py-5 bg-[#0f172a]">
 
-          {/* Outlet Name */}
-          <div>
-            <Label
-              value="Outlet Name"
-              className="mb-1 block text-xs font-medium text-slate-300"
-            />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-            <TextInput
-              sizing="md"
-              shadow
-              name="outletName"
-              placeholder="Enter outlet name"
-              value={singleOutletForm.outletName}
-              onChange={handleSingleOutletChange}
-              className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
-            />
-          </div>
+                    {/* Outlet Name */}
+                    <div>
+                      <Label
+                        value="Outlet Name"
+                        className="mb-1 block text-xs font-medium text-slate-300"
+                      />
 
-          {/* Owner Name */}
-          <div>
-            <Label
-              value="Owner Name"
-              className="mb-1 block text-xs font-medium text-slate-300"
-            />
+                      <TextInput
+                        sizing="md"
+                        shadow
+                        name="outletName"
+                        placeholder="Enter outlet name"
+                        value={singleOutletForm.outletName}
+                        onChange={handleSingleOutletChange}
+                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                      />
+                    </div>
 
-            <TextInput
-              sizing="md"
-              shadow
-              name="ownerName"
-              placeholder="Enter owner name"
-              value={singleOutletForm.ownerName}
-              onChange={handleSingleOutletChange}
-              className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
-            />
-          </div>
+                    {/* Owner Name */}
+                    <div>
+                      <Label
+                        value="Owner Name"
+                        className="mb-1 block text-xs font-medium text-slate-300"
+                      />
 
-          {/* Employee Code */}
-          <div>
-            <Label
-              value="Employee Code"
-              className="mb-1 block text-xs font-medium text-slate-300"
-            />
+                      <TextInput
+                        sizing="md"
+                        shadow
+                        name="ownerName"
+                        placeholder="Enter owner name"
+                        value={singleOutletForm.ownerName}
+                        onChange={handleSingleOutletChange}
+                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                      />
+                    </div>
 
-            <TextInput
-              sizing="md"
-              shadow
-              name="employeeCode"
-              placeholder="Employee code"
-              value={singleOutletForm.employeeCode}
-              onChange={handleSingleOutletChange}
-              className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
-            />
-          </div>
+                    {/* Employee Code */}
+                    <div>
+                      <Label
+                        value="Employee Code"
+                        className="mb-1 block text-xs font-medium text-slate-300"
+                      />
 
-          {/* Beat Code */}
-          <div>
-            <Label
-              value="Beat Code"
-              className="mb-1 block text-xs font-medium text-slate-300"
-            />
+                      <TextInput
+                        sizing="md"
+                        shadow
+                        name="employeeCode"
+                        placeholder="Employee code"
+                        value={singleOutletForm.employeeCode}
+                        onChange={handleSingleOutletChange}
+                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                      />
+                    </div>
 
-            <TextInput
-              sizing="md"
-              shadow
-              name="beatCode"
-              placeholder="Beat code"
-              value={singleOutletForm.beatCode}
-              onChange={handleSingleOutletChange}
-              className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
-            />
-          </div>
+                    {/* Beat Code */}
+                    <div>
+                      <Label
+                        value="Beat Code"
+                        className="mb-1 block text-xs font-medium text-slate-300"
+                      />
 
-          {/* State Code */}
-          <div>
-            <Label
-              value="State Code"
-              className="mb-1 block text-xs font-medium text-slate-300"
-            />
+                      <TextInput
+                        sizing="md"
+                        shadow
+                        name="beatCode"
+                        placeholder="Beat code"
+                        value={singleOutletForm.beatCode}
+                        onChange={handleSingleOutletChange}
+                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                      />
+                    </div>
 
-            <TextInput
-              sizing="md"
-              shadow
-              name="stateCode"
-              placeholder="WB"
-              value={singleOutletForm.stateCode}
-              onChange={handleSingleOutletChange}
-              className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
-            />
-          </div>
+                    {/* State Code */}
+                    <div>
+                      <Label
+                        value="State Code"
+                        className="mb-1 block text-xs font-medium text-slate-300"
+                      />
 
-          {/* Mobile */}
-          <div>
-            <Label
-              value="Mobile Number"
-              className="mb-1 block text-xs font-medium text-slate-300"
-            />
+                      <TextInput
+                        sizing="md"
+                        shadow
+                        name="stateCode"
+                        placeholder="WB"
+                        value={singleOutletForm.stateCode}
+                        onChange={handleSingleOutletChange}
+                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                      />
+                    </div>
 
-            <TextInput
-              sizing="md"
-              shadow
-              name="mobile1"
-              placeholder="Mobile number"
-              value={singleOutletForm.mobile1}
-              onChange={handleSingleOutletChange}
-              className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
-            />
-          </div>
+                    {/* Mobile */}
+                    <div>
+                      <Label
+                        value="Mobile Number"
+                        className="mb-1 block text-xs font-medium text-slate-300"
+                      />
 
-          {/* Alternate */}
-          <div>
-            <Label
-              value="Alternate Number"
-              className="mb-1 block text-xs font-medium text-slate-300"
-            />
+                      <TextInput
+                        sizing="md"
+                        shadow
+                        name="mobile1"
+                        placeholder="Mobile number"
+                        value={singleOutletForm.mobile1}
+                        onChange={handleSingleOutletChange}
+                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                      />
+                    </div>
 
-            <TextInput
-              sizing="md"
-              shadow
-              name="mobile2"
-              placeholder="Alternate number"
-              value={singleOutletForm.mobile2}
-              onChange={handleSingleOutletChange}
-              className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
-            />
-          </div>
+                    {/* Alternate */}
+                    <div>
+                      <Label
+                        value="Alternate Number"
+                        className="mb-1 block text-xs font-medium text-slate-300"
+                      />
 
-          {/* WhatsApp */}
-          <div>
-            <Label
-              value="WhatsApp Number"
-              className="mb-1 block text-xs font-medium text-slate-300"
-            />
+                      <TextInput
+                        sizing="md"
+                        shadow
+                        name="mobile2"
+                        placeholder="Alternate number"
+                        value={singleOutletForm.mobile2}
+                        onChange={handleSingleOutletChange}
+                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                      />
+                    </div>
 
-            <TextInput
-              sizing="md"
-              shadow
-              name="whatsappNumber"
-              placeholder="WhatsApp number"
-              value={singleOutletForm.whatsappNumber}
-              onChange={handleSingleOutletChange}
-              className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
-            />
-          </div>
+                    {/* WhatsApp */}
+                    <div>
+                      <Label
+                        value="WhatsApp Number"
+                        className="mb-1 block text-xs font-medium text-slate-300"
+                      />
 
-          {/* Email */}
-          <div>
-            <Label
-              value="Email"
-              className="mb-1 block text-xs font-medium text-slate-300"
-            />
+                      <TextInput
+                        sizing="md"
+                        shadow
+                        name="whatsappNumber"
+                        placeholder="WhatsApp number"
+                        value={singleOutletForm.whatsappNumber}
+                        onChange={handleSingleOutletChange}
+                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                      />
+                    </div>
 
-            <TextInput
-              sizing="md"
-              shadow
-              type="email"
-              name="email"
-              placeholder="Enter email"
-              value={singleOutletForm.email}
-              onChange={handleSingleOutletChange}
-              className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
-            />
-          </div>
+                    {/* Email */}
+                    <div>
+                      <Label
+                        value="Email"
+                        className="mb-1 block text-xs font-medium text-slate-300"
+                      />
 
-          {/* City */}
-          <div>
-            <Label
-              value="City"
-              className="mb-1 block text-xs font-medium text-slate-300"
-            />
+                      <TextInput
+                        sizing="md"
+                        shadow
+                        type="email"
+                        name="email"
+                        placeholder="Enter email"
+                        value={singleOutletForm.email}
+                        onChange={handleSingleOutletChange}
+                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                      />
+                    </div>
 
-            <TextInput
-              sizing="md"
-              shadow
-              name="city"
-              placeholder="Enter city"
-              value={singleOutletForm.city}
-              onChange={handleSingleOutletChange}
-              className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
-            />
-          </div>
+                    {/* City */}
+                    <div>
+                      <Label
+                        value="City"
+                        className="mb-1 block text-xs font-medium text-slate-300"
+                      />
 
-          {/* PIN */}
-          <div>
-            <Label
-              value="PIN Code"
-              className="mb-1 block text-xs font-medium text-slate-300"
-            />
+                      <TextInput
+                        sizing="md"
+                        shadow
+                        name="city"
+                        placeholder="Enter city"
+                        value={singleOutletForm.city}
+                        onChange={handleSingleOutletChange}
+                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                      />
+                    </div>
 
-            <TextInput
-              sizing="md"
-              shadow
-              name="pin"
-              placeholder="PIN code"
-              value={singleOutletForm.pin}
-              onChange={handleSingleOutletChange}
-              className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
-            />
-          </div>
+                    {/* PIN */}
+                    <div>
+                      <Label
+                        value="PIN Code"
+                        className="mb-1 block text-xs font-medium text-slate-300"
+                      />
 
-          {/* Address */}
-          <div className="md:col-span-2">
-            <Label
-              value="Address"
-              className="mb-1 block text-xs font-medium text-slate-300"
-            />
+                      <TextInput
+                        sizing="md"
+                        shadow
+                        name="pin"
+                        placeholder="PIN code"
+                        value={singleOutletForm.pin}
+                        onChange={handleSingleOutletChange}
+                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                      />
+                    </div>
 
-            <textarea
-              rows={3}
-              name="address1"
-              placeholder="Enter complete address"
-              value={singleOutletForm.address1}
-              onChange={handleSingleOutletChange}
-              className="w-full rounded-xl border border-slate-600 bg-slate-800 px-4 py-3 text-sm text-white placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
-            />
-          </div>
-        </div>
-      </div>
+                    {/* Address */}
+                    <div className="md:col-span-2">
+                      <Label
+                        value="Address"
+                        className="mb-1 block text-xs font-medium text-slate-300"
+                      />
 
-      {/* Footer */}
-      <div className="sticky bottom-0 border-t border-slate-700 bg-[#111827] px-5 py-4 flex items-center justify-end gap-3">
+                      <textarea
+                        rows={3}
+                        name="address1"
+                        placeholder="Enter complete address"
+                        value={singleOutletForm.address1}
+                        onChange={handleSingleOutletChange}
+                        className="w-full rounded-xl border border-slate-600 bg-slate-800 px-4 py-3 text-sm text-white placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
 
-        <Button
-          color="gray"
-          onClick={() => setOpenAddOutletModal(false)}
-          className="bg-slate-700 hover:bg-slate-600 border-0 text-sm"
-        >
-          Cancel
-        </Button>
+                {/* Footer */}
+                <div className="sticky bottom-0 border-t border-slate-700 bg-[#111827] px-5 py-4 flex items-center justify-end gap-3">
 
-        <Button
-          onClick={handleCreateSingleOutlet}
-          disabled={singleOutletLoading}
-          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border-0 px-5 text-sm"
-        >
-          {singleOutletLoading ? (
-            <div className="flex items-center gap-2">
-              <Spinner size="sm" />
-              Creating...
-            </div>
-          ) : (
-            "Create Outlet"
-          )}
-        </Button>
-      </div>
-    </div>
-  </Modal.Body>
-</Modal>
+                  <Button
+                    color="gray"
+                    onClick={() => setOpenAddOutletModal(false)}
+                    className="bg-slate-700 hover:bg-slate-600 border-0 text-sm"
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button
+                    onClick={handleCreateSingleOutlet}
+                    disabled={singleOutletLoading}
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border-0 px-5 text-sm"
+                  >
+                    {singleOutletLoading ? (
+                      <div className="flex items-center gap-2">
+                        <Spinner size="sm" />
+                        Creating...
+                      </div>
+                    ) : (
+                      "Create Outlet"
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </Modal.Body>
+          </Modal>
         </div>
       ) : (
         <div className="w-full h-[70vh] flex justify-center items-center">
