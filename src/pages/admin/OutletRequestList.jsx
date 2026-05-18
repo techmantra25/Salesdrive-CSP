@@ -32,6 +32,8 @@ import { fetchZones } from "../../redux/zoneSlice";
 import { FileUpload } from "../../uploadWidget/FileUpload";
 import { escapeCSVValue } from "../../utils/escapeCSVValue";
 import { getPagePermission } from "../../utils/permissionHelper";
+import { createSingleOutlet } from "../../api/api";
+import { TextInput } from "flowbite-react";
 
 
 const OutletRequestList = () => {
@@ -57,6 +59,24 @@ const OutletRequestList = () => {
 
   const permissionState = useSelector((state) => state.permission);
   const [pagePermission, setPagePermission] = useState(null);
+  const [openAddOutletModal, setOpenAddOutletModal] = useState(false);
+
+  const [singleOutletLoading, setSingleOutletLoading] = useState(false);
+
+  const [singleOutletForm, setSingleOutletForm] = useState({
+    outletName: "",
+    ownerName: "",
+    employeeCode: "",
+    beatCode: "",
+    stateCode: "",
+    mobile1: "",
+    mobile2: "",
+    whatsappNumber: "",
+    email: "",
+    address1: "",
+    city: "",
+    pin: "",
+  });
 
   useEffect(() => {
     if (!permissionState?.data?.data) return;
@@ -393,6 +413,54 @@ const OutletRequestList = () => {
     document.body.removeChild(a);
   };
 
+
+  const handleSingleOutletChange = (e) => {
+    setSingleOutletForm({
+      ...singleOutletForm,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleCreateSingleOutlet = async () => {
+    try {
+      setSingleOutletLoading(true);
+
+      const response = await createSingleOutlet(
+        singleOutletForm
+      );
+
+      toast.success(
+        response?.data?.message ||
+        "Outlet created successfully"
+      );
+
+      setOpenAddOutletModal(false);
+
+      setSingleOutletForm({
+        outletName: "",
+        ownerName: "",
+        employeeCode: "",
+        beatCode: "",
+        stateCode: "",
+        mobile1: "",
+        mobile2: "",
+        whatsappNumber: "",
+        email: "",
+        address1: "",
+        city: "",
+        pin: "",
+      });
+
+      fetchOutletsPaginated();
+    } catch (error) {
+      toast.error(
+        error?.message ||
+        "Failed to create outlet"
+      );
+    } finally {
+      setSingleOutletLoading(false);
+    }
+  };
   return (
     <>
       {pagePermission?.view ? (
@@ -486,6 +554,15 @@ const OutletRequestList = () => {
                 >
                   <RiRefreshFill size={20} />
                   Reset & Refresh
+                </Button>
+                <Button
+                  color="blue"
+                  size="sm"
+                  onClick={() =>
+                    setOpenAddOutletModal(true)
+                  }
+                >
+                  Add Outlet
                 </Button>
                 {/* <Button
               className="text-xs"
@@ -924,6 +1001,145 @@ const OutletRequestList = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+            </Modal.Body>
+          </Modal>
+          <Modal
+            show={openAddOutletModal}
+            onClose={() =>
+              setOpenAddOutletModal(false)
+            }
+            size="3xl"
+          >
+            <Modal.Header>
+              Add Outlet
+            </Modal.Header>
+
+            <Modal.Body>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div>
+                  <Label value="Outlet Name" />
+                  <TextInput
+                    name="outletName"
+                    value={singleOutletForm.outletName}
+                    onChange={handleSingleOutletChange}
+                  />
+                </div>
+
+                <div>
+                  <Label value="Owner Name" />
+                  <TextInput
+                    name="ownerName"
+                    value={singleOutletForm.ownerName}
+                    onChange={handleSingleOutletChange}
+                  />
+                </div>
+
+                <div>
+                  <Label value="Employee Code" />
+                  <TextInput
+                    name="employeeCode"
+                    value={singleOutletForm.employeeCode}
+                    onChange={handleSingleOutletChange}
+                  />
+                </div>
+
+                <div>
+                  <Label value="Beat Code" />
+                  <TextInput
+                    name="beatCode"
+                    value={singleOutletForm.beatCode}
+                    onChange={handleSingleOutletChange}
+                  />
+                </div>
+
+                <div>
+                  <Label value="State Code" />
+                  <TextInput
+                    name="stateCode"
+                    value={singleOutletForm.stateCode}
+                    onChange={handleSingleOutletChange}
+                  />
+                </div>
+
+                <div>
+                  <Label value="Mobile Number" />
+                  <TextInput
+                    name="mobile1"
+                    value={singleOutletForm.mobile1}
+                    onChange={handleSingleOutletChange}
+                  />
+                </div>
+
+                <div>
+                  <Label value="Alternate Number" />
+                  <TextInput
+                    name="mobile2"
+                    value={singleOutletForm.mobile2}
+                    onChange={handleSingleOutletChange}
+                  />
+                </div>
+
+                <div>
+                  <Label value="WhatsApp Number" />
+                  <TextInput
+                    name="whatsappNumber"
+                    value={singleOutletForm.whatsappNumber}
+                    onChange={handleSingleOutletChange}
+                  />
+                </div>
+
+                <div>
+                  <Label value="Email" />
+                  <TextInput
+                    name="email"
+                    value={singleOutletForm.email}
+                    onChange={handleSingleOutletChange}
+                  />
+                </div>
+
+                <div>
+                  <Label value="City" />
+                  <TextInput
+                    name="city"
+                    value={singleOutletForm.city}
+                    onChange={handleSingleOutletChange}
+                  />
+                </div>
+
+                <div>
+                  <Label value="PIN Code" />
+                  <TextInput
+                    name="pin"
+                    value={singleOutletForm.pin}
+                    onChange={handleSingleOutletChange}
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <Label value="Address" />
+                  <TextInput
+                    name="address1"
+                    value={singleOutletForm.address1}
+                    onChange={handleSingleOutletChange}
+                  />
+                </div>
+
+              </div>
+
+              <div className="flex justify-end mt-6">
+                {/* <Button
+                  color="success"
+                  onClick={
+                    handleCreateSingleOutlet
+                  }
+                  disabled={singleOutletLoading}
+                >
+                  {singleOutletLoading
+                    ? "Creating..."
+                    : "Create Outlet"}
+                </Button> */}
               </div>
             </Modal.Body>
           </Modal>

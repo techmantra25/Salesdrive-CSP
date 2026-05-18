@@ -494,6 +494,27 @@ export const bulkUploadProduct = async (payload) => {
   }
 };
 
+
+export async function createSingleOutlet(payload) {
+  try {
+    const response = await axios.post(
+      `${BACKEND_URL}/api/v1/outlet/create-single-outlet`,
+      payload,
+      {
+        headers: setAuthHeader(),
+      }
+    );
+
+    return response;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to create outlet"
+    );
+  }
+}
+
 export const updateProduct = async (payload, id) => {
   try {
     const response = await axios.patch(
