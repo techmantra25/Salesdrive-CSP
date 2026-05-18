@@ -264,7 +264,7 @@ const PriceProductModal = ({ setProductId, productId, setPriceModal }) => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4 w-full p-4">
+    <div className="flex flex-col items-center gap-4 w-full p-4 bg-gray-800 text-white dark:bg-gray-800 dark:text-white">
       {/* Filters */}
       <div className="w-full flex flex-wrap justify-center items-center gap-2">
         {" "}
@@ -273,7 +273,7 @@ const PriceProductModal = ({ setProductId, productId, setPriceModal }) => {
       </div>
       <div className="flex justify-start w-full items-center gap-2 flex-wrap">
         <div className="w-56">
-          <Label htmlFor="searchInput" value="Search" />
+          <Label htmlFor="searchInput" value="Search" className="text-white dark:text-white" />
           <TextInput
             id="searchInput"
             type="text"
@@ -284,7 +284,7 @@ const PriceProductModal = ({ setProductId, productId, setPriceModal }) => {
           />
         </div>
         <div className="w-56">
-          <Label htmlFor="brandSelect" value="Select Brand" />
+          <Label htmlFor="brandSelect" value="Select Brand" className="text-white dark:text-white" />
           <Select
             value={selectedBrand}
             onChange={(e) => setSelectedBrand(e.target.value)}
@@ -300,7 +300,7 @@ const PriceProductModal = ({ setProductId, productId, setPriceModal }) => {
           </Select>
         </div>
         <div className="w-56">
-          <Label htmlFor="subBrandSelect" value="Select Sub Brand" />
+          <Label htmlFor="subBrandSelect" value="Select Sub Brand" className="text-white dark:text-white" />
           <Select
             value={selectedSubBrand}
             onChange={(e) => setSelectedSubBrand(e.target.value)}
@@ -325,7 +325,7 @@ const PriceProductModal = ({ setProductId, productId, setPriceModal }) => {
           </Select>
         </div>
         <div className="w-56">
-          <Label htmlFor="categorySelect" value="Select Category" />
+          <Label htmlFor="categorySelect" value="Select Category" className="text-white dark:text-white" />
           <Select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -341,7 +341,7 @@ const PriceProductModal = ({ setProductId, productId, setPriceModal }) => {
           </Select>
         </div>
         <div className="w-56">
-          <Label htmlFor="collectionSelect" value="Select Collection" />
+          <Label htmlFor="collectionSelect" value="Select Collection" className="text-white dark:text-white" />
           <Select
             value={selectedCollection}
             onChange={(e) => setSelectedCollection(e.target.value)}
@@ -384,41 +384,40 @@ const PriceProductModal = ({ setProductId, productId, setPriceModal }) => {
         </div>
       ) : (
         <div className="overflow-x-auto w-full mt-2">
-          <Table hoverable striped>
-            <Table.Head className="text-center border-b-2  border-gray-200 text-white">
-              <Table.HeadCell>Product Code</Table.HeadCell>
-              <Table.HeadCell>Product Name</Table.HeadCell>
-              {/* <Table.HeadCell>Image</Table.HeadCell> */}
-              <Table.HeadCell>Brand</Table.HeadCell>
-              <Table.HeadCell>Sub Brand</Table.HeadCell>
-              <Table.HeadCell>Category</Table.HeadCell>
-              <Table.HeadCell>Collection</Table.HeadCell>
-              {/* <Table.HeadCell>Status</Table.HeadCell> */}
+          <Table className="text-sm whitespace-nowrap bg-white dark:bg-gray-800">
+            <Table.Head className="text-center text-sm bg-white dark:bg-gray-800 border-b-2 border-gray-700 dark:border-gray-700">
+              <Table.HeadCell className="px-2 py-1 sticky left-0 bg-white dark:bg-gray-800 border-r border-gray-700 dark:border-gray-700">Select</Table.HeadCell>
+              <Table.HeadCell className="px-2 py-1 whitespace-nowrap">Product Code</Table.HeadCell>
+              <Table.HeadCell className="px-2 py-1">Product Name</Table.HeadCell>
+              <Table.HeadCell className="px-2 py-1">Brand</Table.HeadCell>
+              <Table.HeadCell className="px-2 py-1">Sub Brand</Table.HeadCell>
+              <Table.HeadCell className="px-2 py-1">Category</Table.HeadCell>
+              <Table.HeadCell className="px-2 py-1">Collection</Table.HeadCell>
             </Table.Head>
-            <Table.Body>
+            <Table.Body className="divide-y bg-white dark:bg-gray-800">
               {paginatedProducts.map((product) => (
                 <Table.Row
                   key={product._id}
-                  className="text-center text-white text-xs border-b-1 border-gray-200"
+                  className="hover-row text-center text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  <Table.Cell className="text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                  <Table.Cell className="px-2 py-1 text-gray-900 dark:text-gray-200 whitespace-nowrap sticky left-0 bg-white dark:bg-gray-800 border-r border-gray-300 dark:border-gray-700">
                     <Checkbox
                       checked={productId?._id === product._id}
                       onChange={() => handleCheckboxChange(product)}
                       size={"sm"}
                     />
                   </Table.Cell>
-                  <Table.Cell>
+                  <Table.Cell className="px-2 py-1 text-gray-900 dark:text-gray-200 whitespace-nowrap">
                     <UniqueCode
                       text={product.product_code}
                       codeName="Product"
                     />
                   </Table.Cell>
-                  <Table.Cell>{product.name}</Table.Cell>
-                  <Table.Cell>{product?.brand?.name}</Table.Cell>
-                  <Table.Cell>{product?.subBrand?.name}</Table.Cell>
-                  <Table.Cell>{product?.cat_id?.name}</Table.Cell>
-                  <Table.Cell>{product?.collection_id?.name}</Table.Cell>
+                  <Table.Cell className="px-2 py-1">{product.name}</Table.Cell>
+                  <Table.Cell className="px-2 py-1">{product?.brand?.name}</Table.Cell>
+                  <Table.Cell className="px-2 py-1">{product?.subBrand?.name}</Table.Cell>
+                  <Table.Cell className="px-2 py-1">{product?.cat_id?.name}</Table.Cell>
+                  <Table.Cell className="px-2 py-1">{product?.collection_id?.name}</Table.Cell>
                 </Table.Row>
               ))}
             </Table.Body>
@@ -428,7 +427,7 @@ const PriceProductModal = ({ setProductId, productId, setPriceModal }) => {
 
       {/* Selected Summary (Optional) */}
       {selectedProductIds.length > 0 && (
-        <div className="w-full text-right text-sm text-gray-600 mt-2">
+        <div className="w-full text-right text-sm text-gray-300 mt-2">
           Selected Products: {selectedProductIds.length}
         </div>
       )}
