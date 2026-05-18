@@ -315,7 +315,9 @@ const Pricing = () => {
     setMrpPrice(pricing?.mrp_price ? pricing.mrp_price : "");
     setDlpPrice(pricing?.dlp_price ? pricing.dlp_price : "");
     setRlpPrice(pricing?.rlp_price ? pricing.rlp_price : "");
-    setCustomBasicDiscountPercentage(pricing?.custom_basic_discount_percentage ? pricing.custom_basic_discount_percentage : "");
+    setCustomBasicDiscountPercentage(
+      pricing?.customBasicDiscountPercentage ?? pricing?.custom_basic_discount_percentage ?? ""
+    );
     setRegionId(pricing?.regionId?._id ? pricing.regionId._id : "");
     setDistributorId(
       pricing?.distributorId?._id ? pricing.distributorId._id : ""
@@ -349,8 +351,8 @@ const Pricing = () => {
         productId: typeof productId === "object" ? productId._id : productId,
         mrp_price: mrpPrice,
         dlp_price: mrpPrice,
-        rlp_price: String(Number(mrpPrice) - Number(customBasicDiscountPercentage)),
-        custom_basic_discount_percentage: customBasicDiscountPercentage,
+        rlp_price: String(Number(mrpPrice) - (Number(mrpPrice) * Number(customBasicDiscountPercentage) / 100)),
+        customBasicDiscountPercentage: customBasicDiscountPercentage,
         price_type: priceType,
         effective_date: effectiveDate,
       };
@@ -388,8 +390,8 @@ const Pricing = () => {
               productId: productId?._id,
               mrp_price: mrpPrice,
               dlp_price: mrpPrice,
-              rlp_price: String(Number(mrpPrice) - Number(customBasicDiscountPercentage)),
-              custom_basic_discount_percentage: customBasicDiscountPercentage,
+              rlp_price: String(Number(mrpPrice) - (Number(mrpPrice) * Number(customBasicDiscountPercentage) / 100)),
+              customBasicDiscountPercentage: customBasicDiscountPercentage,
               price_type: priceType,
               effective_date: effectiveDate,
             };
@@ -505,8 +507,8 @@ const Pricing = () => {
 
   const handleCSVTemplateDownload = () => {
     const csv = [
-      "Region Code,Region Name,Distributor Code,Distributor Name,Product Code,MRP,DLP,RLP,Effective Date",
-      "REG-LX-007,Region1,DB07 (Optional Field),Rahul Dutta (Optional Field),VOL-25,100,90,80,31-12-2024",
+      "Product Code,MRP,Customer Basic Discount Percentage,Effective Date",
+      "VOL-25,500,10,31-12-2024",
     ];
     const csvString = csv.join("\n");
     const a = document.createElement("a");
@@ -624,7 +626,9 @@ const Pricing = () => {
     setMrpPrice(pricing?.mrp_price ? pricing.mrp_price : "");
     setDlpPrice(pricing?.dlp_price ? pricing.dlp_price : "");
     setRlpPrice(pricing?.rlp_price ? pricing.rlp_price : "");
-    setCustomBasicDiscountPercentage(pricing?.custom_basic_discount_percentage ? pricing.custom_basic_discount_percentage : "");
+    setCustomBasicDiscountPercentage(
+      pricing?.customBasicDiscountPercentage ?? pricing?.custom_basic_discount_percentage ?? ""
+    );
     setRegionId(pricing?.regionId?._id ? pricing.regionId._id : "");
     setDistributorId(
       pricing?.distributorId?._id ? pricing.distributorId._id : ""
@@ -1155,44 +1159,51 @@ const Pricing = () => {
                     Product Code
                   </Table.HeadCell>
 
-                  {/* Sticky Column 3 */}
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 sticky left-[280px] bg-white dark:bg-gray-800 border-r border-gray-300 dark:border-gray-700">
-                    Price Type
-                  </Table.HeadCell>
-
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Region Code
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Region Name
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Distributor Code
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Distributor Name
-                  </Table.HeadCell>
+                   {/* Price Type, Region, Distributor columns removed as requested */}
+                   {/* 
+                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 sticky left-[280px] bg-white dark:bg-gray-800 border-r border-gray-300 dark:border-gray-700">
+                     Price Type
+                   </Table.HeadCell>
+                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                     Region Code
+                   </Table.HeadCell>
+                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                     Region Name
+                   </Table.HeadCell>
+                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                     Distributor Code
+                   </Table.HeadCell>
+                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                     Distributor Name
+                   </Table.HeadCell>
+                   */}
                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                     Product Name
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Brand
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Category
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    UOM
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Pieces in a box
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    MRP
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    DLP
-                  </Table.HeadCell>
+                   {/* Brand, Category, UOM, Pieces in a box commented out */}
+                   {/* 
+                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                     Brand
+                   </Table.HeadCell>
+                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                     Category
+                   </Table.HeadCell>
+                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                     UOM
+                   </Table.HeadCell>
+                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                     Pieces in a box
+                   </Table.HeadCell>
+                   */}
+                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                     MRP
+                   </Table.HeadCell>
+                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                     Base <br/> Discount %
+                   </Table.HeadCell>
+                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                     DLP
+                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                     RLP
                   </Table.HeadCell>
@@ -1257,51 +1268,58 @@ const Pricing = () => {
                             />
                           </Table.Cell>
 
-                          {/* Sticky Column 3 */}
-                          <Table.Cell className="px-2 py-1 text-gray-900 dark:text-gray-200 whitespace-nowrap sticky left-[280px] bg-white dark:bg-gray-800 border-r border-gray-300 dark:border-gray-700">
-                            {price?.price_type}
-                          </Table.Cell>
-
-                          <Table.Cell className="px-2 py-1">
-                            <UniqueCode
-                              text={price?.regionId?.code}
-                              codeName="Region"
-                            />
-                          </Table.Cell>
-                          <Table.Cell className="px-2 py-1">
-                            {price?.regionId?.name ?? ""}
-                          </Table.Cell>
-                          <Table.Cell className="px-2 py-1">
-                            <UniqueCode
-                              text={price?.distributorId?.dbCode}
-                              codeName="DB"
-                            />
-                          </Table.Cell>
-                          <Table.Cell className="px-2 py-1">
-                            {price?.distributorId?.name ?? ""}
-                          </Table.Cell>
-                          <Table.Cell className="px-2 py-1">
-                            {price?.productId?.name}
-                          </Table.Cell>
-                          <Table.Cell className="px-2 py-1">
-                            {price?.productId?.brand?.name} (
-                            {price?.productId?.brand?.desc})
-                          </Table.Cell>
-                          <Table.Cell className="px-2 py-1">
-                            {price?.productId?.cat_id?.name}
-                          </Table.Cell>
-                          <Table.Cell className="px-2 py-1">
-                            {price?.productId?.uom}
-                          </Table.Cell>
-                          <Table.Cell className="px-2 py-1">
-                            {price?.productId?.no_of_pieces_in_a_box}
-                          </Table.Cell>
-                          <Table.Cell className="px-2 py-1">
-                            {Number(price.mrp_price).toLocaleString()}
-                          </Table.Cell>
-                          <Table.Cell className="px-2 py-1">
-                            {Number(price.dlp_price)?.toLocaleString() || ""}
-                          </Table.Cell>
+                           {/* Price Type, Region, Distributor cells removed */}
+                           {/* 
+                           <Table.Cell className="px-2 py-1 text-gray-900 dark:text-gray-200 whitespace-nowrap sticky left-[280px] bg-white dark:bg-gray-800 border-r border-gray-300 dark:border-gray-700">
+                             {price?.price_type}
+                           </Table.Cell>
+                           <Table.Cell className="px-2 py-1">
+                             <UniqueCode
+                               text={price?.regionId?.code}
+                               codeName="Region"
+                             />
+                           </Table.Cell>
+                           <Table.Cell className="px-2 py-1">
+                             {price?.regionId?.name ?? ""}
+                           </Table.Cell>
+                           <Table.Cell className="px-2 py-1">
+                             <UniqueCode
+                               text={price?.distributorId?.dbCode}
+                               codeName="DB"
+                             />
+                           </Table.Cell>
+                           <Table.Cell className="px-2 py-1">
+                             {price?.distributorId?.name ?? ""}
+                           </Table.Cell>
+                           */}
+                           <Table.Cell className="px-2 py-1">
+                             {price?.productId?.name}
+                           </Table.Cell>
+                           {/* Brand, Category, UOM, Pieces in a box commented out */}
+                           {/* 
+                           <Table.Cell className="px-2 py-1">
+                             {price?.productId?.brand?.name} (
+                             {price?.productId?.brand?.desc})
+                           </Table.Cell>
+                           <Table.Cell className="px-2 py-1">
+                             {price?.productId?.cat_id?.name}
+                           </Table.Cell>
+                           <Table.Cell className="px-2 py-1">
+                             {price?.productId?.uom}
+                           </Table.Cell>
+                           <Table.Cell className="px-2 py-1">
+                             {price?.productId?.no_of_pieces_in_a_box}
+                           </Table.Cell>
+                           */}
+                           <Table.Cell className="px-2 py-1">
+                             {Number(price.mrp_price).toLocaleString()}
+                           </Table.Cell>
+                           <Table.Cell className="px-2 py-1">
+                             {price?.custom_basic_discount_percentage ?? price?.customBasicDiscountPercentage ?? ""}
+                           </Table.Cell>
+                           <Table.Cell className="px-2 py-1">
+                             {Number(price.dlp_price)?.toLocaleString() || ""}
+                           </Table.Cell>
                           <Table.Cell className="px-2 py-1">
                             {Number(price.rlp_price)?.toLocaleString() || ""}
                           </Table.Cell>
@@ -1569,10 +1587,10 @@ const Pricing = () => {
                 </div> */}
                 <div className="w-full">
                   <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                    <Label value="Custom Basic discount percentage" />
+                    <Label value="Customer Basic discount percentage" />
                   </div>
                   <TextInput
-                    placeholder="Enter Custom Basic discount percentage"
+                    placeholder="Enter Customer Basic discount percentage"
                     value={customBasicDiscountPercentage}
                     onChange={(event) => setCustomBasicDiscountPercentage(event.target.value)}
                   />
