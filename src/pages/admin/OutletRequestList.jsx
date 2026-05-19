@@ -439,40 +439,84 @@ const OutletRequestList = () => {
 
   const handleCreateSingleOutlet = async () => {
     try {
+
+      // =========================
+      // REQUIRED FIELD VALIDATION
+      // =========================
+
+      if (
+        !singleOutletForm.outletCode?.trim() ||
+        !singleOutletForm.outletName?.trim() ||
+        !singleOutletForm.ownerName?.trim() ||
+        !singleOutletForm.beatCode?.trim() ||
+        !singleOutletForm.mobile1?.trim()
+      ) {
+        toast.error("Please fill all required fields");
+        return;
+      }
+
+      // =========================
+      // MOBILE VALIDATION
+      // =========================
+
+      const mobileRegex = /^[6-9]\d{9}$/;
+
+      if (!mobileRegex.test(singleOutletForm.mobile1?.trim())) {
+        toast.error("Enter valid 10 digit mobile number");
+        return;
+      }
+
       setSingleOutletLoading(true);
 
       const payload = {
-        outletCode: singleOutletForm.outletCode?.trim(),
 
-        outletName: singleOutletForm.outletName?.trim(),
+        outletCode:
+          singleOutletForm.outletCode?.trim(),
 
-        ownerName: singleOutletForm.ownerName?.trim(),
+        outletName:
+          singleOutletForm.outletName?.trim(),
 
-        employeeCode: singleOutletForm.employeeCode?.trim(),
+        ownerName:
+          singleOutletForm.ownerName?.trim(),
 
-        beatCode: singleOutletForm.beatCode?.trim(),
+        employeeCode:
+          singleOutletForm.employeeCode?.trim(),
 
-        stateCode: singleOutletForm.stateCode?.trim(),
+        beatCode:
+          singleOutletForm.beatCode?.trim(),
 
-        mobile1: singleOutletForm.mobile1?.trim(),
+        stateCode:
+          singleOutletForm.stateCode?.trim(),
 
-        mobile2: singleOutletForm.mobile2?.trim(),
+        mobile1:
+          singleOutletForm.mobile1?.trim(),
+
+        mobile2:
+          singleOutletForm.mobile2?.trim(),
 
         whatsappNumber:
           singleOutletForm.whatsappNumber?.trim(),
 
-        email: singleOutletForm.email?.trim(),
+        email:
+          singleOutletForm.email?.trim(),
 
-        address1: singleOutletForm.address1?.trim(),
+        address1:
+          singleOutletForm.address1?.trim(),
 
-        city: singleOutletForm.city?.trim(),
+        city:
+          singleOutletForm.city?.trim(),
 
-        pin: singleOutletForm.pin?.trim(),
+        pin:
+          singleOutletForm.pin?.trim(),
       };
 
-      console.log("CREATE OUTLET PAYLOAD", payload);
+      console.log(
+        "CREATE OUTLET PAYLOAD",
+        payload
+      );
 
-      const response = await createSingleOutlet(payload);
+      const response =
+        await createSingleOutlet(payload);
 
       toast.success(
         response?.data?.message ||
@@ -480,6 +524,10 @@ const OutletRequestList = () => {
       );
 
       setOpenAddOutletModal(false);
+
+      // =========================
+      // RESET FORM
+      // =========================
 
       setSingleOutletForm({
         outletCode: "",
@@ -511,6 +559,8 @@ const OutletRequestList = () => {
 
     } catch (error) {
 
+      console.error(error);
+
       toast.error(
         error?.response?.data?.message ||
         error?.message ||
@@ -518,7 +568,9 @@ const OutletRequestList = () => {
       );
 
     } finally {
+
       setSingleOutletLoading(false);
+
     }
   };
 
@@ -1153,13 +1205,18 @@ const OutletRequestList = () => {
                     {/* Outlet Code */}
                     <div>
                       <Label
-                        value="Outlet Code"
+                        value={
+                          <>
+                            Outlet Code <span className="text-red-500">*</span>
+                          </>
+                        }
                         className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
                         sizing="md"
                         shadow
+                        required
                         name="outletCode"
                         placeholder="Enter outlet code"
                         value={singleOutletForm.outletCode}
@@ -1171,13 +1228,18 @@ const OutletRequestList = () => {
                     {/* Outlet Name */}
                     <div>
                       <Label
-                        value="Outlet Name"
+                        value={
+                          <>
+                            Outlet Name <span className="text-red-500">*</span>
+                          </>
+                        }
                         className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
                         sizing="md"
                         shadow
+                        required
                         name="outletName"
                         placeholder="Enter outlet name"
                         value={singleOutletForm.outletName}
@@ -1189,13 +1251,18 @@ const OutletRequestList = () => {
                     {/* Owner Name */}
                     <div>
                       <Label
-                        value="Owner Name"
+                        value={
+                          <>
+                            Owner Name <span className="text-red-500">*</span>
+                          </>
+                        }
                         className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
                         sizing="md"
                         shadow
+                        required
                         name="ownerName"
                         placeholder="Enter owner name"
                         value={singleOutletForm.ownerName}
@@ -1207,7 +1274,11 @@ const OutletRequestList = () => {
                     {/* Beat Select */}
                     <div>
                       <Label
-                        value="Select Beat"
+                        value={
+                          <>
+                            Select Beat <span className="text-red-500">*</span>
+                          </>
+                        }
                         className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
@@ -1332,13 +1403,18 @@ const OutletRequestList = () => {
                     {/* Mobile Number */}
                     <div>
                       <Label
-                        value="Mobile Number"
+                        value={
+                          <>
+                            Mobile Number <span className="text-red-500">*</span>
+                          </>
+                        }
                         className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
                         sizing="md"
                         shadow
+                        required
                         name="mobile1"
                         placeholder="Mobile number"
                         value={singleOutletForm.mobile1}
