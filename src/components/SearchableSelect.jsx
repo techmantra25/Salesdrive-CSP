@@ -25,8 +25,8 @@ const SearchableSelect = ({
   const internalValue = multiple ? (Array.isArray(value) ? value : []) : value;
 
   useEffect(() => {
-      console.log("OPTIONS RECEIVED:", options);        // add this
-  console.log("DISPLAY KEY:", displayKey);
+    console.log("OPTIONS RECEIVED:", options);        // add this
+    console.log("DISPLAY KEY:", displayKey);
     const filtered = options.filter(
       (option) =>
         option[displayKey]?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -95,9 +95,8 @@ const SearchableSelect = ({
         (option) => option[valueKey] === internalValue
       );
       return selectedOption
-        ? `${selectedOption[displayKey]}${
-            selectedOption[descKey] ? ` (${selectedOption[descKey]})` : ""
-          }`
+        ? `${selectedOption[displayKey]}${selectedOption[descKey] ? ` (${selectedOption[descKey]})` : ""
+        }`
         : placeholder;
     }
   };
@@ -136,11 +135,11 @@ const SearchableSelect = ({
         aria-expanded={isOpen}
         aria-controls={`${id}-listbox`}
         tabIndex={disabled ? -1 : 0}
-        className={`flex items-center justify-between px-3 py-2 text-sm border border-gray-300 rounded-lg cursor-pointer outline-none focus:ring-2 focus:ring-indigo-500 ${
-          disabled
-            ? "bg-gray-100 dark:bg-gray-800 dark:text-gray-400 cursor-not-allowed"
-            : "bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-        } ${isOpen ? "ring-1 ring-lavender-600" : ""} dark:border-gray-600`}
+        className={`flex h-[42px] items-center justify-between rounded-xl border border-slate-900 bg-slate-700 px-4 text-sm text-white shadow-sm transition-all duration-200 outline-none focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500 ${
+  disabled
+    ? "cursor-not-allowed opacity-70"
+    : "hover:border-slate-500"
+} ${isOpen ? "ring-2 ring-indigo-500 border-indigo-500" : ""}`}
         onClick={() => !disabled && setIsOpen(!isOpen)}
         onKeyDown={handleKeyDown}
         aria-label={label || placeholder}
@@ -149,8 +148,8 @@ const SearchableSelect = ({
         <span
           className={
             (selectedDisplay() !== placeholder
-              ? "text-gray-900 dark:text-white/80"
-              : "text-gray-500 dark:text-gray-400") +
+              ? "text-white"
+              : "text-slate-400") +
             " truncate block max-w-[calc(100%-1.5rem)]"
           }
           title={selectedDisplay()}
@@ -158,9 +157,8 @@ const SearchableSelect = ({
           {selectedDisplay()}
         </span>
         <svg
-          className={`w-4 h-4 transition-transform ${
-            isOpen ? "rotate-180" : ""
-          } dark:text-gray-300`}
+          className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""
+            } dark:text-gray-300`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -179,9 +177,9 @@ const SearchableSelect = ({
           id={`${id}-listbox`}
           role="listbox"
           tabIndex={-1}
-          className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg max-h-96 overflow-hidden"
+          className="absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-slate-700 bg-[#1e293b] shadow-2xl"
         >
-          <div className="p-2 border-b border-gray-200 dark:border-gray-600">
+         <div className="border-b border-slate-700 p-2 bg-[#0f172a]">
             <TextInput
               sizing="sm"
               placeholder={`Search ${placeholder.toLowerCase()}...`}
@@ -227,53 +225,54 @@ const SearchableSelect = ({
             </div>
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option) => (
-                <div
-                  key={option[valueKey]}
-                  className={`flex items-center justify-between px-3 py-2 text-xs cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 ${
-                    isOptionSelected(option)
-                      ? "bg-blue-50 text-blue-600 dark:bg-blue-900/50 dark:text-blue-300"
-                      : "text-gray-900 dark:text-white/80"
-                  }`}
-                  role="option"
-                  aria-selected={isOptionSelected(option)}
-                  tabIndex={0}
-                  onClick={() => handleSelect(option)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleSelect(option);
-                  }}
-                >
-                  <span
-                    // No truncate here, just text-xs
-                    title={
-                      option[descKey]
-                        ? `${option[displayKey]} (${option[descKey]})`
-                        : option[displayKey]
-                    }
-                  >
-                    {option[displayKey]}
-                    {option[descKey] && (
-                      <span className="text-gray-500 text-xs dark:text-gray-400">
-                        {" "}
-                        ({option[descKey]})
-                      </span>
-                    )}
-                  </span>
-                  {multiple && isOptionSelected(option) && (
-                    <svg
-                      className="w-4 h-4 text-blue-600 dark:text-blue-300"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  )}
-                </div>
+               <div
+  key={option[valueKey]}
+  className={`flex items-center justify-between px-4 py-3 text-sm cursor-pointer transition-all duration-150 hover:bg-slate-700 ${
+    isOptionSelected(option)
+      ? "bg-indigo-600/20 text-indigo-300"
+      : "text-slate-200"
+  }`}
+  role="option"
+  aria-selected={isOptionSelected(option)}
+  tabIndex={0}
+  onClick={() => handleSelect(option)}
+  onKeyDown={(e) => {
+    if (e.key === "Enter") handleSelect(option);
+  }}
+>
+  <span
+    className="truncate"
+    title={
+      option[descKey]
+        ? `${option[displayKey]} (${option[descKey]})`
+        : option[displayKey]
+    }
+  >
+    {option[displayKey]}
+
+    {option[descKey] && (
+      <span className="ml-1 text-xs text-slate-400">
+        ({option[descKey]})
+      </span>
+    )}
+  </span>
+
+  {multiple && isOptionSelected(option) && (
+    <svg
+      className="w-4 h-4 text-indigo-300"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M5 13l4 4L19 7"
+      />
+    </svg>
+  )}
+</div>
               ))
             ) : (
               <div className="px-3 py-2 text-xs text-gray-500 dark:text-gray-400">

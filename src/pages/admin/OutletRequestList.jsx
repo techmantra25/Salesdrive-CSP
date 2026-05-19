@@ -11,6 +11,7 @@ import {
   Spinner,
   Table,
 } from "flowbite-react";
+import { beatListPaginated } from "../../api/api";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FaTimesCircle } from "react-icons/fa";
@@ -34,6 +35,7 @@ import { escapeCSVValue } from "../../utils/escapeCSVValue";
 import { getPagePermission } from "../../utils/permissionHelper";
 import { createSingleOutlet } from "../../api/api";
 import { TextInput } from "flowbite-react";
+import SearchableSelect from "../../components/SearchableSelect";
 
 
 const OutletRequestList = () => {
@@ -62,18 +64,31 @@ const OutletRequestList = () => {
   const [openAddOutletModal, setOpenAddOutletModal] = useState(false);
 
   const [singleOutletLoading, setSingleOutletLoading] = useState(false);
+  const [beats, setBeats] = useState([]);
+  const [beatsLoading, setBeatsLoading] = useState(false);
 
   const [singleOutletForm, setSingleOutletForm] = useState({
+    outletCode: "",
     outletName: "",
     ownerName: "",
+
     employeeCode: "",
+    employeeName: "",
+
     beatCode: "",
+
     stateCode: "",
+    region: "",
+    distributor: "",
+    beatType: "",
+
     mobile1: "",
     mobile2: "",
     whatsappNumber: "",
     email: "",
+
     address1: "",
+
     city: "",
     pin: "",
   });
@@ -102,6 +117,7 @@ const OutletRequestList = () => {
     setCurrentPage(1);
   }, [selectedRegion, selectedState, statusFilter, dateRange]);
   // const { zones } = useSelector((state) => state.zone);
+
 
   const { regions, loading: regionsLoading } = useSelector(
     (state) => state.region
@@ -425,9 +441,38 @@ const OutletRequestList = () => {
     try {
       setSingleOutletLoading(true);
 
-      const response = await createSingleOutlet(
-        singleOutletForm
-      );
+      const payload = {
+        outletCode: singleOutletForm.outletCode?.trim(),
+
+        outletName: singleOutletForm.outletName?.trim(),
+
+        ownerName: singleOutletForm.ownerName?.trim(),
+
+        employeeCode: singleOutletForm.employeeCode?.trim(),
+
+        beatCode: singleOutletForm.beatCode?.trim(),
+
+        stateCode: singleOutletForm.stateCode?.trim(),
+
+        mobile1: singleOutletForm.mobile1?.trim(),
+
+        mobile2: singleOutletForm.mobile2?.trim(),
+
+        whatsappNumber:
+          singleOutletForm.whatsappNumber?.trim(),
+
+        email: singleOutletForm.email?.trim(),
+
+        address1: singleOutletForm.address1?.trim(),
+
+        city: singleOutletForm.city?.trim(),
+
+        pin: singleOutletForm.pin?.trim(),
+      };
+
+      console.log("CREATE OUTLET PAYLOAD", payload);
+
+      const response = await createSingleOutlet(payload);
 
       toast.success(
         response?.data?.message ||
@@ -437,30 +482,84 @@ const OutletRequestList = () => {
       setOpenAddOutletModal(false);
 
       setSingleOutletForm({
+        outletCode: "",
         outletName: "",
         ownerName: "",
+
         employeeCode: "",
+        employeeName: "",
+
         beatCode: "",
+
         stateCode: "",
+        region: "",
+        distributor: "",
+        beatType: "",
+
         mobile1: "",
         mobile2: "",
         whatsappNumber: "",
         email: "",
+
         address1: "",
+
         city: "",
         pin: "",
       });
 
       fetchOutletsPaginated();
+
     } catch (error) {
+
       toast.error(
+        error?.response?.data?.message ||
         error?.message ||
         "Failed to create outlet"
       );
+
     } finally {
       setSingleOutletLoading(false);
     }
   };
+
+  const fetchBeatList = async () => {
+    try {
+      setBeatsLoading(true);
+
+      const response = await beatListPaginated({
+        page: 1,
+        limit: 1000,
+      });
+
+      setBeats(response?.data?.data || []);
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ||
+        "Failed to fetch beats"
+      );
+    } finally {
+      setBeatsLoading(false);
+    }
+  };
+
+  const commonInputClass =
+    "[&_input]:!h-[44px] " +
+    "[&_input]:!rounded-xl " +
+    "[&_input]:!border " +
+    "[&_input]:!border-slate-600 " +
+    "[&_input]:!bg-slate-700/80 " +
+    "[&_input]:!px-4 " +
+    "[&_input]:!text-sm " +
+    "[&_input]:!font-medium " +
+    "[&_input]:!text-white " +
+    "[&_input]:placeholder:!text-slate-400 " +
+    "[&_input]:!shadow-sm " +
+    "[&_input]:!transition-all " +
+    "[&_input]:!duration-200 " +
+    "[&_input]:focus:!border-indigo-500 " +
+    "[&_input]:focus:!ring-2 " +
+    "[&_input]:focus:!ring-indigo-500/40 " +
+    "[&_input]:focus:!bg-slate-700";
   return (
     <>
       {pagePermission?.view ? (
@@ -558,9 +657,10 @@ const OutletRequestList = () => {
                 <Button
                   color="blue"
                   size="sm"
-                  onClick={() =>
-                    setOpenAddOutletModal(true)
-                  }
+                  onClick={() => {
+                    fetchBeatList();
+                    setOpenAddOutletModal(true);
+                  }}
                 >
                   Add Outlet
                 </Button>
@@ -1007,47 +1107,72 @@ const OutletRequestList = () => {
 
 
 
-          {/* Add Outlet Modal - Compact Dark Theme */}
+
+
+
+
+
+
+
+          {/* Add Outlet Modal */}
           <Modal
             show={openAddOutletModal}
             onClose={() => setOpenAddOutletModal(false)}
-            size="4xl"
+            size="5xl"
             popup
           >
             <Modal.Body className="p-0 bg-transparent">
-              <div className="relative overflow-hidden rounded-2xl bg-[#0f172a] border border-slate-700 shadow-2xl">
+              <div className="relative overflow-hidden rounded-2xl border border-slate-700 bg-[#0f172a] shadow-2xl">
 
                 {/* Header */}
-                <div className="sticky top-0 z-10 bg-gradient-to-r from-[#111827] to-[#1e293b] border-b border-slate-700 px-5 py-4 flex items-center justify-between">
+                <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-700 bg-gradient-to-r from-[#111827] to-[#1e293b] px-6 py-4">
 
                   <div>
-                    <h2 className="text-2xl font-bold text-white tracking-wide">
+                    <h2 className="text-3xl font-bold tracking-wide text-white">
                       Add New Outlet
                     </h2>
 
-                    <p className="text-slate-400 text-sm mt-1">
+                    <p className="mt-1 text-sm text-slate-400">
                       Create outlet with complete retailer information
                     </p>
                   </div>
 
                   <button
                     onClick={() => setOpenAddOutletModal(false)}
-                    className="text-slate-400 hover:text-white hover:bg-slate-700 transition-all duration-200 rounded-full p-2"
+                    className="rounded-full p-2 text-slate-400 transition-all duration-200 hover:bg-slate-700 hover:text-white"
                   >
-                    <FaTimesCircle size={20} />
+                    <FaTimesCircle size={22} />
                   </button>
                 </div>
 
                 {/* Body */}
-                <div className="max-h-[72vh] overflow-y-auto px-5 py-5 bg-[#0f172a]">
+                <div className="max-h-[72vh] overflow-y-auto bg-[#0f172a] px-6 py-5">
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+                    {/* Outlet Code */}
+                    <div>
+                      <Label
+                        value="Outlet Code"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                      />
+
+                      <TextInput
+                        sizing="md"
+                        shadow
+                        name="outletCode"
+                        placeholder="Enter outlet code"
+                        value={singleOutletForm.outletCode}
+                        onChange={handleSingleOutletChange}
+                        className={commonInputClass}
+                      />
+                    </div>
 
                     {/* Outlet Name */}
                     <div>
                       <Label
                         value="Outlet Name"
-                        className="mb-1 block text-xs font-medium text-slate-300"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
@@ -1057,7 +1182,7 @@ const OutletRequestList = () => {
                         placeholder="Enter outlet name"
                         value={singleOutletForm.outletName}
                         onChange={handleSingleOutletChange}
-                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                        className={commonInputClass}
                       />
                     </div>
 
@@ -1065,7 +1190,7 @@ const OutletRequestList = () => {
                     <div>
                       <Label
                         value="Owner Name"
-                        className="mb-1 block text-xs font-medium text-slate-300"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
@@ -1075,7 +1200,62 @@ const OutletRequestList = () => {
                         placeholder="Enter owner name"
                         value={singleOutletForm.ownerName}
                         onChange={handleSingleOutletChange}
-                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                        className={commonInputClass}
+                      />
+                    </div>
+
+                    {/* Beat Select */}
+                    <div>
+                      <Label
+                        value="Select Beat"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                      />
+
+                      <SearchableSelect
+                        options={beats}
+                        value={singleOutletForm.beatCode}
+                        onChange={(e) => {
+                          const selectedBeat = beats.find(
+                            (beat) => beat.code === e.target.value
+                          );
+
+                          setSingleOutletForm({
+                            ...singleOutletForm,
+
+                            beatCode: selectedBeat?.code || "",
+
+                            stateCode:
+                              selectedBeat?.regionId?.stateId?.slug || "",
+
+                            city:
+                              selectedBeat?.distributorId?.[0]?.city || "",
+
+                            pin:
+                              selectedBeat?.distributorId?.[0]?.pincode || "",
+
+                            employeeCode:
+                              selectedBeat?.employeeId?.[0]?.empId || "",
+
+                            employeeName:
+                              selectedBeat?.employeeId?.[0]?.name || "",
+
+                            region:
+                              selectedBeat?.regionId?.name || "",
+
+                            distributor:
+                              selectedBeat?.distributorId?.[0]?.name || "",
+
+                            beatType:
+                              selectedBeat?.beat_type || "",
+                          });
+                        }}
+                        placeholder="Select Beat"
+                        disabled={beatsLoading}
+                        displayKey="name"
+                        valueKey="code"
+                        descKey="code"
+                        id="beat-select"
+                        className="w-full"
                       />
                     </div>
 
@@ -1083,35 +1263,27 @@ const OutletRequestList = () => {
                     <div>
                       <Label
                         value="Employee Code"
-                        className="mb-1 block text-xs font-medium text-slate-300"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
-                        sizing="md"
-                        shadow
-                        name="employeeCode"
-                        placeholder="Employee code"
                         value={singleOutletForm.employeeCode}
-                        onChange={handleSingleOutletChange}
-                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                        readOnly
+                        className={commonInputClass}
                       />
                     </div>
 
-                    {/* Beat Code */}
+                    {/* Employee Name */}
                     <div>
                       <Label
-                        value="Beat Code"
-                        className="mb-1 block text-xs font-medium text-slate-300"
+                        value="Employee Name"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
-                        sizing="md"
-                        shadow
-                        name="beatCode"
-                        placeholder="Beat code"
-                        value={singleOutletForm.beatCode}
-                        onChange={handleSingleOutletChange}
-                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                        value={singleOutletForm.employeeName}
+                        readOnly
+                        className={commonInputClass}
                       />
                     </div>
 
@@ -1119,25 +1291,49 @@ const OutletRequestList = () => {
                     <div>
                       <Label
                         value="State Code"
-                        className="mb-1 block text-xs font-medium text-slate-300"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
-                        sizing="md"
-                        shadow
-                        name="stateCode"
-                        placeholder="WB"
                         value={singleOutletForm.stateCode}
-                        onChange={handleSingleOutletChange}
-                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                        readOnly
+                        className={commonInputClass}
                       />
                     </div>
 
-                    {/* Mobile */}
+                    {/* Region */}
+                    <div>
+                      <Label
+                        value="Region"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                      />
+
+                      <TextInput
+                        value={singleOutletForm.region}
+                        readOnly
+                        className={commonInputClass}
+                      />
+                    </div>
+
+                    {/* Beat Type */}
+                    <div>
+                      <Label
+                        value="Beat Type"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                      />
+
+                      <TextInput
+                        value={singleOutletForm.beatType}
+                        readOnly
+                        className={commonInputClass}
+                      />
+                    </div>
+
+                    {/* Mobile Number */}
                     <div>
                       <Label
                         value="Mobile Number"
-                        className="mb-1 block text-xs font-medium text-slate-300"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
@@ -1147,15 +1343,15 @@ const OutletRequestList = () => {
                         placeholder="Mobile number"
                         value={singleOutletForm.mobile1}
                         onChange={handleSingleOutletChange}
-                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                        className={commonInputClass}
                       />
                     </div>
 
-                    {/* Alternate */}
+                    {/* Alternate Number */}
                     <div>
                       <Label
                         value="Alternate Number"
-                        className="mb-1 block text-xs font-medium text-slate-300"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
@@ -1165,15 +1361,15 @@ const OutletRequestList = () => {
                         placeholder="Alternate number"
                         value={singleOutletForm.mobile2}
                         onChange={handleSingleOutletChange}
-                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                        className={commonInputClass}
                       />
                     </div>
 
-                    {/* WhatsApp */}
+                    {/* WhatsApp Number */}
                     <div>
                       <Label
                         value="WhatsApp Number"
-                        className="mb-1 block text-xs font-medium text-slate-300"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
@@ -1183,7 +1379,7 @@ const OutletRequestList = () => {
                         placeholder="WhatsApp number"
                         value={singleOutletForm.whatsappNumber}
                         onChange={handleSingleOutletChange}
-                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                        className={commonInputClass}
                       />
                     </div>
 
@@ -1191,7 +1387,7 @@ const OutletRequestList = () => {
                     <div>
                       <Label
                         value="Email"
-                        className="mb-1 block text-xs font-medium text-slate-300"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
@@ -1202,7 +1398,7 @@ const OutletRequestList = () => {
                         placeholder="Enter email"
                         value={singleOutletForm.email}
                         onChange={handleSingleOutletChange}
-                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                        className={commonInputClass}
                       />
                     </div>
 
@@ -1210,17 +1406,13 @@ const OutletRequestList = () => {
                     <div>
                       <Label
                         value="City"
-                        className="mb-1 block text-xs font-medium text-slate-300"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
-                        sizing="md"
-                        shadow
-                        name="city"
-                        placeholder="Enter city"
                         value={singleOutletForm.city}
-                        onChange={handleSingleOutletChange}
-                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                        readOnly
+                        className={commonInputClass}
                       />
                     </div>
 
@@ -1228,17 +1420,13 @@ const OutletRequestList = () => {
                     <div>
                       <Label
                         value="PIN Code"
-                        className="mb-1 block text-xs font-medium text-slate-300"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
-                        sizing="md"
-                        shadow
-                        name="pin"
-                        placeholder="PIN code"
                         value={singleOutletForm.pin}
-                        onChange={handleSingleOutletChange}
-                        className="[&_input]:bg-slate-800 [&_input]:border-slate-600 [&_input]:text-white [&_input]:placeholder-slate-400 [&_input]:py-2 [&_input]:text-sm"
+                        readOnly
+                        className={commonInputClass}
                       />
                     </div>
 
@@ -1246,28 +1434,47 @@ const OutletRequestList = () => {
                     <div className="md:col-span-2">
                       <Label
                         value="Address"
-                        className="mb-1 block text-xs font-medium text-slate-300"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <textarea
-                        rows={3}
+                        rows={4}
                         name="address1"
                         placeholder="Enter complete address"
                         value={singleOutletForm.address1}
                         onChange={handleSingleOutletChange}
-                        className="w-full rounded-xl border border-slate-600 bg-slate-800 px-4 py-3 text-sm text-white placeholder-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="
+                w-full
+                rounded-xl
+                border
+                border-slate-600
+                bg-slate-700
+                px-4
+                py-3
+                text-sm
+                font-medium
+                text-white
+                placeholder-slate-400
+                shadow-sm
+                transition-all
+                duration-200
+                focus:border-indigo-500
+                focus:ring-2
+                focus:ring-indigo-500/40
+                focus:outline-none
+              "
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Footer */}
-                <div className="sticky bottom-0 border-t border-slate-700 bg-[#111827] px-5 py-4 flex items-center justify-end gap-3">
+                <div className="sticky bottom-0 flex items-center justify-end gap-3 border-t border-slate-700 bg-[#111827] px-6 py-4">
 
                   <Button
                     color="gray"
                     onClick={() => setOpenAddOutletModal(false)}
-                    className="bg-slate-700 hover:bg-slate-600 border-0 text-sm"
+                    className="border-0 bg-slate-700 text-sm hover:bg-slate-600"
                   >
                     Cancel
                   </Button>
@@ -1275,7 +1482,7 @@ const OutletRequestList = () => {
                   <Button
                     onClick={handleCreateSingleOutlet}
                     disabled={singleOutletLoading}
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border-0 px-5 text-sm"
+                    className="border-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 text-sm hover:from-blue-500 hover:to-indigo-500"
                   >
                     {singleOutletLoading ? (
                       <div className="flex items-center gap-2">
