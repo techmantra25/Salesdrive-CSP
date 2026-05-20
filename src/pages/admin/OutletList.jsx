@@ -1297,7 +1297,7 @@ const OutletList = () => {
             </Button>
           </div>
           <div className="flex justify-end gap-2">
-            <Button
+            {/* <Button
               className="text-xs"
               size="xs"
               color="blue"
@@ -1310,9 +1310,9 @@ const OutletList = () => {
                 <IoSyncCircleSharp size={20} />
                 {syncingOutlets ? "Syncing..." : "Sync outlets"}
               </span>
-            </Button>
+            </Button> */}
 
-            <Button
+            {/* <Button
               className="text-xs"
               size="xs"
               color="purple"
@@ -1325,9 +1325,9 @@ const OutletList = () => {
                 <IoSyncCircleSharp size={20} />
                 {updatingSync ? "Updating..." : "Update Sync"}
               </span>
-            </Button>
+            </Button> */}
 
-            <Button
+            {/* <Button
               className="text-xs"
               size="xs"
               color="warning"
@@ -1340,7 +1340,7 @@ const OutletList = () => {
                 <IoSyncCircleSharp size={20} />
                 {customSyncing ? "Syncing..." : "Custom Sync"}
               </span>
-            </Button>
+            </Button> */}
           </div>
         </Card>
       </div>
