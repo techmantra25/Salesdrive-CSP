@@ -943,7 +943,7 @@ export const Employee = () => {
                   </Button>
                 )}
               </div>
-              <div>
+              {/* <div>
                 <p className="text-sm text-red-500 flex items-center gap-2 mb-1">
                   <IoInformationCircleSharp size={20} /> CSP field:{" "}
                   <u>EMPLOYEE ID</u> is SFA field: <u>LABEL</u>
@@ -952,7 +952,7 @@ export const Employee = () => {
                   <IoInformationCircleSharp size={20} /> CSP field: <u>LABEL</u> is
                   SFA field: <u>Emp_id</u>
                 </p>
-              </div>
+              </div> */}
             </Card>
           </div>
 
@@ -977,15 +977,15 @@ export const Employee = () => {
                 {" "}
                 <Table.Head className="text-center">
                   <Table.HeadCell className="whitespace-nowrap text-center">
-                    Employee ID <br />
-                    SFA field: <u className="text-red-500">label</u>
+                    Employee ID 
+                    
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap text-center">
                     Employee Name
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap text-center">
-                    Label <br />
-                    SFA field: <u className="text-red-500">Emp_id</u>
+                    EMP Label 
+                 
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap text-center">
                     Email

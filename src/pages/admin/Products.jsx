@@ -1353,10 +1353,10 @@ const Product = () => {
                       <Table.HeadCell>product_code</Table.HeadCell>
                       <Table.HeadCell>EAN</Table.HeadCell>
                       <Table.HeadCell>Description</Table.HeadCell>
-                      <Table.HeadCell>Size</Table.HeadCell>
-                      <Table.HeadCell>Color</Table.HeadCell>
+                      {/* <Table.HeadCell>Size</Table.HeadCell> */}
+                      {/* <Table.HeadCell>Color</Table.HeadCell> */}
                       <Table.HeadCell>Pack</Table.HeadCell>
-                      <Table.HeadCell>Supplier</Table.HeadCell>
+                      {/* <Table.HeadCell>Supplier</Table.HeadCell> */}
                       <Table.HeadCell>Brand</Table.HeadCell>
                       <Table.HeadCell>subBrand</Table.HeadCell>
                       <Table.HeadCell>Category</Table.HeadCell>
@@ -1370,7 +1370,7 @@ const Product = () => {
                       <Table.HeadCell>CGST</Table.HeadCell>
                       <Table.HeadCell>SGST</Table.HeadCell>
                       <Table.HeadCell>IGST</Table.HeadCell>
-                      <Table.HeadCell>Base Point</Table.HeadCell>
+                      {/* <Table.HeadCell>Base Point</Table.HeadCell> */}
                       <Table.HeadCell>Created</Table.HeadCell>
                       <Table.HeadCell>Updated</Table.HeadCell>
                       <Table.HeadCell>Status</Table.HeadCell>
@@ -1409,16 +1409,16 @@ const Product = () => {
                             <Table.Cell>{product?.name || "-"}</Table.Cell>
 
                             {/* SIZE */}
-                            <Table.Cell>{product?.size || "-"}</Table.Cell>
+                            {/* <Table.Cell>{product?.size || "-"}</Table.Cell> */}
 
                             {/* COLOR */}
-                            <Table.Cell>{product?.color || "-"}</Table.Cell>
+                            {/* <Table.Cell>{product?.color || "-"}</Table.Cell> */}
 
                             {/* PACK */}
                             <Table.Cell>{product?.pack || "-"}</Table.Cell>
 
                             {/* SUPPLIER */}
-                            <Table.Cell>
+                            {/* <Table.Cell>
                               {product?.supplier &&
                                 typeof product?.supplier === "object" && (
                                   <>
@@ -1519,7 +1519,7 @@ const Product = () => {
                             <Table.Cell>{product?.igst || "-"}</Table.Cell>
 
                             {/* BASE POINT */}
-                            <Table.Cell>{product?.base_point || "-"}</Table.Cell>
+                            {/* <Table.Cell>{product?.base_point || "-"}</Table.Cell> */}
 
                             {/* CREATED */}
                             <Table.Cell>
