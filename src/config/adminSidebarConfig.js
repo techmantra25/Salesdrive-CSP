@@ -366,83 +366,84 @@ export const adminSidebarConfig = [
       },
     ],
   },
-  {
-    type: "collapse",
-    label: "RBP App",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      // {
-      //   label: "App Banner",
-      //   path: "/admin/rvp-app-banner",
-      //   icon: PiFlagBannerFoldLight,
-      // },
-      // {
-      //   label: "Gift Master",
-      //   path: "/admin/rbp-reward-products",
-      //   icon: FaGift,
-      // },
-      // {
-      //   label: "Terms & Conditions",
-      //   path: "/admin/rvp-terms-conditions",
-      //   icon: MdChecklist,
-      // },
-      // {
-      //   label: "Catalogue",
-      //   path: "/admin/rvp-catalogue",
-      //   icon: MdChecklist,
-      // },
-      {
-        label: "Multiplier Slab Config",
-        path: "/admin/retailer-multiplier-slab-config",
-        icon: MdChecklist,
-      },
-      {
-        label: "Multiplier Transactions",
-        path: "/admin/retailer-multiplier-transactions",
-        icon: MdChecklist,
-      },
-      {
-        label: "Distributor Transactions",
-        path: "/admin/rbp-reward-transactions",
-        icon: MdChecklist,
-      },
-      {
-        label: "Retailer Transaction History",
-        path: "/admin/retailer-transaction-history",
-        icon: MdChecklist,
-      },
-      {
-        label: "Reward Products",
-        path: "/admin/rbp-reward-products",
-        icon: FaGift,
-      },
-      {
-        label: "RBP Catalogue",
-        path: "/admin/rbp-catalogue",
-        icon: GrCatalogOption,
-      },
-      {
-        label: "RBP Banner",
-        path: "/admin/rbp-banner",
-        icon: GiTatteredBanner,
-      },
-      {
-        label: "Terms & Conditions",
-        path: "/admin/rvp-terms-conditions",
-        icon: MdChecklist,
-      },
-      {
-        label: "Retailer Orders",
-        path: "/admin/retailer-orders",
-        icon: LiaBorderStyleSolid,
-      },
-      {
-        label: "App Versions",
-        path: "/admin/app-versions",
-        icon: FaMobileAlt,
-      },
-    ],
-  },
+
+  // {
+  //   type: "collapse",
+  //   label: "RBP App",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     // {
+  //     //   label: "App Banner",
+  //     //   path: "/admin/rvp-app-banner",
+  //     //   icon: PiFlagBannerFoldLight,
+  //     // },
+  //     // {
+  //     //   label: "Gift Master",
+  //     //   path: "/admin/rbp-reward-products",
+  //     //   icon: FaGift,
+  //     // },
+  //     // {
+  //     //   label: "Terms & Conditions",
+  //     //   path: "/admin/rvp-terms-conditions",
+  //     //   icon: MdChecklist,
+  //     // },
+  //     // {
+  //     //   label: "Catalogue",
+  //     //   path: "/admin/rvp-catalogue",
+  //     //   icon: MdChecklist,
+  //     // },
+  //     {
+  //       label: "Multiplier Slab Config",
+  //       path: "/admin/retailer-multiplier-slab-config",
+  //       icon: MdChecklist,
+  //     },
+  //     {
+  //       label: "Multiplier Transactions",
+  //       path: "/admin/retailer-multiplier-transactions",
+  //       icon: MdChecklist,
+  //     },
+  //     {
+  //       label: "Distributor Transactions",
+  //       path: "/admin/rbp-reward-transactions",
+  //       icon: MdChecklist,
+  //     },
+  //     {
+  //       label: "Retailer Transaction History",
+  //       path: "/admin/retailer-transaction-history",
+  //       icon: MdChecklist,
+  //     },
+  //     {
+  //       label: "Reward Products",
+  //       path: "/admin/rbp-reward-products",
+  //       icon: FaGift,
+  //     },
+  //     {
+  //       label: "RBP Catalogue",
+  //       path: "/admin/rbp-catalogue",
+  //       icon: GrCatalogOption,
+  //     },
+  //     {
+  //       label: "RBP Banner",
+  //       path: "/admin/rbp-banner",
+  //       icon: GiTatteredBanner,
+  //     },
+  //     {
+  //       label: "Terms & Conditions",
+  //       path: "/admin/rvp-terms-conditions",
+  //       icon: MdChecklist,
+  //     },
+  //     {
+  //       label: "Retailer Orders",
+  //       path: "/admin/retailer-orders",
+  //       icon: LiaBorderStyleSolid,
+  //     },
+  //     {
+  //       label: "App Versions",
+  //       path: "/admin/app-versions",
+  //       icon: FaMobileAlt,
+  //     },
+  //   ],
+  // },
   {
     type: "collapse",
     label: "Settings & Configs",
@@ -904,93 +905,95 @@ export const usersidebarconfig = [
       },
     ],
   },
-  {
-    type: "collapse",
-    label: "RBP App",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      // {
-      //   label: "App Banner",
-      //   path: "/user/rvp-app-banner",
-      //   icon: PiFlagBannerFoldLight,
-      // },
-      // {
-      //   label: "Gift Master",
-      //   path: "/user/rbp-reward-products",
-      //   icon: FaGift,
-      // },
-      // {
-      //   label: "Terms & Conditions",
-      //   path: "/user/rvp-terms-conditions",
-      //   icon: MdChecklist,
-      // },
-      // {
-      //   label: "Catalogue",
-      //   path: "/user/rvp-catalogue",
-      //   icon: MdChecklist,
-      // },
-      {
-        label: "Multiplier Slab Config",
-        path: "/user/retailer-multiplier-slab-config",
-        icon: MdChecklist,
-        slug: "multiplier-slab-config",
-      },
-      {
-        label: "Multiplier Transactions",
-        path: "/user/retailer-multiplier-transactions",
-        icon: MdChecklist,
-        slug: "multiplier-transactions",
-      },
-      {
-        label: "Distributor Transactions",
-        path: "/user/rbp-reward-transactions",
-        icon: MdChecklist,
-        slug: "distributor-transactions",
-      },
-      {
-        label: "Retailer Transaction History",
-        path: "/user/retailer-transaction-history",
-        icon: MdChecklist,
-        slug: "retailer-transaction-history",
-      },
-      {
-        label: "Reward Products",
-        path: "/user/rbp-reward-products",
-        icon: FaGift,
-        slug: "reward-products",
-      },
-      {
-        label: "RBP Catalogue",
-        path: "/user/rbp-catalogue",
-        icon: GrCatalogOption,
-        slug: "rbp-catalogue",
-      },
-      {
-        label: "RBP Banner",
-        path: "/user/rbp-banner",
-        icon: GiTatteredBanner,
-        slug: "rbp-banner",
-      },
-      {
-        label: "Terms & Conditions",
-        path: "/user/rvp-terms-conditions",
-        icon: MdChecklist,
-        slug: "terms-and-conditions",
-      },
-      {
-        label: "Retailer Orders",
-        path: "/user/retailer-orders",
-        icon: LiaBorderStyleSolid,
-        slug: "retailer-orders",
-      },
-      {
-        label: "App Versions",
-        path: "/user/app-versions",
-        icon: FaMobileAlt,
-        slug: "app-versions",
-      },
-    ],
-  },
+
+
+  // {
+  //   type: "collapse",
+  //   label: "RBP App",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     // {
+  //     //   label: "App Banner",
+  //     //   path: "/user/rvp-app-banner",
+  //     //   icon: PiFlagBannerFoldLight,
+  //     // },
+  //     // {
+  //     //   label: "Gift Master",
+  //     //   path: "/user/rbp-reward-products",
+  //     //   icon: FaGift,
+  //     // },
+  //     // {
+  //     //   label: "Terms & Conditions",
+  //     //   path: "/user/rvp-terms-conditions",
+  //     //   icon: MdChecklist,
+  //     // },
+  //     // {
+  //     //   label: "Catalogue",
+  //     //   path: "/user/rvp-catalogue",
+  //     //   icon: MdChecklist,
+  //     // },
+  //     {
+  //       label: "Multiplier Slab Config",
+  //       path: "/user/retailer-multiplier-slab-config",
+  //       icon: MdChecklist,
+  //       slug: "multiplier-slab-config",
+  //     },
+  //     {
+  //       label: "Multiplier Transactions",
+  //       path: "/user/retailer-multiplier-transactions",
+  //       icon: MdChecklist,
+  //       slug: "multiplier-transactions",
+  //     },
+  //     {
+  //       label: "Distributor Transactions",
+  //       path: "/user/rbp-reward-transactions",
+  //       icon: MdChecklist,
+  //       slug: "distributor-transactions",
+  //     },
+  //     {
+  //       label: "Retailer Transaction History",
+  //       path: "/user/retailer-transaction-history",
+  //       icon: MdChecklist,
+  //       slug: "retailer-transaction-history",
+  //     },
+  //     {
+  //       label: "Reward Products",
+  //       path: "/user/rbp-reward-products",
+  //       icon: FaGift,
+  //       slug: "reward-products",
+  //     },
+  //     {
+  //       label: "RBP Catalogue",
+  //       path: "/user/rbp-catalogue",
+  //       icon: GrCatalogOption,
+  //       slug: "rbp-catalogue",
+  //     },
+  //     {
+  //       label: "RBP Banner",
+  //       path: "/user/rbp-banner",
+  //       icon: GiTatteredBanner,
+  //       slug: "rbp-banner",
+  //     },
+  //     {
+  //       label: "Terms & Conditions",
+  //       path: "/user/rvp-terms-conditions",
+  //       icon: MdChecklist,
+  //       slug: "terms-and-conditions",
+  //     },
+  //     {
+  //       label: "Retailer Orders",
+  //       path: "/user/retailer-orders",
+  //       icon: LiaBorderStyleSolid,
+  //       slug: "retailer-orders",
+  //     },
+  //     {
+  //       label: "App Versions",
+  //       path: "/user/app-versions",
+  //       icon: FaMobileAlt,
+  //       slug: "app-versions",
+  //     },
+  //   ],
+  // },
   {
     type: "collapse",
     label: "Settings & Configs",
@@ -1449,92 +1452,95 @@ export const subadminssidebarconfig = [
       },
     ],
   },
-  {
-    type: "collapse",
-    label: "RBP App",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      // {
-      //   label: "App Banner",
-      //   path: "/sub-admins/rvp-app-banner",
-      //   icon: PiFlagBannerFoldLight,
-      // },
-      // {
-      //   label: "Gift Master",
-      //   path: "/sub-admins/rbp-reward-products",
-      //   icon: FaGift,
-      // },
-      // {
-      //   label: "Terms & Conditions",
-      //   path: "/sub-admins/rvp-terms-conditions",
-      //   icon: MdChecklist,
-      // },
-      // {
-      //   label: "Catalogue",
-      //   path: "/sub-admins/rvp-catalogue",
-      //   icon: MdChecklist,
-      // },
-      {
-        label: "Multiplier Slab Config",
-        path: "/sub-admins/multiplier-slab-config",
-        icon: MdChecklist,
-        slug: "multiplier-slab-config",
-      },
-      {
-        label: "Multiplier Transactions",
-        path: "/sub-admins/retailer-multiplier-transactions",
-        icon: MdChecklist,
-        slug: "multiplier-transactions",
-      },
-      {
-        label: "Distributor Transactions",
-        path: "/sub-admins/rbp-reward-transactions",
-        icon: MdChecklist,
-        slug: "distributor-transactions",
-      },
-      {
-        label: "Retailer Transaction History",
-        path: "/sub-admins/retailer-transaction-history",
-        icon: MdChecklist,
-        slug: "retailer-transaction-history",
-      },
-      {
-        label: "Reward Products",
-        path: "/sub-admins/rbp-reward-products",
-        icon: FaGift,
-        slug: "reward-products",
-      },
-      {
-        label: "RBP Catalogue",
-        path: "/sub-admins/rbp-catalogue",
-        icon: GrCatalogOption,
-        slug: "rbp-catalogue",
-      },
-      {
-        label: "RBP Banner",
-        path: "/sub-admins/rbp-banner",
-        icon: GiTatteredBanner,
-        slug: "rbp-banner",
-      },
-      {
-        label: "Terms & Conditions",
-        path: "/sub-admins/rvp-terms-conditions",
-        icon: MdChecklist,
-        slug: "terms-and-conditions",
-      },
-      {
-        label: "Retailer Orders",
-        path: "/sub-admins/retailer-orders",
-        icon: LiaBorderStyleSolid,
-        slug: "retailer-orders",
-      },
-      {
-        label: "App Versions",
-        path: "/sub-admins/app-versions",
-        icon: FaMobileAlt,
-      },
-    ],
-  },
+
+
+  // {
+  //   type: "collapse",
+  //   label: "RBP App",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     // {
+  //     //   label: "App Banner",
+  //     //   path: "/sub-admins/rvp-app-banner",
+  //     //   icon: PiFlagBannerFoldLight,
+  //     // },
+  //     // {
+  //     //   label: "Gift Master",
+  //     //   path: "/sub-admins/rbp-reward-products",
+  //     //   icon: FaGift,
+  //     // },
+  //     // {
+  //     //   label: "Terms & Conditions",
+  //     //   path: "/sub-admins/rvp-terms-conditions",
+  //     //   icon: MdChecklist,
+  //     // },
+  //     // {
+  //     //   label: "Catalogue",
+  //     //   path: "/sub-admins/rvp-catalogue",
+  //     //   icon: MdChecklist,
+  //     // },
+  //     {
+  //       label: "Multiplier Slab Config",
+  //       path: "/sub-admins/multiplier-slab-config",
+  //       icon: MdChecklist,
+  //       slug: "multiplier-slab-config",
+  //     },
+  //     {
+  //       label: "Multiplier Transactions",
+  //       path: "/sub-admins/retailer-multiplier-transactions",
+  //       icon: MdChecklist,
+  //       slug: "multiplier-transactions",
+  //     },
+  //     {
+  //       label: "Distributor Transactions",
+  //       path: "/sub-admins/rbp-reward-transactions",
+  //       icon: MdChecklist,
+  //       slug: "distributor-transactions",
+  //     },
+  //     {
+  //       label: "Retailer Transaction History",
+  //       path: "/sub-admins/retailer-transaction-history",
+  //       icon: MdChecklist,
+  //       slug: "retailer-transaction-history",
+  //     },
+  //     {
+  //       label: "Reward Products",
+  //       path: "/sub-admins/rbp-reward-products",
+  //       icon: FaGift,
+  //       slug: "reward-products",
+  //     },
+  //     {
+  //       label: "RBP Catalogue",
+  //       path: "/sub-admins/rbp-catalogue",
+  //       icon: GrCatalogOption,
+  //       slug: "rbp-catalogue",
+  //     },
+  //     {
+  //       label: "RBP Banner",
+  //       path: "/sub-admins/rbp-banner",
+  //       icon: GiTatteredBanner,
+  //       slug: "rbp-banner",
+  //     },
+  //     {
+  //       label: "Terms & Conditions",
+  //       path: "/sub-admins/rvp-terms-conditions",
+  //       icon: MdChecklist,
+  //       slug: "terms-and-conditions",
+  //     },
+  //     {
+  //       label: "Retailer Orders",
+  //       path: "/sub-admins/retailer-orders",
+  //       icon: LiaBorderStyleSolid,
+  //       slug: "retailer-orders",
+  //     },
+  //     {
+  //       label: "App Versions",
+  //       path: "/sub-admins/app-versions",
+  //       icon: FaMobileAlt,
+  //     },
+  //   ],
+  // },
+
   {
     type: "collapse",
     label: "Settings & Configs",
@@ -1993,93 +1999,99 @@ export const aaadminsesidebarconfig = [
       },
     ],
   },
-  {
-    type: "collapse",
-    label: "RBP App",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      // {
-      //   label: "App Banner",
-      //   path: "/admine/rvp-app-banner",
-      //   icon: PiFlagBannerFoldLight,
-      // },
-      // {
-      //   label: "Gift Master",
-      //   path: "/admine/rbp-reward-products",
-      //   icon: FaGift,
-      // },
-      // {
-      //   label: "Terms & Conditions",
-      //   path: "/admine/rbp-terms-conditions",
-      //   icon: MdChecklist,
-      // },
-      // {
-      //   label: "Catalogue",
-      //   path: "/admine/rbp-catalogue",
-      //   icon: MdChecklist,
-      // },
-      {
-        label: "Multiplier Slab Config",
-        path: "/admine/retailer-multiplier-slab-config",
-        icon: MdChecklist,
-        slug: "multiplier-slab-config",
-      },
-      {
-        label: "Multiplier Transactions",
-        path: "/admine/retailer-multiplier-transactions",
-        icon: MdChecklist,
-        slug: "multiplier-transactions",
-      },
-      {
-        label: "Distributor Transactions",
-        path: "/admine/rbp-reward-transactions",
-        icon: MdChecklist,
-        slug: "distributor-transactions",
-      },
 
-      {
-        label: "Retailer Transaction History",
-        path: "/admine/retailer-transaction-history",
-        icon: MdChecklist,
-        slug: "retailer-transaction-history",
-      },
-      {
-        label: "Reward Products",
-        path: "/admine/rbp-reward-products",
-        icon: FaGift,
-        slug: "reward-products",
-      },
-      {
-        label: "RBP Catalogue",
-        path: "/admine/rbp-catalogue",
-        icon: GrCatalogOption,
-        slug: "rbp-catalogue",
-      },
-      {
-        label: "RBP Banner",
-        path: "/admine/rbp-banner",
-        icon: GiTatteredBanner,
-        slug: "rbp-banner",
-      },
-      {
-        label: "Terms & Conditions",
-        path: "/admine/rbp-terms-conditions",
-        icon: MdChecklist,
-        slug: "terms-and-conditions",
-      },
-      {
-        label: "Retailer Orders",
-        path: "/admine/retailer-orders",
-        icon: LiaBorderStyleSolid,
-        slug: "retailer-orders",
-      },
-      {
-        label: "App Versions",
-        path: "/admine/app-versions",
-        icon: FaMobileAlt,
-      },
-    ],
-  },
+
+
+  // {
+  //   type: "collapse",
+  //   label: "RBP App",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     // {
+  //     //   label: "App Banner",
+  //     //   path: "/admine/rvp-app-banner",
+  //     //   icon: PiFlagBannerFoldLight,
+  //     // },
+  //     // {
+  //     //   label: "Gift Master",
+  //     //   path: "/admine/rbp-reward-products",
+  //     //   icon: FaGift,
+  //     // },
+  //     // {
+  //     //   label: "Terms & Conditions",
+  //     //   path: "/admine/rbp-terms-conditions",
+  //     //   icon: MdChecklist,
+  //     // },
+  //     // {
+  //     //   label: "Catalogue",
+  //     //   path: "/admine/rbp-catalogue",
+  //     //   icon: MdChecklist,
+  //     // },
+  //     {
+  //       label: "Multiplier Slab Config",
+  //       path: "/admine/retailer-multiplier-slab-config",
+  //       icon: MdChecklist,
+  //       slug: "multiplier-slab-config",
+  //     },
+  //     {
+  //       label: "Multiplier Transactions",
+  //       path: "/admine/retailer-multiplier-transactions",
+  //       icon: MdChecklist,
+  //       slug: "multiplier-transactions",
+  //     },
+  //     {
+  //       label: "Distributor Transactions",
+  //       path: "/admine/rbp-reward-transactions",
+  //       icon: MdChecklist,
+  //       slug: "distributor-transactions",
+  //     },
+
+  //     {
+  //       label: "Retailer Transaction History",
+  //       path: "/admine/retailer-transaction-history",
+  //       icon: MdChecklist,
+  //       slug: "retailer-transaction-history",
+  //     },
+  //     {
+  //       label: "Reward Products",
+  //       path: "/admine/rbp-reward-products",
+  //       icon: FaGift,
+  //       slug: "reward-products",
+  //     },
+  //     {
+  //       label: "RBP Catalogue",
+  //       path: "/admine/rbp-catalogue",
+  //       icon: GrCatalogOption,
+  //       slug: "rbp-catalogue",
+  //     },
+  //     {
+  //       label: "RBP Banner",
+  //       path: "/admine/rbp-banner",
+  //       icon: GiTatteredBanner,
+  //       slug: "rbp-banner",
+  //     },
+  //     {
+  //       label: "Terms & Conditions",
+  //       path: "/admine/rbp-terms-conditions",
+  //       icon: MdChecklist,
+  //       slug: "terms-and-conditions",
+  //     },
+  //     {
+  //       label: "Retailer Orders",
+  //       path: "/admine/retailer-orders",
+  //       icon: LiaBorderStyleSolid,
+  //       slug: "retailer-orders",
+  //     },
+  //     {
+  //       label: "App Versions",
+  //       path: "/admine/app-versions",
+  //       icon: FaMobileAlt,
+  //     },
+  //   ],
+  // },
+
+
+
   {
     type: "collapse",
     label: "Settings & Configs",
@@ -2538,92 +2550,92 @@ export const salessidebarconfig = [
       },
     ],
   },
-  {
-    type: "collapse",
-    label: "RBP App",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      // {
-      //   label: "App Banner",
-      //   path: "/Sales/rvp-app-banner",
-      //   icon: PiFlagBannerFoldLight,
-      // },
-      // {
-      //   label: "Gift Master",
-      //   path: "/Sales/rbp-reward-products",
-      //   icon: FaGift,
-      // },
-      // {
-      //   label: "Terms & Conditions",
-      //   path: "/Sales/rvp-terms-conditions",
-      //   icon: MdChecklist,
-      // },
-      // {
-      //   label: "Catalogue",
-      //   path: "/Sales/rvp-catalogue",
-      //   icon: MdChecklist,
-      // },
-      {
-        label: "Multiplier Slab Config",
-        path: "/Sales/retailer-multiplier-slab-config",
-        icon: MdChecklist,
-        slug: "multiplier-slab-config",
-      },
-      {
-        label: "Multiplier Transactions",
-        path: "/Sales/retailer-multiplier-transactions",
-        icon: MdChecklist,
-        slug: "multiplier-transactions",
-      },
-      {
-        label: "Distributor Transactions",
-        path: "/Sales/rbp-reward-transactions",
-        icon: MdChecklist,
-        slug: "distributor-transactions",
-      },
-      {
-        label: "Retailer Transaction History",
-        path: "/Sales/retailer-transaction-history",
-        icon: MdChecklist,
-        slug: "retailer-transaction-history",
-      },
-      {
-        label: "Reward Products",
-        path: "/Sales/rbp-reward-products",
-        icon: FaGift,
-        slug: "reward-products",
-      },
-      {
-        label: "RBP Catalogue",
-        path: "/Sales/rbp-catalogue",
-        icon: GrCatalogOption,
-        slug: "rbp-catalogue",
-      },
-      {
-        label: "RBP Banner",
-        path: "/Sales/rbp-banner",
-        icon: GiTatteredBanner,
-        slug: "rbp-banner",
-      },
-      {
-        label: "Terms & Conditions",
-        path: "/Sales/rbp-terms-conditions",
-        icon: MdChecklist,
-        slug: "terms-and-conditions",
-      },
-      {
-        label: "Retailer Orders",
-        path: "/Sales/retailer-orders",
-        icon: LiaBorderStyleSolid,
-        slug: "retailer-orders",
-      },
-      {
-        label: "App Versions",
-        path: "/Sales/app-versions",
-        icon: FaMobileAlt,
-      },
-    ],
-  },
+  // {
+  //   type: "collapse",
+  //   label: "RBP App",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     // {
+  //     //   label: "App Banner",
+  //     //   path: "/Sales/rvp-app-banner",
+  //     //   icon: PiFlagBannerFoldLight,
+  //     // },
+  //     // {
+  //     //   label: "Gift Master",
+  //     //   path: "/Sales/rbp-reward-products",
+  //     //   icon: FaGift,
+  //     // },
+  //     // {
+  //     //   label: "Terms & Conditions",
+  //     //   path: "/Sales/rvp-terms-conditions",
+  //     //   icon: MdChecklist,
+  //     // },
+  //     // {
+  //     //   label: "Catalogue",
+  //     //   path: "/Sales/rvp-catalogue",
+  //     //   icon: MdChecklist,
+  //     // },
+  //     {
+  //       label: "Multiplier Slab Config",
+  //       path: "/Sales/retailer-multiplier-slab-config",
+  //       icon: MdChecklist,
+  //       slug: "multiplier-slab-config",
+  //     },
+  //     {
+  //       label: "Multiplier Transactions",
+  //       path: "/Sales/retailer-multiplier-transactions",
+  //       icon: MdChecklist,
+  //       slug: "multiplier-transactions",
+  //     },
+  //     {
+  //       label: "Distributor Transactions",
+  //       path: "/Sales/rbp-reward-transactions",
+  //       icon: MdChecklist,
+  //       slug: "distributor-transactions",
+  //     },
+  //     {
+  //       label: "Retailer Transaction History",
+  //       path: "/Sales/retailer-transaction-history",
+  //       icon: MdChecklist,
+  //       slug: "retailer-transaction-history",
+  //     },
+  //     {
+  //       label: "Reward Products",
+  //       path: "/Sales/rbp-reward-products",
+  //       icon: FaGift,
+  //       slug: "reward-products",
+  //     },
+  //     {
+  //       label: "RBP Catalogue",
+  //       path: "/Sales/rbp-catalogue",
+  //       icon: GrCatalogOption,
+  //       slug: "rbp-catalogue",
+  //     },
+  //     {
+  //       label: "RBP Banner",
+  //       path: "/Sales/rbp-banner",
+  //       icon: GiTatteredBanner,
+  //       slug: "rbp-banner",
+  //     },
+  //     {
+  //       label: "Terms & Conditions",
+  //       path: "/Sales/rbp-terms-conditions",
+  //       icon: MdChecklist,
+  //       slug: "terms-and-conditions",
+  //     },
+  //     {
+  //       label: "Retailer Orders",
+  //       path: "/Sales/retailer-orders",
+  //       icon: LiaBorderStyleSolid,
+  //       slug: "retailer-orders",
+  //     },
+  //     {
+  //       label: "App Versions",
+  //       path: "/Sales/app-versions",
+  //       icon: FaMobileAlt,
+  //     },
+  //   ],
+  // },
   {
     type: "collapse",
     label: "Settings & Configs",
