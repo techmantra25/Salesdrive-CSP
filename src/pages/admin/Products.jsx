@@ -1251,7 +1251,7 @@ const Product = () => {
                     </span>
                   </Button>
 
-                  {pagePermission?.update && (
+                  {/* {pagePermission?.update && (
                     <Button
                       size="xs"
                       color="blue"
@@ -1267,7 +1267,7 @@ const Product = () => {
                           {syncingProducts ? "Syncing..." : "Sync Products"}
                         </span>
                       </span>
-                    </Button>)}
+                    </Button>)} */}
 
                   {pagePermission?.create && (
                     <Button
