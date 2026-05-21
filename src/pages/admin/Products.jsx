@@ -348,7 +348,7 @@ const Product = () => {
     // Use downloadFile utility for CSV export toast notification
     downloadFile({
       url: url,
-      queryParams: params,
+      // queryParams,
       fileName: "products.csv",
     });
   };
