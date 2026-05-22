@@ -808,6 +808,13 @@ const Pricing = () => {
     dispatch(fetchBrands());
   }, [dispatch]);
 
+  // Auto inactivate expired prices once on first render (background)
+  useEffect(() => {
+    inactivePriceByExpiredDate().catch((err) => {
+      console.error("Auto inactivate expired prices failed:", err);
+    });
+  }, []);
+
   useEffect(() => {
     fetchPricingPaginated();
     // eslint-disable-next-line react-hooks/exhaustive-deps
