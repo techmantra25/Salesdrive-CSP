@@ -3,6 +3,7 @@ import {
   Badge,
   Button,
   Card,
+  Dropdown,
   Label,
   Modal,
   Pagination,
@@ -1135,44 +1136,34 @@ const Pricing = () => {
                 )}
 
                 {pagePermission?.create && (
-                  <Button
-                    className="text-xs"
-                    size="sm"
-                    color="warning"
-                    onClick={() => setOpenMaterialPriceUploadModal(true)}
+                  <Dropdown
+                    dismissOnClick={true}
+                    label="Upload Price"
+                    renderTrigger={() => (
+                      <Button className="text-xs" size="sm" color="warning">
+                        <span className="flex justify-center items-center gap-2">
+                          <BiSolidFileImport size={20} />
+                          Upload Price
+                        </span>
+                      </Button>
+                    )}
                   >
-                    <span className="flex justify-center items-center gap-2">
-                      <BiSolidFileImport size={20} />
+                    <Dropdown.Item
+                      onClick={() => setOpenMaterialPriceUploadModal(true)}
+                    >
                       Material Price Upload
-                    </span>
-                  </Button>
-                )}
-
-                {pagePermission?.create && (
-                  <Button
-                    className="text-xs"
-                    size="sm"
-                    color="warning"
-                    onClick={() => setOpenCategoryPriceUploadModal(true)}
-                  >
-                    <span className="flex justify-center items-center gap-2">
-                      <BiSolidFileImport size={20} />
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      onClick={() => setOpenCategoryPriceUploadModal(true)}
+                    >
                       Category's Price Upload
-                    </span>
-                  </Button>
-                )}
-                {pagePermission?.create && (
-                  <Button
-                    className="text-xs"
-                    size="sm"
-                    color="warning"
-                    onClick={() => setOpenMrpPriceUploadModal(true)}
-                  >
-                    <span className="flex justify-center items-center gap-2">
-                      <BiSolidFileImport size={20} />
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                      onClick={() => setOpenMrpPriceUploadModal(true)}
+                    >
                       MRP Price Upload
-                    </span>
-                  </Button>
+                    </Dropdown.Item>
+                  </Dropdown>
                 )}
                 <Button
                   className={`text-xs`}
@@ -1753,7 +1744,7 @@ const Pricing = () => {
           <Modal
             show={openMaterialPriceUploadModal}
             onClose={() => setOpenMaterialPriceUploadModal(false)}
-            size="2xl"
+            size="3xl"
           >
             <Modal.Header>Material Price Upload</Modal.Header>
             <Modal.Body>
@@ -1788,7 +1779,7 @@ const Pricing = () => {
           <Modal
             show={openCategoryPriceUploadModal}
             onClose={() => setOpenCategoryPriceUploadModal(false)}
-            size="2xl"
+            size="3xl"
           >
             <Modal.Header>Category's Price Upload</Modal.Header>
             <Modal.Body>
@@ -1823,7 +1814,7 @@ const Pricing = () => {
           <Modal
             show={openMrpPriceUploadModal}
             onClose={() => setOpenMrpPriceUploadModal(false)}
-            size="2xl"
+            size="3xl"
           >
             <Modal.Header>MRP Price Upload</Modal.Header>
             <Modal.Body>
