@@ -14,7 +14,8 @@ import {
 import moment from "moment";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { BiSolidFileExport } from "react-icons/bi";
+import Papa from "papaparse";
+import { BiSolidFileExport, BiSolidFileImport } from "react-icons/bi";
 import { FaPlus } from "react-icons/fa";
 import { IoMdAddCircle } from "react-icons/io";
 import { MdDownloadForOffline, MdSimCardDownload } from "react-icons/md";
@@ -65,16 +66,16 @@ const Pricing = () => {
   const sortedCategoryList = sortByName(categoryList);
   const activeBrands = sortedBrandList.filter((brand) => brand.status === true);
   const activeCategories = sortedCategoryList.filter(
-    (category) => category.status === true
+    (category) => category.status === true,
   );
 
   const { collections: collectionList } = useSelector(
-    (state) => state.collection
+    (state) => state.collection,
   );
 
   const sortedCollectionList = sortByName(collectionList);
   const activeCollections = sortedCollectionList.filter(
-    (collection) => collection.status === true
+    (collection) => collection.status === true,
   );
 
   const [pricing, setPricing] = useState([]);
@@ -91,16 +92,25 @@ const Pricing = () => {
   const [mrpPrice, setMrpPrice] = useState("");
   const [dlpPrice, setDlpPrice] = useState("");
   const [rlpPrice, setRlpPrice] = useState("");
-  const [customBasicDiscountPercentage, setCustomBasicDiscountPercentage] = useState("");
+  const [L1DiscountPercentage, setL1DiscountPercentage] = useState("");
+  const [L2DiscountPercentage, setL2DiscountPercentage] = useState("");
   const [regionId, setRegionId] = useState("");
   const [distributorId, setDistributorId] = useState("");
   const [modalMode, setModalMode] = useState("add");
   const [selectedPricing, setSelectedPricing] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
-  const [priceType, setPriceType] = useState("national");
+  const [priceType, setPriceType] = useState("regional");
   const [effectiveDate, setEffectiveDate] = useState(new Date());
   const [priceInactiveModal, setPriceInactiveModal] = useState(false);
   const [inactiveType, setInactiveType] = useState("");
+  const [openMaterialPriceUploadModal, setOpenMaterialPriceUploadModal] =
+    useState(false);
+  const [openCategoryPriceUploadModal, setOpenCategoryPriceUploadModal] =
+    useState(false);
+  const [bulkCsvData, setBulkCsvData] = useState([]);
+  const [openBulkConfirmModal, setOpenBulkConfirmModal] = useState(false);
+  const [bulkUploading, setBulkUploading] = useState(false);
+  const [bulkUploadType, setBulkUploadType] = useState("material");
 
   const [selectedPriceCode, setSelectedPriceCode] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("default");
@@ -221,7 +231,7 @@ const Pricing = () => {
         `${BACKEND_URL}/api/v1/price/all-list-paginated`,
         {
           params: query,
-        }
+        },
       );
 
       setPricing(response?.data?.data);
@@ -233,8 +243,8 @@ const Pricing = () => {
       console.log(error);
       toast.error(
         error?.response?.data?.message ||
-        error?.message ||
-        "Failed to fetch pricing"
+          error?.message ||
+          "Failed to fetch pricing",
       );
     } finally {
       setPricingLoading(false);
@@ -243,7 +253,7 @@ const Pricing = () => {
 
   let fetchPricingPaginated = useDebounce(
     fetchPricingPaginatedWithOutDebounce,
-    500
+    500,
   );
 
   const { openConfirmationModel } = useContext(ConfirmationModelContext);
@@ -315,16 +325,23 @@ const Pricing = () => {
     setMrpPrice(pricing?.mrp_price ? pricing.mrp_price : "");
     setDlpPrice(pricing?.dlp_price ? pricing.dlp_price : "");
     setRlpPrice(pricing?.rlp_price ? pricing.rlp_price : "");
-    setCustomBasicDiscountPercentage(
-      pricing?.customBasicDiscountPercentage ?? pricing?.custom_basic_discount_percentage ?? ""
+    setL1DiscountPercentage(
+      pricing?.L1DiscountPercentage ?? pricing?.L1_discount_percentage ?? "",
+    );
+    setL2DiscountPercentage(
+      pricing?.L2DiscountPercentage ??
+        pricing?.L2_discount_percentage ??
+        pricing?.customBasicDiscountPercentage ??
+        pricing?.custom_basic_discount_percentage ??
+        "",
     );
     setRegionId(pricing?.regionId?._id ? pricing.regionId._id : "");
     setDistributorId(
-      pricing?.distributorId?._id ? pricing.distributorId._id : ""
+      pricing?.distributorId?._id ? pricing.distributorId._id : "",
     );
     setSelectedPricing(pricing ? pricing : "");
     setEffectiveDate(
-      new Date(pricing?.effective_date).toISOString().split("T")[0]
+      new Date(pricing?.effective_date).toISOString().split("T")[0],
     );
   };
 
@@ -335,11 +352,12 @@ const Pricing = () => {
     setMrpPrice("");
     setDlpPrice("");
     setRlpPrice("");
-    setCustomBasicDiscountPercentage("");
+    setL1DiscountPercentage("");
+    setL2DiscountPercentage("");
     setRegionId("");
     setDistributorId("");
     setSelectedPricing(null);
-    setPriceType("national");
+    setPriceType("regional");
     setEffectiveDate("");
   };
 
@@ -350,9 +368,16 @@ const Pricing = () => {
       const payload = {
         productId: typeof productId === "object" ? productId._id : productId,
         mrp_price: mrpPrice,
-        dlp_price: mrpPrice,
-        rlp_price: String(Number(mrpPrice) - (Number(mrpPrice) * Number(customBasicDiscountPercentage) / 100)),
-        customBasicDiscountPercentage: customBasicDiscountPercentage,
+        dlp_price: String(
+          Number(mrpPrice) -
+            (Number(mrpPrice) * Number(L1DiscountPercentage)) / 100,
+        ),
+        rlp_price: String(
+          Number(mrpPrice) -
+            (Number(mrpPrice) * Number(L2DiscountPercentage)) / 100,
+        ),
+        L1DiscountPercentage: L1DiscountPercentage,
+        L2DiscountPercentage: L2DiscountPercentage,
         price_type: priceType,
         effective_date: effectiveDate,
       };
@@ -389,9 +414,16 @@ const Pricing = () => {
             const payload = {
               productId: productId?._id,
               mrp_price: mrpPrice,
-              dlp_price: mrpPrice,
-              rlp_price: String(Number(mrpPrice) - (Number(mrpPrice) * Number(customBasicDiscountPercentage) / 100)),
-              customBasicDiscountPercentage: customBasicDiscountPercentage,
+              dlp_price: String(
+                Number(mrpPrice) -
+                  (Number(mrpPrice) * Number(L1DiscountPercentage)) / 100,
+              ),
+              rlp_price: String(
+                Number(mrpPrice) -
+                  (Number(mrpPrice) * Number(L2DiscountPercentage)) / 100,
+              ),
+              L1DiscountPercentage: L1DiscountPercentage,
+              L2DiscountPercentage: L2DiscountPercentage,
               price_type: priceType,
               effective_date: effectiveDate,
             };
@@ -411,7 +443,7 @@ const Pricing = () => {
             console.error(error);
             toast.error(
               error?.response?.data?.message ||
-              "Failed to update price, try again"
+                "Failed to update price, try again",
             );
           } finally {
             setFormLoading(false);
@@ -426,8 +458,9 @@ const Pricing = () => {
 
   const handleStatusUpdate = async (pricing) => {
     openConfirmationModel({
-      question: `Are you sure you want to ${pricing.status ? "deactivate" : "activate"
-        } this pricing?`,
+      question: `Are you sure you want to ${
+        pricing.status ? "deactivate" : "activate"
+      } this pricing?`,
       answer: ["Yes", "No"],
       onClose: async (result) => {
         if (result) {
@@ -447,8 +480,8 @@ const Pricing = () => {
             console.error(error);
             toast.error(
               error?.message ??
-              error?.response?.data?.message ??
-              "Failed to update pricing status"
+                error?.response?.data?.message ??
+                "Failed to update pricing status",
             );
           }
         } else {
@@ -507,14 +540,26 @@ const Pricing = () => {
 
   const handleCSVTemplateDownload = () => {
     const csv = [
-      "Product Code,MRP,Customer Basic Discount Percentage,Effective Date",
-      "VOL-25,500,10,31-12-2024",
+      "Product Code,MRP,L1(%),L2(%),Effective Date",
+      "VOL-25,500,10,5,31-12-2024",
     ];
     const csvString = csv.join("\n");
     const a = document.createElement("a");
 
     a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
     a.setAttribute("download", "pricing_template.csv");
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const handleCategoryCSVTemplateDownload = () => {
+    const csv = ["Category,MRP,L1(%),L2(%)", "CAT-01,500,10,5"];
+    const csvString = csv.join("\n");
+    const a = document.createElement("a");
+
+    a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
+    a.setAttribute("download", "category_pricing_template.csv");
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -529,7 +574,7 @@ const Pricing = () => {
 
       // Dynamically get all unique keys from the errorLog array
       const headers = Array.from(
-        new Set(errorLog.flatMap((obj) => Object.keys(obj)))
+        new Set(errorLog.flatMap((obj) => Object.keys(obj))),
       );
 
       // CSV header
@@ -562,58 +607,121 @@ const Pricing = () => {
       console.error(error);
       toast.error(
         error?.response?.data?.message ||
-        error?.message ||
-        "Failed to export error log, try again"
+          error?.message ||
+          "Failed to export error log, try again",
       );
     }
   };
 
-  const [importingCsv, setImportingCsv] = useState(false);
   const [importingCsvForPriceInactive, setImportingCsvForPriceInactive] =
     useState(false);
 
-  const handleCSVImport = async (url) => {
-    try {
-      openConfirmationModel({
-        question: "Are you sure you want to import this Pricing CSV?",
-        answer: ["Yes", "No"],
-        onClose: async (result) => {
-          if (result) {
-            try {
-              let payload = {
-                file: url,
-              };
-              setImportingCsv(true);
-              const res = await bulkUpload(payload, "Price");
-
-              if (res?.data?.skippedRows?.length > 0) {
-                toast.error(
-                  `${res?.data?.skippedRows?.length} rows skipped, ${res?.data?.data?.length ? res?.data?.data?.length : 0
-                  } rows imported`
-                );
-                setErrorLog(res?.data?.skippedRows);
-              } else {
-                toast.success(`${res?.data?.data?.length} rows imported`);
-              }
-              onCloseModal();
-            } catch (error) {
-              console.error(error);
-              toast.error(
-                error?.response?.data?.message ||
-                "Failed to import pricing, try again"
-              );
-            } finally {
-              setImportingCsv(false);
-              fetchPricingPaginated();
-            }
-          } else {
-            onCloseModal();
+  const parseCSVFile = (file) => {
+    return new Promise((resolve, reject) => {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        quoteChar: '"',
+        escapeChar: '"',
+        delimiter: ",",
+        complete: (results) => {
+          if (results.errors.length > 0) {
+            console.error("CSV Parse Errors:", results.errors);
+            reject("CSV format error. Check commas and quotes.");
             return;
           }
+
+          const rows = results.data;
+
+          if (!rows || rows.length === 0) {
+            reject("CSV file is empty or invalid");
+            return;
+          }
+
+          const parsedData = rows.map((row, index) => ({
+            rowNumber: index + 2,
+            ...row,
+          }));
+
+          resolve(parsedData);
         },
       });
+    });
+  };
+
+  const handleUploadClick = (type) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".csv";
+
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      try {
+        const parsed = await parseCSVFile(file);
+        setBulkCsvData(parsed);
+        setBulkUploadType(type);
+        setOpenBulkConfirmModal(true);
+      } catch (err) {
+        console.error(err);
+        toast.error("Invalid CSV file. Please check the format and try again.");
+      }
+    };
+
+    input.click();
+  };
+
+  const handleBulkConfirmSubmit = async () => {
+    try {
+      setBulkUploading(true);
+
+      // Strip rowNumber before re-serializing to avoid extra column
+      const cleanData = bulkCsvData.map(({ rowNumber, ...rest }) => rest);
+
+      const formData = new FormData();
+      const csvString = Papa.unparse(cleanData);
+      const blob = new Blob([csvString], { type: "text/csv" });
+      formData.append("my_file", blob, `${bulkUploadType}_price_upload.csv`);
+
+      const uploadRes = await axios.post(
+        BACKEND_URL + "/api/v1/cloudinary/upload",
+        formData,
+      );
+
+      const url = uploadRes?.data?.secure_url;
+
+      if (!url) {
+        toast.error("Failed to upload file to cloud");
+        return;
+      }
+
+      const payload = { file: url };
+      const res = await bulkUpload(payload, "Price");
+
+      if (res?.data?.skippedRows?.length > 0) {
+        toast.error(
+          `${res?.data?.skippedRows?.length} rows skipped, ${
+            res?.data?.data?.length ? res?.data?.data?.length : 0
+          } rows imported`,
+        );
+        setErrorLog(res?.data?.skippedRows);
+      } else {
+        toast.success(`${res?.data?.data?.length} rows imported`);
+      }
+
+      setOpenBulkConfirmModal(false);
+      setBulkCsvData([]);
+      fetchPricingPaginated();
     } catch (error) {
       console.error(error);
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to import pricing, try again",
+      );
+    } finally {
+      setBulkUploading(false);
     }
   };
 
@@ -626,16 +734,23 @@ const Pricing = () => {
     setMrpPrice(pricing?.mrp_price ? pricing.mrp_price : "");
     setDlpPrice(pricing?.dlp_price ? pricing.dlp_price : "");
     setRlpPrice(pricing?.rlp_price ? pricing.rlp_price : "");
-    setCustomBasicDiscountPercentage(
-      pricing?.customBasicDiscountPercentage ?? pricing?.custom_basic_discount_percentage ?? ""
+    setL1DiscountPercentage(
+      pricing?.L1DiscountPercentage ?? pricing?.L1_discount_percentage ?? "",
+    );
+    setL2DiscountPercentage(
+      pricing?.L2DiscountPercentage ??
+        pricing?.L2_discount_percentage ??
+        pricing?.customBasicDiscountPercentage ??
+        pricing?.custom_basic_discount_percentage ??
+        "",
     );
     setRegionId(pricing?.regionId?._id ? pricing.regionId._id : "");
     setDistributorId(
-      pricing?.distributorId?._id ? pricing.distributorId._id : ""
+      pricing?.distributorId?._id ? pricing.distributorId._id : "",
     );
     setSelectedPricing(pricing ? pricing : "");
     setEffectiveDate(
-      new Date(pricing?.effective_date).toISOString().split("T")[0]
+      new Date(pricing?.effective_date).toISOString().split("T")[0],
     );
   };
 
@@ -665,7 +780,7 @@ const Pricing = () => {
       "download",
       inactiveType === "priceCode"
         ? "inactive_by_price_code_template.csv"
-        : "inactive_by_product_code_template.csv"
+        : "inactive_by_product_code_template.csv",
     );
     document.body.appendChild(a);
     a.click();
@@ -700,8 +815,9 @@ const Pricing = () => {
 
               if (res?.data?.skippedRows?.length > 0) {
                 toast.error(
-                  `${res?.data?.skippedRows?.length} rows skipped, ${res?.data?.data?.length ? res?.data?.data?.length : 0
-                  } rows success`
+                  `${res?.data?.skippedRows?.length} rows skipped, ${
+                    res?.data?.data?.length ? res?.data?.data?.length : 0
+                  } rows success`,
                 );
                 setErrorLog(res?.data?.skippedRows);
               } else {
@@ -713,7 +829,7 @@ const Pricing = () => {
               console.error(error);
               toast.error(
                 error?.response?.data?.message ||
-                "Failed to import inactive pricing, try again"
+                  "Failed to import inactive pricing, try again",
               );
             } finally {
               setImportingCsvForPriceInactive(false);
@@ -783,7 +899,6 @@ const Pricing = () => {
     <>
       {pagePermission?.view ? (
         <div className="flex justify-start items-center flex-col gap-2 w-full">
-
           {/* page header */}
           <div className="flex justify-between w-full items-center border-b-2 py-4">
             <div className="flex justify-center items-center">
@@ -832,7 +947,9 @@ const Pricing = () => {
                   >
                     <option value="default">All</option>
                     <option value="regional">Regional</option>
-                    <option value="distributor">Distributor</option>
+                    <option value="distributor" disabled>
+                      Distributor
+                    </option>
                     <option value="national">National</option>
                   </Select>
                 </div>
@@ -862,7 +979,9 @@ const Pricing = () => {
                   </div>
                   <Select
                     value={selectDistributor}
-                    onChange={(event) => setSelectDistributor(event.target.value)}
+                    onChange={(event) =>
+                      setSelectDistributor(event.target.value)
+                    }
                   >
                     <option value="default">All</option>
                     {distributors?.map((option, index) => (
@@ -913,7 +1032,10 @@ const Pricing = () => {
                 {/* filter : 7 */}
                 <div className="w-56">
                   <div className="mb-2 block">
-                    <Label htmlFor="collectionSelect" value="Select Collection" />
+                    <Label
+                      htmlFor="collectionSelect"
+                      value="Select Collection"
+                    />
                   </div>
                   <Select
                     value={selectedCollection}
@@ -950,7 +1072,11 @@ const Pricing = () => {
               </div> */}
                 <div className="w-56">
                   <div className="mb-2 block">
-                    <Label htmlFor="productionSelect" value="Select Product" className="text-white dark:text-white" />
+                    <Label
+                      htmlFor="productionSelect"
+                      value="Select Product"
+                      className="text-white dark:text-white"
+                    />
                   </div>
                   {/* input search field with product code search */}
                   <TextInput
@@ -1040,7 +1166,10 @@ const Pricing = () => {
                   <Button
                     className="text-xs"
                     size="sm"
-                    onClick={() => setOpenModal(true)}
+                     onClick={() => {
+                       setRegionId("68385270baa10349c65aba46");
+                       setOpenModal(true);
+                     }}
                   >
                     <span className="flex justify-center items-center gap-2">
                       <IoMdAddCircle size={20} />
@@ -1049,19 +1178,33 @@ const Pricing = () => {
                   </Button>
                 )}
 
-                <Button
-                  className="text-xs"
-                  color="light"
-                  size="sm"
-                  onClick={() => {
-                    handleCSVTemplateDownload();
-                  }}
-                >
-                  <span className="flex justify-center items-center gap-2">
-                    <MdSimCardDownload size={20} />
-                    Template
-                  </span>
-                </Button>
+                {pagePermission?.create && (
+                  <Button
+                    className="text-xs"
+                    size="sm"
+                    color="warning"
+                    onClick={() => setOpenMaterialPriceUploadModal(true)}
+                  >
+                    <span className="flex justify-center items-center gap-2">
+                      <BiSolidFileImport size={20} />
+                      Material Price Upload
+                    </span>
+                  </Button>
+                )}
+
+                {pagePermission?.create && (
+                  <Button
+                    className="text-xs"
+                    size="sm"
+                    color="warning"
+                    onClick={() => setOpenCategoryPriceUploadModal(true)}
+                  >
+                    <span className="flex justify-center items-center gap-2">
+                      <BiSolidFileImport size={20} />
+                      Category's Price Upload
+                    </span>
+                  </Button>
+                )}
                 <Button
                   className={`text-xs`}
                   size="sm"
@@ -1075,27 +1218,6 @@ const Pricing = () => {
                     CSV Download
                   </span>
                 </Button>
-
-                {pagePermission?.create && (
-                  importingCsv ? (
-                    <Button className="text-xs" size="sm" color="warning">
-                      <span className="flex justify-center items-center gap-2">
-                        <Spinner size="sm" />
-                        Importing CSV...
-                      </span>
-                    </Button>
-                  ) : (
-                    <FileUpload
-                      type="single-file"
-                      page="bulk-import"
-                      onSetFileUrl={(url) => {
-                        handleCSVImport(url);
-                      }}
-                    />
-                  )
-                )}
-
-
 
                 {pagePermission?.update && (
                   <Button
@@ -1159,29 +1281,21 @@ const Pricing = () => {
                     Product Code
                   </Table.HeadCell>
 
-                   {/* Price Type, Region, Distributor columns removed as requested */}
-                   {/* 
-                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 sticky left-[280px] bg-white dark:bg-gray-800 border-r border-gray-300 dark:border-gray-700">
-                     Price Type
-                   </Table.HeadCell>
-                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                     Region Code
-                   </Table.HeadCell>
-                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                     Region Name
-                   </Table.HeadCell>
-                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                     Distributor Code
-                   </Table.HeadCell>
-                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                     Distributor Name
-                   </Table.HeadCell>
-                   */}
+                  {/* Price Type */}
+                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                    Price Type
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                    Region Code
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                    Region Name
+                  </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                     Product Name
                   </Table.HeadCell>
-                   {/* Brand, Category, UOM, Pieces in a box commented out */}
-                   {/* 
+                  {/* Brand, Category, UOM, Pieces in a box commented out */}
+                  {/* 
                    <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                      Brand
                    </Table.HeadCell>
@@ -1195,15 +1309,18 @@ const Pricing = () => {
                      Pieces in a box
                    </Table.HeadCell>
                    */}
-                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                     MRP
-                   </Table.HeadCell>
-                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                     Base <br/> Discount %
-                   </Table.HeadCell>
-                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                     DLP
-                   </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                    MRP
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                    DLP % <br /> (L1)
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                    RLP % <br /> (L2)
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                    DLP
+                  </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                     RLP
                   </Table.HeadCell>
@@ -1248,7 +1365,7 @@ const Pricing = () => {
                   ) : pricing?.length > 0 ? (
                     pricing?.map((price, index) => {
                       const { remainingDays } = checkDateForPrice(
-                        price?.effective_date
+                        price?.effective_date,
                       );
                       return (
                         <Table.Row
@@ -1268,35 +1385,24 @@ const Pricing = () => {
                             />
                           </Table.Cell>
 
-                           {/* Price Type, Region, Distributor cells removed */}
-                           {/* 
-                           <Table.Cell className="px-2 py-1 text-gray-900 dark:text-gray-200 whitespace-nowrap sticky left-[280px] bg-white dark:bg-gray-800 border-r border-gray-300 dark:border-gray-700">
-                             {price?.price_type}
-                           </Table.Cell>
-                           <Table.Cell className="px-2 py-1">
-                             <UniqueCode
-                               text={price?.regionId?.code}
-                               codeName="Region"
-                             />
-                           </Table.Cell>
-                           <Table.Cell className="px-2 py-1">
-                             {price?.regionId?.name ?? ""}
-                           </Table.Cell>
-                           <Table.Cell className="px-2 py-1">
-                             <UniqueCode
-                               text={price?.distributorId?.dbCode}
-                               codeName="DB"
-                             />
-                           </Table.Cell>
-                           <Table.Cell className="px-2 py-1">
-                             {price?.distributorId?.name ?? ""}
-                           </Table.Cell>
-                           */}
-                           <Table.Cell className="px-2 py-1">
-                             {price?.productId?.name}
-                           </Table.Cell>
-                           {/* Brand, Category, UOM, Pieces in a box commented out */}
-                           {/* 
+                          {/* Price Type & Region cells */}
+                          <Table.Cell className="px-2 py-1 text-gray-900 dark:text-gray-200 whitespace-nowrap">
+                            {price?.price_type}
+                          </Table.Cell>
+                          <Table.Cell className="px-2 py-1">
+                            <UniqueCode
+                              text={price?.regionId?.code}
+                              codeName="Region"
+                            />
+                          </Table.Cell>
+                          <Table.Cell className="px-2 py-1">
+                            {price?.regionId?.name ?? ""}
+                          </Table.Cell>
+                          <Table.Cell className="px-2 py-1">
+                            {price?.productId?.name}
+                          </Table.Cell>
+                          {/* Brand, Category, UOM, Pieces in a box commented out */}
+                          {/* 
                            <Table.Cell className="px-2 py-1">
                              {price?.productId?.brand?.name} (
                              {price?.productId?.brand?.desc})
@@ -1311,15 +1417,24 @@ const Pricing = () => {
                              {price?.productId?.no_of_pieces_in_a_box}
                            </Table.Cell>
                            */}
-                           <Table.Cell className="px-2 py-1">
-                             {Number(price.mrp_price).toLocaleString()}
-                           </Table.Cell>
-                           <Table.Cell className="px-2 py-1">
-                             {price?.custom_basic_discount_percentage ?? price?.customBasicDiscountPercentage ?? ""}
-                           </Table.Cell>
-                           <Table.Cell className="px-2 py-1">
-                             {Number(price.dlp_price)?.toLocaleString() || ""}
-                           </Table.Cell>
+                          <Table.Cell className="px-2 py-1">
+                            {Number(price.mrp_price).toLocaleString()}
+                          </Table.Cell>
+                          <Table.Cell className="px-2 py-1">
+                            {price?.L1DiscountPercentage ??
+                              price?.L1_discount_percentage ??
+                              ""}
+                          </Table.Cell>
+                          <Table.Cell className="px-2 py-1">
+                            {price?.L2DiscountPercentage ??
+                              price?.L2_discount_percentage ??
+                              price?.customBasicDiscountPercentage ??
+                              price?.custom_basic_discount_percentage ??
+                              ""}
+                          </Table.Cell>
+                          <Table.Cell className="px-2 py-1">
+                            {Number(price.dlp_price)?.toLocaleString() || ""}
+                          </Table.Cell>
                           <Table.Cell className="px-2 py-1">
                             {Number(price.rlp_price)?.toLocaleString() || ""}
                           </Table.Cell>
@@ -1331,8 +1446,8 @@ const Pricing = () => {
                           <Table.Cell className="px-2 py-1">
                             {price?.effective_date
                               ? moment(price?.effective_date)
-                                .tz("Asia/Kolkata")
-                                .format("DD-MM-YYYY")
+                                  .tz("Asia/Kolkata")
+                                  .format("DD-MM-YYYY")
                               : ""}
                           </Table.Cell>
                           <Table.Cell className="px-2 py-1 font-bold">
@@ -1341,7 +1456,9 @@ const Pricing = () => {
                             ) : remainingDays < 0 && price?.status === false ? (
                               <span className="text-red-500">Expired</span>
                             ) : remainingDays === 0 ? (
-                              <span className="text-blue-500">Applied today</span>
+                              <span className="text-blue-500">
+                                Applied today
+                              </span>
                             ) : (
                               <span className="text-yellow-500">{`${remainingDays} days left`}</span>
                             )}
@@ -1349,8 +1466,8 @@ const Pricing = () => {
                           <Table.Cell className="px-2 py-1">
                             {price?.expiresAt
                               ? moment(price?.expiresAt)
-                                .tz("Asia/Kolkata")
-                                .format("DD-MM-YYYY  hh:mm A")
+                                  .tz("Asia/Kolkata")
+                                  .format("DD-MM-YYYY  hh:mm A")
                               : ""}
                           </Table.Cell>
                           <Table.Cell className="px-2 py-1 flex justify-center items-center">
@@ -1362,7 +1479,6 @@ const Pricing = () => {
                                 <FaPlus size={15} /> Create
                               </button>
                             )}
-
                           </Table.Cell>
                           <Table.Cell className="px-2 py-1">
                             <StatusIndicator
@@ -1391,7 +1507,6 @@ const Pricing = () => {
                                 (remainingDays < 0 && price?.status === false)
                               }
                             />
-
                           </Table.Cell>
                         </Table.Row>
                       );
@@ -1442,8 +1557,7 @@ const Pricing = () => {
                     )}
                   </Select>
                 </div>
-                {/* Price Type selection commented out - default is national */}
-                {/* <div className="w-full">
+                <div className="w-full">
                   <div className="mb-2 block text-gray-700 dark:text-gray-100">
                     <Label value="Price Type" />{" "}
                     <span className="text-red-500">*</span>
@@ -1458,15 +1572,16 @@ const Pricing = () => {
                       />{" "}
                       Regional
                     </label>
-                    <label>
+                    {/* <label>
                       <input
                         type="radio"
                         value="distributor"
                         checked={priceType === "distributor"}
                         onChange={(e) => setPriceType(e.target.value)}
+                        disabled
                       />{" "}
                       Distributor
-                    </label>
+                    </label> */}
                     <label>
                       <input
                         type="radio"
@@ -1477,7 +1592,7 @@ const Pricing = () => {
                       National
                     </label>
                   </div>
-                </div> */}
+                </div>
                 {priceType === "regional" && (
                   <div className="w-full">
                     <div className="mb-2 block text-gray-700 dark:text-gray-100">
@@ -1542,20 +1657,10 @@ const Pricing = () => {
                   </div>
                 )}
 
-                {priceType === "national" && (
-                  <div className="w-full">
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                      <p className="text-sm text-blue-700 dark:text-blue-300">
-                        <strong>National Pricing:</strong> This pricing will apply
-                        across all regions and distributors in the country.
-                      </p>
-                    </div>
-                  </div>
-                )}
-
                 <div className="w-full">
                   <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                    <Label value="MRP" /> <span className="text-red-500">*</span>
+                    <Label value="MRP" />{" "}
+                    <span className="text-red-500">*</span>
                   </div>
                   <TextInput
                     placeholder="Enter MRP"
@@ -1587,12 +1692,26 @@ const Pricing = () => {
                 </div> */}
                 <div className="w-full">
                   <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                    <Label value="Customer Basic discount percentage" />
+                    <Label value="L1 % or DLP Discount" />
                   </div>
                   <TextInput
-                    placeholder="Enter Customer Basic discount percentage"
-                    value={customBasicDiscountPercentage}
-                    onChange={(event) => setCustomBasicDiscountPercentage(event.target.value)}
+                    placeholder="Enter extra DLP discount percentage"
+                    value={L1DiscountPercentage}
+                    onChange={(event) =>
+                      setL1DiscountPercentage(event.target.value)
+                    }
+                  />
+                </div>
+                <div className="w-full">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label value="L2  % or RLP Discount" />
+                  </div>
+                  <TextInput
+                    placeholder="Enter extra RLP discount percentage"
+                    value={L2DiscountPercentage}
+                    onChange={(event) =>
+                      setL2DiscountPercentage(event.target.value)
+                    }
                   />
                 </div>
                 <div className="w-full">
@@ -1615,8 +1734,9 @@ const Pricing = () => {
                       modalMode === "add" ? handleAddPricing : handleEditPricing
                     }
                     disabled={formLoading}
-                    className={`${formLoading ? "opacity-60 cursor-not-allowed" : ""
-                      }`}
+                    className={`${
+                      formLoading ? "opacity-60 cursor-not-allowed" : ""
+                    }`}
                   >
                     {formLoading ? (
                       <Spinner size="sm" aria-label="Loading spinner" />
@@ -1637,7 +1757,9 @@ const Pricing = () => {
             size="7xl"
             className="dark:bg-gray-800 bg-gray-800 text-white dark:text-white"
           >
-            <Modal.Header className="bg-gray-800 dark:bg-gray-800 !text-white dark:!text-white border-b border-gray-700 dark:border-gray-700">Select Product</Modal.Header>
+            <Modal.Header className="bg-gray-800 dark:bg-gray-800 !text-white dark:!text-white border-b border-gray-700 dark:border-gray-700">
+              Select Product
+            </Modal.Header>
             <Modal.Body>
               <div className="space-y-5">
                 <PriceProductModal
@@ -1647,6 +1769,118 @@ const Pricing = () => {
                 />
               </div>
             </Modal.Body>
+          </Modal>
+
+          {/* Material Price Upload Modal */}
+          <Modal
+            show={openMaterialPriceUploadModal}
+            onClose={() => setOpenMaterialPriceUploadModal(false)}
+            size="2xl"
+          >
+            <Modal.Header>Material Price Upload</Modal.Header>
+            <Modal.Body>
+              <div className="flex justify-center gap-6 py-10">
+                <Button
+                  color="blue"
+                  size="sm"
+                  className="px-6 py-2 text-sm font-medium rounded-lg shadow hover:shadow-md transition-all"
+                  onClick={() => {
+                    handleCSVTemplateDownload();
+                    setOpenMaterialPriceUploadModal(false);
+                  }}
+                >
+                  Download Template
+                </Button>
+                <Button
+                  color="green"
+                  size="sm"
+                  className="px-6 py-2 text-sm font-medium rounded-lg shadow hover:shadow-md transition-all"
+                  onClick={() => {
+                    setOpenMaterialPriceUploadModal(false);
+                    handleUploadClick("material");
+                  }}
+                >
+                  Upload File
+                </Button>
+              </div>
+            </Modal.Body>
+          </Modal>
+
+          {/* Category's Price Upload Modal */}
+          <Modal
+            show={openCategoryPriceUploadModal}
+            onClose={() => setOpenCategoryPriceUploadModal(false)}
+            size="2xl"
+          >
+            <Modal.Header>Category's Price Upload</Modal.Header>
+            <Modal.Body>
+              <div className="flex justify-center gap-6 py-10">
+                <Button
+                  color="blue"
+                  size="sm"
+                  className="px-6 py-2 text-sm font-medium rounded-lg shadow hover:shadow-md transition-all"
+                  onClick={() => {
+                    handleCategoryCSVTemplateDownload();
+                    setOpenCategoryPriceUploadModal(false);
+                  }}
+                >
+                  Download Template
+                </Button>
+                <Button
+                  color="green"
+                  size="sm"
+                  className="px-6 py-2 text-sm font-medium rounded-lg shadow hover:shadow-md transition-all"
+                  onClick={() => {
+                    setOpenCategoryPriceUploadModal(false);
+                    handleUploadClick("category");
+                  }}
+                >
+                  Upload File
+                </Button>
+              </div>
+            </Modal.Body>
+          </Modal>
+
+          {/* Confirm Bulk Upload Modal */}
+          <Modal
+            show={openBulkConfirmModal}
+            onClose={() => setOpenBulkConfirmModal(false)}
+            size="lg"
+          >
+            <Modal.Header>Confirm Bulk Upload</Modal.Header>
+
+            <Modal.Body>
+              <div className="flex flex-col items-center justify-center gap-4 py-10">
+                <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                  📄
+                </div>
+
+                <p className="text-sm text-gray-600 text-center">
+                  CSV file selected successfully.
+                  <br />
+                  <strong>{bulkCsvData.length}</strong> rows found.
+                  <br />
+                  Click <strong>Confirm Upload</strong> to proceed.
+                </p>
+              </div>
+            </Modal.Body>
+
+            <Modal.Footer>
+              <Button
+                color="gray"
+                onClick={() => setOpenBulkConfirmModal(false)}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                color="green"
+                disabled={bulkUploading}
+                onClick={handleBulkConfirmSubmit}
+              >
+                {bulkUploading ? "Uploading..." : "Confirm Upload"}
+              </Button>
+            </Modal.Footer>
           </Modal>
 
           {/* Price Inactive Modal  */}
@@ -1724,14 +1958,11 @@ const Pricing = () => {
         </div>
       ) : (
         <div className="w-full h-[70vh] flex justify-center items-center">
-          <h1 className="text-xl font-semibold text-red-500">
-            Access Denied
-          </h1>
+          <h1 className="text-xl font-semibold text-red-500">Access Denied</h1>
         </div>
       )}
     </>
   );
-
 };
 
 export default Pricing;

@@ -193,11 +193,11 @@ export const adminSidebarConfig = [
         path: "/admin/pricing",
         icon: IoPricetags,
       },
-      {
-        label: "Price Update",
-        path: "/admin/price-update",
-        icon: IoPricetags,
-      },
+      // {
+      //   label: "Price Update",
+      //   path: "/admin/price-update",
+      //   icon: IoPricetags,
+      // },
     ],
   },
   {
@@ -715,12 +715,12 @@ export const usersidebarconfig = [
         icon: IoPricetags,
         slug: "pricing",
       },
-      {
-        label: "Price Update",
-        path: "/user/price-update",
-        icon: IoPricetags,
-        slug: "price-update",
-      },
+      // {
+      //   label: "Price Update",
+      //   path: "/user/price-update",
+      //   icon: IoPricetags,
+      //   slug: "price-update",
+      // },
     ],
   },
   {
@@ -1262,12 +1262,12 @@ export const subadminssidebarconfig = [
         icon: IoPricetags,
         slug: "pricing",
       },
-      {
-        label: "Price Update",
-        path: "/sub-admins/price-update",
-        icon: IoPricetags,
-        slug: "price-update",
-      },
+      // {
+      //   label: "Price Update",
+      //   path: "/sub-admins/price-update",
+      //   icon: IoPricetags,
+      //   slug: "price-update",
+      // },
     ],
   },
   {
@@ -1809,12 +1809,12 @@ export const aaadminsesidebarconfig = [
         icon: IoPricetags,
         slug: "pricing",
       },
-      {
-        label: "Price Update",
-        path: "/admine/price-update",
-        icon: IoPricetags,
-        slug: "price-update",
-      },
+      // {
+      //   label: "Price Update",
+      //   path: "/admine/price-update",
+      //   icon: IoPricetags,
+      //   slug: "price-update",
+      // },
     ],
   },
   {
@@ -2360,12 +2360,12 @@ export const salessidebarconfig = [
         icon: IoPricetags,
         slug: "pricing",
       },
-      {
-        label: "Price Update",
-        path: "/sales/price-update",
-        icon: IoPricetags,
-        slug: "price-update",
-      },
+      // {
+      //   label: "Price Update",
+      //   path: "/sales/price-update",
+      //   icon: IoPricetags,
+      //   slug: "price-update",
+      // },
     ],
   },
   {
