@@ -18,14 +18,14 @@ import Papa from "papaparse";
 import { BiSolidFileExport, BiSolidFileImport } from "react-icons/bi";
 import { FaPlus } from "react-icons/fa";
 import { IoMdAddCircle } from "react-icons/io";
-import { MdDownloadForOffline, MdSimCardDownload } from "react-icons/md";
+import { MdDownloadForOffline } from "react-icons/md";
 import { RiPassExpiredLine, RiRefreshFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 import Datepicker from "react-tailwindcss-datepicker";
 import {
   addPricing,
   bulkUpload,
-  bulkUpload2,
+  inactivePriceByExpiredDate,
   pricingStatusBulkUpdate,
   updatePricing,
 } from "../../api/api";
@@ -42,7 +42,6 @@ import { fetchCategories } from "../../redux/categorySlice";
 import { fetchCollections } from "../../redux/collectionSlice";
 import { fetchDistributors } from "../../redux/distributorListSlice";
 import { fetchRegions } from "../../redux/regionSlice";
-import { FileUpload } from "../../uploadWidget/FileUpload";
 import { getPagePermission } from "../../utils/permissionHelper";
 import { downloadFile } from "../../utils/downloadFile";
 
@@ -101,8 +100,6 @@ const Pricing = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [priceType, setPriceType] = useState("regional");
   const [effectiveDate, setEffectiveDate] = useState(new Date());
-  const [priceInactiveModal, setPriceInactiveModal] = useState(false);
-  const [inactiveType, setInactiveType] = useState("");
   const [openMaterialPriceUploadModal, setOpenMaterialPriceUploadModal] =
     useState(false);
   const [openCategoryPriceUploadModal, setOpenCategoryPriceUploadModal] =
@@ -634,9 +631,6 @@ const Pricing = () => {
     }
   };
 
-  const [importingCsvForPriceInactive, setImportingCsvForPriceInactive] =
-    useState(false);
-
   const parseCSVFile = (file) => {
     return new Promise((resolve, reject) => {
       Papa.parse(file, {
@@ -781,96 +775,27 @@ const Pricing = () => {
     );
   };
 
-  const handleInactiveTemplateDownload = () => {
-    let csv = [];
-    if (inactiveType === "priceCode") {
-      csv = [
-        "Price Code,Expiry",
-        "PR-2003457,31-12-2025", // example row
-      ];
-    } else if (inactiveType === "productCode") {
-      csv = [
-        "Product Code,Price Type,Expiry",
-        "RBMTS08050P0142XXL,regional,31-10-2025", // example row
-        "RBMTS08050P0142XXP,national,31-10-2025", // example row
-        "RBMTS08050P0142XXL,distributor,31-10-2025", // example row
-      ];
-    } else {
-      toast.error("Please select a type first");
-      return;
-    }
-
-    const csvString = csv.join("\n");
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
-    a.setAttribute(
-      "download",
-      inactiveType === "priceCode"
-        ? "inactive_by_price_code_template.csv"
-        : "inactive_by_product_code_template.csv",
-    );
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
-
-  const handleCSVImportForPriceInactive = async (url) => {
-    try {
-      if (!inactiveType) {
-        toast.error("Please select a type first");
-        return;
-      }
-      openConfirmationModel({
-        question: "Are you sure you want to inactive this Pricing CSV?",
-        answer: ["Yes", "No"],
-        onClose: async (result) => {
-          if (result) {
-            try {
-              let payload = {
-                file: url,
-              };
-
-              // Determine API type based on inactiveType
-              let apiType = "";
-              if (inactiveType === "priceCode") {
-                apiType = "InactivePriceByPriceCode";
-              } else if (inactiveType === "productCode") {
-                apiType = "InactivePriceByProductCodeAndPriceType";
-              }
-              setImportingCsvForPriceInactive(true);
-              const res = await bulkUpload2(payload, apiType);
-
-              if (res?.data?.skippedRows?.length > 0) {
-                toast.error(
-                  `${res?.data?.skippedRows?.length} rows skipped, ${
-                    res?.data?.data?.length ? res?.data?.data?.length : 0
-                  } rows success`,
-                );
-                setErrorLog(res?.data?.skippedRows);
-              } else {
-                toast.success(`${res?.data?.data?.length} rows processed`);
-              }
-
-              setPriceInactiveModal(false);
-            } catch (error) {
-              console.error(error);
-              toast.error(
-                error?.response?.data?.message ||
-                  "Failed to import inactive pricing, try again",
-              );
-            } finally {
-              setImportingCsvForPriceInactive(false);
-              fetchPricingPaginated();
-            }
-          } else {
-            setPriceInactiveModal(false);
-            return;
+  const handleInactiveByExpiredDate = async () => {
+    openConfirmationModel({
+      question: "Are you sure you want to inactivate all expired pricing?",
+      answer: ["Yes", "No"],
+      onClose: async (result) => {
+        if (result) {
+          try {
+            await inactivePriceByExpiredDate();
+            fetchPricingPaginated();
+            toast.success("Expired prices inactivated successfully");
+          } catch (error) {
+            console.error(error);
+            toast.error(
+              error?.response?.data?.message ||
+                error?.message ||
+                "Failed to inactivate expired prices",
+            );
           }
-        },
-      });
-    } catch (error) {
-      console.error(error);
-    }
+        }
+      },
+    });
   };
 
   useEffect(() => {
@@ -1265,7 +1190,7 @@ const Pricing = () => {
                     className="text-xs"
                     color="purple"
                     size="sm"
-                    onClick={() => setPriceInactiveModal(true)}
+                    onClick={handleInactiveByExpiredDate}
                   >
                     <span className="flex justify-center items-center gap-2">
                       <RiPassExpiredLine size={20} />
@@ -1966,79 +1891,6 @@ const Pricing = () => {
                 {bulkUploading ? "Uploading..." : "Confirm Upload"}
               </Button>
             </Modal.Footer>
-          </Modal>
-
-          {/* Price Inactive Modal  */}
-
-          <Modal
-            show={priceInactiveModal}
-            onClose={() => {
-              setPriceInactiveModal(false);
-              setInactiveType("");
-            }}
-            className=" text-gray-700 dark:text-gray-100"
-          >
-            <Modal.Header>Inactive Price</Modal.Header>
-            <Modal.Body>
-              <div className="space-y-4">
-                {/* Radio Buttons */}
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      value="priceCode"
-                      checked={inactiveType === "priceCode"}
-                      onChange={(e) => setInactiveType(e.target.value)}
-                    />
-                    Inactive Price by Price Code
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      value="productCode"
-                      checked={inactiveType === "productCode"}
-                      onChange={(e) => setInactiveType(e.target.value)}
-                    />
-                    Inactive Price by Product Code
-                  </label>
-                </div>
-
-                {/* Buttons appear only when a type is selected */}
-                {inactiveType && (
-                  <div className="flex gap-4 mt-4">
-                    {/* Template Download */}
-                    <Button
-                      color="light"
-                      size="sm"
-                      onClick={handleInactiveTemplateDownload}
-                    >
-                      <span className="flex items-center gap-2">
-                        <MdSimCardDownload size={20} /> Template
-                      </span>
-                    </Button>
-
-                    {/* File Upload */}
-
-                    {importingCsvForPriceInactive ? (
-                      <Button className="text-xs" size="sm" color="warning">
-                        <span className="flex justify-center items-center gap-2">
-                          <Spinner size="sm" />
-                          Importing CSV...
-                        </span>
-                      </Button>
-                    ) : (
-                      <FileUpload
-                        type="single-file"
-                        page="bulk-import"
-                        onSetFileUrl={(url) => {
-                          handleCSVImportForPriceInactive(url); // reuse existing import function
-                        }}
-                      />
-                    )}
-                  </div>
-                )}
-              </div>
-            </Modal.Body>
           </Modal>
         </div>
       ) : (

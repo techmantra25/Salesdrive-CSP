@@ -861,6 +861,25 @@ export const pricingStatusBulkUpdate = async () => {
   }
 };
 
+export const inactivePriceByExpiredDate = async () => {
+  try {
+    const response = await axios.put(
+      BACKEND_URL + `/api/v1/price/inactive-price-by-expired-date`,
+      {},
+      {
+        headers: setAuthHeader(),
+      },
+    );
+    return response;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to add price, try again",
+    );
+  }
+};
+
 // Sales Hierarchy
 
 export const AllDesignationList = async () => {
