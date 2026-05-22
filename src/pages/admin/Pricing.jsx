@@ -549,8 +549,8 @@ const Pricing = () => {
 
   const handleCSVTemplateDownload = () => {
     const csv = [
-      "Product Code,MRP,L1(%),L2(%),Effective Date",
-      "VOL-25,500,10,5,31-12-2024",
+      "Product Code,Region Code,L1(%),L2(%),Effective Date",
+      "VOL-25,RWB01,10,5,31-12-2024",
     ];
     const csvString = csv.join("\n");
     const a = document.createElement("a");
@@ -563,7 +563,7 @@ const Pricing = () => {
   };
 
   const handleCategoryCSVTemplateDownload = () => {
-    const csv = ["Category,MRP,L1(%),L2(%)", "CAT-01,500,10,5"];
+    const csv = ["Collection Code,L1(%),L2(%)", "COL-01,10,5"];
     const csvString = csv.join("\n");
     const a = document.createElement("a");
 
@@ -718,7 +718,12 @@ const Pricing = () => {
       }
 
       const payload = { file: url };
-      const uploadType = bulkUploadType === "mrp" ? "MRP_Price" : "Price";
+      let uploadType = "Price";
+      if (bulkUploadType === "mrp") {
+        uploadType = "MRP_Price";
+      } else if (bulkUploadType === "category") {
+        uploadType = "price-collection";
+      }
       const res = await bulkUpload(payload, uploadType);
 
       if (res?.data?.skippedRows?.length > 0) {
@@ -1327,10 +1332,13 @@ const Pricing = () => {
                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                     Region Name
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Product Name
-                  </Table.HeadCell>
-                  {/* Brand, Category, UOM, Pieces in a box commented out */}
+                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                     Product Name
+                   </Table.HeadCell>
+                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                     Collection Code
+                   </Table.HeadCell>
+                   {/* Brand, Category, UOM, Pieces in a box commented out */}
                   {/* 
                    <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                      Brand
@@ -1436,10 +1444,13 @@ const Pricing = () => {
                           <Table.Cell className="px-2 py-1">
                             {price?.regionId?.name ?? ""}
                           </Table.Cell>
-                          <Table.Cell className="px-2 py-1">
-                            {price?.productId?.name}
-                          </Table.Cell>
-                          {/* Brand, Category, UOM, Pieces in a box commented out */}
+                           <Table.Cell className="px-2 py-1">
+                             {price?.productId?.name}
+                           </Table.Cell>
+                           <Table.Cell className="px-2 py-1">
+                             {price?.productId?.collection_id?.code ?? ""}
+                           </Table.Cell>
+                           {/* Brand, Category, UOM, Pieces in a box commented out */}
                           {/* 
                            <Table.Cell className="px-2 py-1">
                              {price?.productId?.brand?.name} (
