@@ -107,6 +107,7 @@ const Pricing = () => {
     useState(false);
   const [openCategoryPriceUploadModal, setOpenCategoryPriceUploadModal] =
     useState(false);
+  const [openMrpPriceUploadModal, setOpenMrpPriceUploadModal] = useState(false);
   const [bulkCsvData, setBulkCsvData] = useState([]);
   const [openBulkConfirmModal, setOpenBulkConfirmModal] = useState(false);
   const [bulkUploading, setBulkUploading] = useState(false);
@@ -135,6 +136,9 @@ const Pricing = () => {
     startDate: null,
     endDate: null,
   });
+
+  const minEffectiveDate = new Date().toISOString().split("T")[0];
+
   useEffect(() => {
     if (permissionState) {
       const permission = getPagePermission(permissionState, "pricing");
@@ -310,6 +314,11 @@ const Pricing = () => {
 
     if (priceType === "distributor" && !distributorId) {
       toast.error("Please select distributor");
+      return false;
+    }
+
+    if (modalMode === "add" && effectiveDate && effectiveDate < minEffectiveDate) {
+      toast.error("Effective date cannot be in the past");
       return false;
     }
 
@@ -565,6 +574,18 @@ const Pricing = () => {
     document.body.removeChild(a);
   };
 
+  const handleMRPPriceCSVTemplateDownload = () => {
+    const csv = ["Product Code,MRP,Effective Date", "VOL-25,500,31-12-2024"];
+    const csvString = csv.join("\n");
+    const a = document.createElement("a");
+
+    a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
+    a.setAttribute("download", "mrp_price_template.csv");
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   const handleErrorLogDownload = async () => {
     try {
       if (!errorLog || errorLog.length === 0) {
@@ -697,7 +718,8 @@ const Pricing = () => {
       }
 
       const payload = { file: url };
-      const res = await bulkUpload(payload, "Price");
+      const uploadType = bulkUploadType === "mrp" ? "MRP_Price" : "Price";
+      const res = await bulkUpload(payload, uploadType);
 
       if (res?.data?.skippedRows?.length > 0) {
         toast.error(
@@ -1166,10 +1188,11 @@ const Pricing = () => {
                   <Button
                     className="text-xs"
                     size="sm"
-                     onClick={() => {
-                       setRegionId("68385270baa10349c65aba46");
-                       setOpenModal(true);
-                     }}
+                      onClick={() => {
+                        setRegionId("68385270baa10349c65aba46");
+                        setEffectiveDate(minEffectiveDate);
+                        setOpenModal(true);
+                      }}
                   >
                     <span className="flex justify-center items-center gap-2">
                       <IoMdAddCircle size={20} />
@@ -1202,6 +1225,19 @@ const Pricing = () => {
                     <span className="flex justify-center items-center gap-2">
                       <BiSolidFileImport size={20} />
                       Category's Price Upload
+                    </span>
+                  </Button>
+                )}
+                {pagePermission?.create && (
+                  <Button
+                    className="text-xs"
+                    size="sm"
+                    color="warning"
+                    onClick={() => setOpenMrpPriceUploadModal(true)}
+                  >
+                    <span className="flex justify-center items-center gap-2">
+                      <BiSolidFileImport size={20} />
+                      MRP Price Upload
                     </span>
                   </Button>
                 )}
@@ -1313,10 +1349,10 @@ const Pricing = () => {
                     MRP
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    DLP % <br /> (L1)
+                    L1 % 
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    RLP % <br /> (L2)
+                    L2 % 
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                     DLP
@@ -1363,11 +1399,13 @@ const Pricing = () => {
                       </Table.Cell>
                     </Table.Row>
                   ) : pricing?.length > 0 ? (
-                    pricing?.map((price, index) => {
-                      const { remainingDays } = checkDateForPrice(
-                        price?.effective_date,
-                      );
-                      return (
+                     pricing?.map((price, index) => {
+                       const { remainingDays } = checkDateForPrice(
+                         price?.effective_date,
+                       );
+                       const isDateActive = remainingDays >= 0;
+                       const displayStatus = Boolean(price.status) && isDateActive;
+                       return (
                         <Table.Row
                           key={index}
                           className="hover-row text-center text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -1423,14 +1461,14 @@ const Pricing = () => {
                           <Table.Cell className="px-2 py-1">
                             {price?.L1DiscountPercentage ??
                               price?.L1_discount_percentage ??
-                              ""}
+                              ""}%
                           </Table.Cell>
                           <Table.Cell className="px-2 py-1">
                             {price?.L2DiscountPercentage ??
                               price?.L2_discount_percentage ??
                               price?.customBasicDiscountPercentage ??
                               price?.custom_basic_discount_percentage ??
-                              ""}
+                              ""}%
                           </Table.Cell>
                           <Table.Cell className="px-2 py-1">
                             {Number(price.dlp_price)?.toLocaleString() || ""}
@@ -1450,7 +1488,7 @@ const Pricing = () => {
                                   .format("DD-MM-YYYY")
                               : ""}
                           </Table.Cell>
-                          <Table.Cell className="px-2 py-1 font-bold">
+                           <Table.Cell className="px-2 py-1 font-bold">
                             {remainingDays < 0 && price?.status === true ? (
                               <span className="text-blue-500">N/A</span>
                             ) : remainingDays < 0 && price?.status === false ? (
@@ -1481,18 +1519,18 @@ const Pricing = () => {
                             )}
                           </Table.Cell>
                           <Table.Cell className="px-2 py-1">
-                            <StatusIndicator
-                              status={price.status}
-                              onClick={
-                                pagePermission?.update
-                                  ? () => handleStatusUpdate(price)
-                                  : undefined
-                              }
-                              isDisabled={
-                                !pagePermission?.update ||
-                                (remainingDays < 0 && price?.status === false)
-                              }
-                            />
+                             <StatusIndicator
+                               status={price.status}
+                               onClick={
+                                 pagePermission?.update
+                                   ? () => handleStatusUpdate(price)
+                                   : undefined
+                               }
+                               isDisabled={
+                                 !pagePermission?.update ||
+                                 (remainingDays < 0 && price?.status === false)
+                               }
+                             />
                           </Table.Cell>
 
                           <Table.Cell className="px-2 py-1">
@@ -1718,14 +1756,15 @@ const Pricing = () => {
                   <div className="mb-2 block text-gray-700 dark:text-gray-100">
                     <Label value="Effective Date" />
                   </div>
-                  <TextInput
-                    type="date"
-                    disabled={modalMode === "edit"}
-                    name="effective_date"
-                    className=" text-gray-700 dark:text-gray-100"
-                    value={effectiveDate}
-                    onChange={(event) => setEffectiveDate(event.target.value)}
-                  />
+                   <TextInput
+                     type="date"
+                     disabled={modalMode === "edit"}
+                     min={modalMode === "add" ? minEffectiveDate : undefined}
+                     name="effective_date"
+                     className=" text-gray-700 dark:text-gray-100"
+                     value={effectiveDate}
+                     onChange={(event) => setEffectiveDate(event.target.value)}
+                   />
                 </div>
 
                 <div className="w-full">
@@ -1833,6 +1872,41 @@ const Pricing = () => {
                   onClick={() => {
                     setOpenCategoryPriceUploadModal(false);
                     handleUploadClick("category");
+                  }}
+                >
+                  Upload File
+                </Button>
+              </div>
+            </Modal.Body>
+          </Modal>
+
+          {/* MRP Price Upload Modal */}
+          <Modal
+            show={openMrpPriceUploadModal}
+            onClose={() => setOpenMrpPriceUploadModal(false)}
+            size="2xl"
+          >
+            <Modal.Header>MRP Price Upload</Modal.Header>
+            <Modal.Body>
+              <div className="flex justify-center gap-6 py-10">
+                <Button
+                  color="blue"
+                  size="sm"
+                  className="px-6 py-2 text-sm font-medium rounded-lg shadow hover:shadow-md transition-all"
+                   onClick={() => {
+                     handleMRPPriceCSVTemplateDownload();
+                     setOpenMrpPriceUploadModal(false);
+                   }}
+                >
+                  Download Template
+                </Button>
+                <Button
+                  color="green"
+                  size="sm"
+                  className="px-6 py-2 text-sm font-medium rounded-lg shadow hover:shadow-md transition-all"
+                  onClick={() => {
+                    setOpenMrpPriceUploadModal(false);
+                    handleUploadClick("mrp");
                   }}
                 >
                   Upload File
