@@ -263,7 +263,7 @@ const Pricing = () => {
   const { openConfirmationModel } = useContext(ConfirmationModelContext);
 
   const handleResetFilter = () => {
-    pricingStatusBulkUpdate();
+    // pricingStatusBulkUpdate();
     setSelectedStatus("active");
     setSelectedCategory("default");
     setSelectedBrand("default");
