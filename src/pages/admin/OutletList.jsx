@@ -52,6 +52,7 @@ import SearchableSelect from "../../components/SearchableSelect";
 import AddManualPointsModal from "../../components/OutLetComp/AddManualPointsModal";
 import { BulkRebuildRetailerTransaction } from "../../api/rbp/transaction";
 import { IoClose } from "react-icons/io5";
+import { FaSort, FaSortAlphaDown, FaSortAlphaUp } from "react-icons/fa";
 import { downloadFile } from "../../utils/downloadFile";
 
 const OutletList = () => {
@@ -110,6 +111,7 @@ const OutletList = () => {
   });
   const [customSyncing, setCustomSyncing] = useState(false);
   const [selectedCustomSyncDistributor, setSelectedCustomSyncDistributor] = useState("");
+  const [outletNameSort, setOutletNameSort] = useState(null); // null | "a_to_z" | "z_to_a"
 
   const { openConfirmationModel } = useContext(ConfirmationModelContext);
   const [openDistributorModal, setOpenDistributorModal] = useState(false);
@@ -156,6 +158,7 @@ const OutletList = () => {
     searchTerm,
     phoneSearch,
     selectedOutletSource,
+    outletNameSort,
   ]);
   // Reset page on filter change
   useEffect(() => {
@@ -169,6 +172,7 @@ const OutletList = () => {
     searchTerm,
     phoneSearch,
     selectedOutletSource,
+    outletNameSort,
   ]);
   // Debounced fetch
   const fetchOutletsPaginated = useDebounce(async () => {
@@ -206,6 +210,7 @@ const OutletList = () => {
           }),
 
         ...(phoneSearch && { phoneSearch }),
+        ...(outletNameSort && { outletname_sort: outletNameSort }),
       };
 
       const response = await ApprovedOutletPaginated(query);
@@ -238,6 +243,15 @@ const OutletList = () => {
     fetchOutletsPaginated();
     setSelectedOutletSource("default");
     setUpdatedDateRange({ startDate: null, endDate: null });
+    setOutletNameSort(null);
+  };
+
+  const handleOutletNameSortToggle = () => {
+    setOutletNameSort((prev) => {
+      if (prev === null) return "a_to_z";
+      if (prev === "a_to_z") return "z_to_a";
+      return null;
+    });
   };
 
   const handleOutletDetails = (outlet) => {
@@ -518,6 +532,7 @@ const OutletList = () => {
           fromDate: dateRange.startDate,
           toDate: dateRange.endDate,
         }),
+      ...(outletNameSort && { outletname_sort: outletNameSort }),
     };
 
     const params = new URLSearchParams(query).toString();
@@ -1368,8 +1383,18 @@ const OutletList = () => {
               <Table.HeadCell className="whitespace-nowrap">
                 Outlet Code
               </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap">
-                Outlet Name
+              <Table.HeadCell
+                className="whitespace-nowrap cursor-pointer select-none"
+                onClick={handleOutletNameSortToggle}
+              >
+                Outlet Name{" "}
+                {outletNameSort === "a_to_z" ? (
+                  <FaSortAlphaDown className="inline ml-1" size={25} />
+                ) : outletNameSort === "z_to_a" ? (
+                  <FaSortAlphaUp className="inline ml-1" size={25} />
+                ) : (
+                  <FaSort className="inline ml-1" size={25} />
+                )}
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
                 Source Ids
