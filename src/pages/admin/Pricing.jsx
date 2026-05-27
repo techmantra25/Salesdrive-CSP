@@ -1287,12 +1287,15 @@ const handleCategoryCSVTemplateDownload = () => {
                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                     RLP
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Created Date
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Effective Date
-                  </Table.HeadCell>
+                    <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                      Created Date
+                    </Table.HeadCell>
+                    <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                      Updated At
+                    </Table.HeadCell>
+                    <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                      Effective Date
+                    </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                     Days Left
                   </Table.HeadCell>
@@ -1378,9 +1381,15 @@ const handleCategoryCSVTemplateDownload = () => {
                            <Table.Cell className="px-2 py-1">
                              {price?.productId?.cat_id?.name}
                            </Table.Cell>
-                           <Table.Cell className="px-2 py-1">
-                             {price?.productId?.uom}
-                           </Table.Cell>
+                            <Table.Cell className="px-2 py-1">
+                              {price?.createdAt}
+                            </Table.Cell>
+                            <Table.Cell className="px-2 py-1">
+                              {price?.updatedAt}
+                            </Table.Cell>
+                            <Table.Cell className="px-2 py-1">
+                              {price?.effective_date}
+                            </Table.Cell>
                            <Table.Cell className="px-2 py-1">
                              {price?.productId?.no_of_pieces_in_a_box}
                            </Table.Cell>
@@ -1408,6 +1417,11 @@ const handleCategoryCSVTemplateDownload = () => {
                           </Table.Cell>
                           <Table.Cell className="px-2 py-1">
                             {moment(price?.createdAt)
+                              .tz("Asia/Kolkata")
+                              .format("YYYY-MM-DD hh:mm A")}
+                          </Table.Cell>
+                           <Table.Cell className="px-2 py-1">
+                            {moment(price?.updatedAt)
                               .tz("Asia/Kolkata")
                               .format("YYYY-MM-DD hh:mm A")}
                           </Table.Cell>
