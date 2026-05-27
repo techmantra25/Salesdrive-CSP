@@ -563,17 +563,17 @@ const Pricing = () => {
     document.body.removeChild(a);
   };
 
-  const handleCategoryCSVTemplateDownload = () => {
-    const csv = ["Collection Code,L1(%),L2(%)", "COL-01,10,5"];
-    const csvString = csv.join("\n");
-    const a = document.createElement("a");
+const handleCategoryCSVTemplateDownload = () => {
+  const csv = ["Collection Code,L1(%),L2(%),Effective Date", "COL-01,10,5,31-12-2024"];
+  const csvString = csv.join("\n");
+  const a = document.createElement("a");
 
-    a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
-    a.setAttribute("download", "category_pricing_template.csv");
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
+  a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
+  a.setAttribute("download", "category_pricing_template.csv");
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};
 
   const handleMRPPriceCSVTemplateDownload = () => {
     const csv = ["Product Code,MRP,Effective Date", "VOL-25,500,31-12-2024"];
