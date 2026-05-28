@@ -14,13 +14,13 @@ function App() {
   return (
     <>
       <div className={theme === "dark" ? "dark" : "light"}>
-        <SocketProvider>
+        {/* <SocketProvider> */}
           <AutoLogout />
           <MainRoutes />
           <ConfirmationModal />
           <ScrollToTopBtn />
           <Toaster position="top-center" reverseOrder={false} />
-        </SocketProvider>
+        {/* </SocketProvider> */}
       </div>
     </>
   );

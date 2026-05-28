@@ -64,7 +64,7 @@ export const DashboardNav = () => {
                 )}
               </span>
 
-              {role === "admin" && <NotificationBell />}
+              {/* {role === "admin" && <NotificationBell />} */}
 
               {/* Profile Link */}
 
