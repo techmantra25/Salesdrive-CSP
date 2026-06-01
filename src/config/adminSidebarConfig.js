@@ -514,12 +514,12 @@ export const adminSidebarConfig = [
     path: "/admin/image-converter",
     icon: IoIosImages,
   },
-  {
-    type: "item",
-    label: "Announcements",
-    path: "/admin/announcements",
-    icon: TbMicrophone2,
-  },
+  // {
+  //   type: "item",
+  //   label: "Announcements",
+  //   path: "/admin/announcements",
+  //   icon: TbMicrophone2,
+  // },
   {
     type: "item",
     label: "HelpDesk",
