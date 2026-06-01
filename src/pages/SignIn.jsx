@@ -179,7 +179,7 @@ export const SignIn = () => {
                 </svg>
               </div>
             )}
-            <span className="text-2xl font-bold">{companyName || "Salesdrive CSP"}</span>
+            <span className="text-2xl font-bold">{companyName || "Calcutta Metal Corporation CSP"}</span>
           </div>
 
           {/* Main Content */}
@@ -313,7 +313,7 @@ export const SignIn = () => {
               </div>
             )}
             <span className="text-xl font-bold text-gray-900 dark:text-white">
-              {companyName || "Salesdrive CSP"}
+              {companyName || "Calcutta Metal Corporation CSP"}
             </span>
           </div>
 
@@ -494,7 +494,7 @@ export const SignIn = () => {
 
           {/* Footer */}
           <p className="mt-8 text-center text-xs text-gray-500 dark:text-gray-400">
-            © 2026 {companyName || "Salesdrive CSP"}. All rights reserved.
+            © 2026 {companyName || "Calcutta Metal Corporation CSP"}. All rights reserved.
           </p>
         </div>
       </div>

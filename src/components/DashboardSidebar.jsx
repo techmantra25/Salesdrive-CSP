@@ -307,7 +307,7 @@ export const DashboardSidebar = ({ sidebarOpen, onSidebarClose }) => {
                 <span className="text-white font-bold text-sm">S</span>
               </div>
               <span className="text-lg font-bold text-gray-900 dark:text-white">
-                Salesdrive
+                Calcutta Metal Corporation
               </span>
             </NavLink>
             <button
@@ -368,7 +368,7 @@ export const DashboardSidebar = ({ sidebarOpen, onSidebarClose }) => {
           {/* Bottom spacer */}
           <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
             <p className="text-xs text-gray-400 dark:text-gray-500 text-center">
-              © 2026 Salesdrive CSP
+              © 2026 Calcutta Metal Corporation CSP
             </p>
           </div>
         </aside>
