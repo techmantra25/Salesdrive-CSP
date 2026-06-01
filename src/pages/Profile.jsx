@@ -206,7 +206,7 @@ export const Profile = () => {
           {/* page header */}
           <div className="flex justify-between w-full items-center border-b-2 py-4">
             <div className="flex justify-center items-center">
-              <h1 className="text-2xl font-bold">User Profile</h1>
+              <h1 className="text-2xl font-bold">User Profile.</h1>
             </div>
           </div>
           {/* current user profile */}
