@@ -341,7 +341,7 @@ const PuchaseInvoiceLog = () => {
                   <Table.HeadCell>Invoice NO</Table.HeadCell>
                   <Table.HeadCell>Status</Table.HeadCell>
                   <Table.HeadCell>View PO Data</Table.HeadCell>
-                  <Table.HeadCell>Error Log</Table.HeadCell>
+                  {/* <Table.HeadCell>Error Log</Table.HeadCell> */}
                   <Table.HeadCell>Original PO Date</Table.HeadCell>
                   <Table.HeadCell>Created At (DMS)</Table.HeadCell>
                   <Table.HeadCell>Updated At</Table.HeadCell>
@@ -393,9 +393,9 @@ const PuchaseInvoiceLog = () => {
                             ) : null}
                           </Table.Cell>
 
-                          <Table.Cell className="text-red-500 w-96">
+                          {/* <Table.Cell className="text-red-500 w-96">
                             {order?.ErrorLog}
-                          </Table.Cell>
+                          </Table.Cell> */}
 
                           <Table.Cell>
                             {order?.invoiceId?.GRNFKDATE

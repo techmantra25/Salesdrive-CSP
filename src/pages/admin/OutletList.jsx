@@ -1021,7 +1021,7 @@ const OutletList = () => {
                 )}
               </span>
             </Button> */}
-            <Button
+            {/* <Button
               className="text-xs"
               size="sm"
               color="none"
@@ -1041,8 +1041,8 @@ const OutletList = () => {
                   <IoWallet size={20} />
                 )}
               </span>
-            </Button>
-            <Button
+            </Button> */}
+            {/* <Button
               size="xs"
               color="blue"
               onClick={() => cleanCurrentBalanceHnandler()}
@@ -1050,7 +1050,7 @@ const OutletList = () => {
               <span className="flex justify-center items-center gap-2">
                 <RiRefreshFill size={20} />
               </span>
-            </Button>
+            </Button> */}
           </div>
           <div className="flex flex-wrap justify-center w-full items-center gap-4">
             {/* Status Filter */}
@@ -1399,15 +1399,15 @@ const OutletList = () => {
               <Table.HeadCell className="whitespace-nowrap">
                 Source Ids
               </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap">
+              {/* <Table.HeadCell className="whitespace-nowrap">
                 Current Point <br /> Balance
-              </Table.HeadCell>
+              </Table.HeadCell> */}
               <Table.HeadCell className="whitespace-nowrap">
                 Distributor
               </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap">
+              {/* <Table.HeadCell className="whitespace-nowrap">
                 Add Manual Points
-              </Table.HeadCell>
+              </Table.HeadCell> */}
               <Table.HeadCell className="whitespace-nowrap">
                 Owner Name
               </Table.HeadCell>
@@ -1512,7 +1512,7 @@ const OutletList = () => {
                           ? [...new Set(outlet.massistRefIds)].join(", ")
                           : " "}
                       </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                      {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         <div className="flex gap-4 justify-center items-center">
                           {outlet?.currentPointBalance != null
                             ? Number.isInteger(outlet.currentPointBalance)
@@ -1538,7 +1538,7 @@ const OutletList = () => {
                             <IoWallet size={16} />
                           </Button>
                         </div>
-                      </Table.Cell>
+                      </Table.Cell> */}
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         <Button
                           size="xs"
@@ -1549,25 +1549,7 @@ const OutletList = () => {
                           <HiOutlineMenu size={16} />
                         </Button>
                       </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        <div className="flex gap-2 justify-center items-center">
-                          <Button
-                            size="xs"
-                            color="success"
-                            onClick={() => handleAddPoints(outlet)}
-                          >
-                            Add Points
-                          </Button>
-                          {/* <Button
-                            size="xs"
-                            color="blue"
-                            onClick={() => handleRebuildBalance(outlet._id)}
-                            disabled={rebuildingBalance.has(outlet._id)}
-                          >
-                            <IoSyncCircleSharp size={14} />
-                          </Button> */}
-                        </div>
-                      </Table.Cell>
+                    
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.ownerName}
                       </Table.Cell>

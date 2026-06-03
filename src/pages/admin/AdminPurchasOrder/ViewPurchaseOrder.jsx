@@ -324,7 +324,7 @@ export const ViewPurchaseOrder = () => {
               </Button>
             </div>
             <div>
-              {role === "admin" ? (
+              {/* {role === "admin" ? (
                 <Button
                   className="text-xs"
                   size="sm"
@@ -339,7 +339,7 @@ export const ViewPurchaseOrder = () => {
                     {fetchingStatus ? "Fetching..." : "Fetch Quotation status"}
                   </span>
                 </Button>
-              ) : null}
+              ) : null} */}
             </div>
           </div>
         </Card>

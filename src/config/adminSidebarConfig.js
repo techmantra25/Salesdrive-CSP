@@ -466,35 +466,35 @@ export const adminSidebarConfig = [
       },
     ],
   },
-  {
-    type: "collapse",
-    label: "Target VS  Achievement",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      {
-        label: "Primary Slab Setting ",
-        path: "/admin/primary-slab",
-        icon: CiSettings,
-      },
+  // {
+  //   type: "collapse",
+  //   label: "Target VS  Achievement",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     {
+  //       label: "Primary Slab Setting ",
+  //       path: "/admin/primary-slab",
+  //       icon: CiSettings,
+  //     },
 
-      {
-        label: "Primary Target VS Achievement Setting",
-        path: "/admin/primary-target-setting",
-        icon: CiSettings,
-      },
+  //     {
+  //       label: "Primary Target VS Achievement Setting",
+  //       path: "/admin/primary-target-setting",
+  //       icon: CiSettings,
+  //     },
 
-      {
-        label: "Secondary Slab Setting",
-        path: "/admin/secondary-slab",
-        icon: CiSettings,
-      },
-      {
-        label: "Secondary Target VS Achievement Setting",
-        path: "/admin/secondary-target",
-        icon: CiSettings,
-      },
-    ],
-  },
+  //     {
+  //       label: "Secondary Slab Setting",
+  //       path: "/admin/secondary-slab",
+  //       icon: CiSettings,
+  //     },
+  //     {
+  //       label: "Secondary Target VS Achievement Setting",
+  //       path: "/admin/secondary-target",
+  //       icon: CiSettings,
+  //     },
+  //   ],
+  // },
   {
     type: "collapse",
     label: "User Management",
@@ -1007,39 +1007,39 @@ export const usersidebarconfig = [
       },
     ],
   },
-  {
-    type: "collapse",
-    label: "Target VS  Achievement",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      {
-        label: "Primary Slab Setting ",
-        path: "/user/primary-slab",
-        icon: CiSettings,
-        slug: "primary-slab-setting",
-      },
+  // {
+  //   type: "collapse",
+  //   label: "Target VS  Achievement",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     {
+  //       label: "Primary Slab Setting ",
+  //       path: "/user/primary-slab",
+  //       icon: CiSettings,
+  //       slug: "primary-slab-setting",
+  //     },
 
-      {
-        label: "Primary Target VS Achievement Setting",
-        path: "/user/primary-target-setting",
-        icon: CiSettings,
-        slug: "primary-target-vs-achievement-setting",
-      },
+  //     {
+  //       label: "Primary Target VS Achievement Setting",
+  //       path: "/user/primary-target-setting",
+  //       icon: CiSettings,
+  //       slug: "primary-target-vs-achievement-setting",
+  //     },
 
-      {
-        label: "Secondary Slab Setting",
-        path: "/user/secondary-slab",
-        icon: CiSettings,
-        slug: "secondary-slab-setting",
-      },
-      {
-        label: "Secondary Target VS Achievement Setting",
-        path: "/user/secondary-target",
-        icon: CiSettings,
-        slug: "secondary-target-vs-achievement-setting",
-      },
-    ],
-  },
+  //     {
+  //       label: "Secondary Slab Setting",
+  //       path: "/user/secondary-slab",
+  //       icon: CiSettings,
+  //       slug: "secondary-slab-setting",
+  //     },
+  //     {
+  //       label: "Secondary Target VS Achievement Setting",
+  //       path: "/user/secondary-target",
+  //       icon: CiSettings,
+  //       slug: "secondary-target-vs-achievement-setting",
+  //     },
+  //   ],
+  // },
   //   {
   //   type: "collapse",
   //   label: "User Management",
@@ -1554,39 +1554,39 @@ export const subadminssidebarconfig = [
       },
     ],
   },
-  {
-    type: "collapse",
-    label: "Target VS  Achievement",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      {
-        label: "Primary Slab Setting ",
-        path: "/sub-admins/primary-slab",
-        icon: CiSettings,
-        slug: "primary-slab-setting",
-      },
+  // {
+  //   type: "collapse",
+  //   label: "Target VS  Achievement",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     {
+  //       label: "Primary Slab Setting ",
+  //       path: "/sub-admins/primary-slab",
+  //       icon: CiSettings,
+  //       slug: "primary-slab-setting",
+  //     },
 
-      {
-        label: "Primary Target VS Achievement Setting",
-        path: "/sub-admins/primary-target-setting",
-        icon: CiSettings,
-        slug: "primary-target-vs-achievement-setting",
-      },
+  //     {
+  //       label: "Primary Target VS Achievement Setting",
+  //       path: "/sub-admins/primary-target-setting",
+  //       icon: CiSettings,
+  //       slug: "primary-target-vs-achievement-setting",
+  //     },
 
-      {
-        label: "Secondary Slab Setting",
-        path: "/sub-admins/secondary-slab",
-        icon: CiSettings,
-        slug: "secondary-slab-setting",
-      },
-      {
-        label: "Secondary Target VS Achievement Setting",
-        path: "/sub-admins/secondary-target",
-        icon: CiSettings,
-        slug: "secondary-target-vs-achievement-setting",
-      },
-    ],
-  },
+  //     {
+  //       label: "Secondary Slab Setting",
+  //       path: "/sub-admins/secondary-slab",
+  //       icon: CiSettings,
+  //       slug: "secondary-slab-setting",
+  //     },
+  //     {
+  //       label: "Secondary Target VS Achievement Setting",
+  //       path: "/sub-admins/secondary-target",
+  //       icon: CiSettings,
+  //       slug: "secondary-target-vs-achievement-setting",
+  //     },
+  //   ],
+  // },
   //   {
   //   type: "collapse",
   //   label: "User Management",
@@ -2105,39 +2105,39 @@ export const aaadminsesidebarconfig = [
       },
     ],
   },
-  {
-    type: "collapse",
-    label: "Target VS  Achievement",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      {
-        label: "Primary Slab Setting ",
-        path: "/admine/primary-slab",
-        icon: CiSettings,
-        slug: "primary-slab-setting",
-      },
+  // {
+  //   type: "collapse",
+  //   label: "Target VS  Achievement",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     {
+  //       label: "Primary Slab Setting ",
+  //       path: "/admine/primary-slab",
+  //       icon: CiSettings,
+  //       slug: "primary-slab-setting",
+  //     },
 
-      {
-        label: "Primary Target VS Achievement Setting",
-        path: "/admine/primary-target-setting",
-        icon: CiSettings,
-        slug: "primary-target-vs-achievement-setting",
-      },
+  //     {
+  //       label: "Primary Target VS Achievement Setting",
+  //       path: "/admine/primary-target-setting",
+  //       icon: CiSettings,
+  //       slug: "primary-target-vs-achievement-setting",
+  //     },
 
-      {
-        label: "Secondary Slab Setting",
-        path: "/admine/secondary-slab",
-        icon: CiSettings,
-        slug: "secondary-slab-setting",
-      },
-      {
-        label: "Secondary Target VS Achievement Setting",
-        path: "/admine/secondary-target",
-        icon: CiSettings,
-        slug: "secondary-target-vs-achievement-setting",
-      },
-    ],
-  },
+  //     {
+  //       label: "Secondary Slab Setting",
+  //       path: "/admine/secondary-slab",
+  //       icon: CiSettings,
+  //       slug: "secondary-slab-setting",
+  //     },
+  //     {
+  //       label: "Secondary Target VS Achievement Setting",
+  //       path: "/admine/secondary-target",
+  //       icon: CiSettings,
+  //       slug: "secondary-target-vs-achievement-setting",
+  //     },
+  //   ],
+  // },
   //   {
   //   type: "collapse",
   //   label: "User Management",
@@ -2649,39 +2649,39 @@ export const salessidebarconfig = [
       },
     ],
   },
-  {
-    type: "collapse",
-    label: "Target VS  Achievement",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      {
-        label: "Primary Slab Setting ",
-        path: "/Sales/primary-slab",
-        icon: CiSettings,
-        slug: "primary-slab-setting",
-      },
+  // {
+  //   type: "collapse",
+  //   label: "Target VS  Achievement",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     {
+  //       label: "Primary Slab Setting ",
+  //       path: "/Sales/primary-slab",
+  //       icon: CiSettings,
+  //       slug: "primary-slab-setting",
+  //     },
 
-      {
-        label: "Primary Target VS Achievement Setting",
-        path: "/Sales/primary-target-setting",
-        icon: CiSettings,
-        slug: "primary-target-vs-achievement-setting",
-      },
+  //     {
+  //       label: "Primary Target VS Achievement Setting",
+  //       path: "/Sales/primary-target-setting",
+  //       icon: CiSettings,
+  //       slug: "primary-target-vs-achievement-setting",
+  //     },
 
-      {
-        label: "Secondary Slab Setting",
-        path: "/Sales/secondary-slab",
-        icon: CiSettings,
-        slug: "secondary-slab-setting",
-      },
-      {
-        label: "Secondary Target VS Achievement Setting",
-        path: "/Sales/secondary-target",
-        icon: CiSettings,
-        slug: "secondary-target-vs-achievement-setting",
-      },
-    ],
-  },
+  //     {
+  //       label: "Secondary Slab Setting",
+  //       path: "/Sales/secondary-slab",
+  //       icon: CiSettings,
+  //       slug: "secondary-slab-setting",
+  //     },
+  //     {
+  //       label: "Secondary Target VS Achievement Setting",
+  //       path: "/Sales/secondary-target",
+  //       icon: CiSettings,
+  //       slug: "secondary-target-vs-achievement-setting",
+  //     },
+  //   ],
+  // },
   //   {
   //   type: "collapse",
   //   label: "User Management",
