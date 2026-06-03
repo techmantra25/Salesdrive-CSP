@@ -856,6 +856,17 @@ const Product = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
+  useEffect(() => {
+    if (openModal && modalMode === "add") {
+      if (!formData.supplier && supplierList?.length > 0) {
+        setFormData((prev) => ({
+          ...prev,
+          supplier: supplierList[0]?._id || "",
+        }));
+      }
+    }
+  }, [openModal, modalMode, supplierList]);
+
   // Effect for fetching paginated products when filters or pagination change
   useEffect(() => {
     fetchProductsPaginated();
@@ -1618,25 +1629,25 @@ const Product = () => {
                     required
                   />
                 </div>
-                {/* <div className="mb-4">
-              <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                <Label htmlFor="supplier">Supplier</Label>
-                <span className="text-red-500">*</span>
-              </div>
-              <Select
-                id="supplier"
-                name="supplier"
-                value={formData.supplier}
-                onChange={handleChange}
-              >
-                <option value="">Select Supplier</option>
-                {supplierList?.map((supplier) => (
-                  <option key={supplier._id} value={supplier._id}>
-                    {supplier.supplierCode}({supplier?.supplierName})
-                  </option>
-                ))}
-              </Select>
-            </div> */}
+                <div className="mb-4">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label htmlFor="supplier">Supplier</Label>
+                    <span className="text-red-500">*</span>
+                  </div>
+                  <Select
+                    id="supplier"
+                    name="supplier"
+                    value={formData.supplier}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select Supplier</option>
+                    {supplierList?.map((supplier) => (
+                      <option key={supplier._id} value={supplier._id}>
+                        {supplier.supplierCode}({supplier?.supplierName})
+                      </option>
+                    ))}
+                  </Select>
+                </div>
                 <div className="mb-4">
                   <div className="mb-2 block text-gray-700 dark:text-gray-100">
                     <Label htmlFor="brand">Brand</Label>
