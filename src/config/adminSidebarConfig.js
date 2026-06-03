@@ -454,11 +454,11 @@ export const adminSidebarConfig = [
         path: "/admin/settings",
         icon: CiSettings,
       },
-      {
-        label: "Cron Settings",
-        path: "/admin/cron-settings",
-        icon: CiSettings,
-      },
+      // {
+      //   label: "Cron Settings",
+      //   path: "/admin/cron-settings",
+      //   icon: CiSettings,
+      // },
       {
         label: "Page Settings",
         path: "/admin/create-page",
