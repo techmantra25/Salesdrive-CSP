@@ -79,6 +79,7 @@ export const SupplierMaster = () => {
     address: "",
     city: "",
     gstNo: "",
+    panNo: "",
     contactNo: "",
     stateId: "",
     email: "",
@@ -199,6 +200,7 @@ export const SupplierMaster = () => {
       address: "",
       city: "",
       gstNo: "",
+      panNo: "",
       contactNo: "",
       stateId: "",
       email: "",
@@ -221,6 +223,7 @@ export const SupplierMaster = () => {
       address: supplier?.address ?? "",
       city: supplier?.city ?? "",
       gstNo: supplier?.gstNo ?? "",
+      panNo: supplier?.panNo ?? "",
       contactNo: supplier?.contactNo ?? "",
       stateId: supplier?.stateId?._id ?? "",
       email: supplier?.email ?? "",
@@ -241,6 +244,7 @@ export const SupplierMaster = () => {
         address: formData.address,
         city: formData.city,
         gstNo: formData.gstNo,
+        panNo: formData.panNo,
         contactNo: formData.contactNo,
         email: formData.email,
         pinCode: formData.pinCode,
@@ -287,6 +291,7 @@ export const SupplierMaster = () => {
               address: formData.address,
               city: formData.city,
               gstNo: formData.gstNo,
+              panNo: formData.panNo,
               contactNo: formData.contactNo,
               stateId: formData.stateId ? formData?.stateId : null,
               email: formData.email,
@@ -490,278 +495,278 @@ export const SupplierMaster = () => {
 
   return (
     <>
-    {pagePermission?.view && (
-      <div className="flex justify-start items-center flex-col gap-4 w-full">
-        {/* page header */}
-        <div className="flex justify-between w-full items-center border-b-2 py-4">
-          <div className="flex justify-center items-center">
-            <h1 className="text-2xl font-bold">Supplier Master</h1>
-          </div>
-        </div>
-
-        {/* filters */}
-        <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
-          <Card className="w-full flex justify-center items-center flex-col">
-            {/* filter card header */}
-            <div className="w-full flex flex-wrap justify-center items-center gap-2">
-              <Badge color="warning">Total Count : {totalItems} </Badge>
-              <Badge color="warning">Filtered Count : {filteredCount} </Badge>
+      {pagePermission?.view && (
+        <div className="flex justify-start items-center flex-col gap-4 w-full">
+          {/* page header */}
+          <div className="flex justify-between w-full items-center border-b-2 py-4">
+            <div className="flex justify-center items-center">
+              <h1 className="text-2xl font-bold">Supplier Master</h1>
             </div>
-            {/* filter div */}
-            <div className="flex justify-center w-full items-center gap-4 flex-wrap">
-              <div className="w-40">
-                <div className="mb-2 block">
-                  <Label htmlFor="statusSelect" value="Select Status" />
-                </div>
-                <Select
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                  id="statusSelect"
-                  required
-                >
-                  <option value="default">All</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </Select>
-              </div>
+          </div>
 
-              <div className="w-44">
-                <div className="mb-2 block">
-                  <Label htmlFor="stateSelect" value="Select State" />
-                </div>
-                <Select
-                  value={selectedState}
-                  onChange={(event) => setSelectedState(event.target.value)}
-                  required
-                >
-                  <option value="default">Select State</option>
-                  {activeStates?.map((state) => (
-                    <option key={state._id} value={state._id}>
-                      {state.name}
-                    </option>
-                  ))}
-                </Select>
+          {/* filters */}
+          <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
+            <Card className="w-full flex justify-center items-center flex-col">
+              {/* filter card header */}
+              <div className="w-full flex flex-wrap justify-center items-center gap-2">
+                <Badge color="warning">Total Count : {totalItems} </Badge>
+                <Badge color="warning">Filtered Count : {filteredCount} </Badge>
               </div>
-              {selectedState !== "default" ? (
-                <div className="w-44">
+              {/* filter div */}
+              <div className="flex justify-center w-full items-center gap-4 flex-wrap">
+                <div className="w-40">
                   <div className="mb-2 block">
-                    <Label
-                      htmlFor="distributorSelect"
-                      value="Select Distributor"
-                    />
+                    <Label htmlFor="statusSelect" value="Select Status" />
                   </div>
                   <Select
-                    value={selectedDistributor}
-                    onChange={(event) =>
-                      setSelectedDistributor(event.target.value)
-                    }
-                    id="distributorSelect"
+                    value={selectedStatus}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    id="statusSelect"
+                    required
                   >
-                    <option value="default">Select Distributor</option>
-                    {selectedState
-                      ? activeDistributors
-                        .filter(
-                          (distributor) =>
-                            distributor?.stateId?._id === selectedState
-                        )
-                        .map((distributor) => (
-                          <option
-                            key={distributor._id}
-                            value={distributor._id}
-                          >
-                            {distributor.name} ({distributor.dbCode})
-                          </option>
-                        ))
-                      : null}
+                    <option value="default">All</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
                   </Select>
                 </div>
-              ) : null}
-              <div className="w-56">
-                <div className="mb-2 block">
-                  <Label htmlFor="supplierType" value="Select Supplier Type" />
+
+                <div className="w-44">
+                  <div className="mb-2 block">
+                    <Label htmlFor="stateSelect" value="Select State" />
+                  </div>
+                  <Select
+                    value={selectedState}
+                    onChange={(event) => setSelectedState(event.target.value)}
+                    required
+                  >
+                    <option value="default">Select State</option>
+                    {activeStates?.map((state) => (
+                      <option key={state._id} value={state._id}>
+                        {state.name}
+                      </option>
+                    ))}
+                  </Select>
                 </div>
-                <Select
-                  value={selectedSupplierType}
-                  onChange={(e) => setSelectedSupplierType(e.target.value)}
-                  id="supplierTypeSelect"
-                  required
-                >
-                  <option value="default">All</option>
-                  <option value="C&Agent">C & Agent</option>
-                  <option value="Factory">Factory</option>
-                  <option value="Depo">Depo</option>
-                  <option value="Company">Company</option>
-                  <option value="Distributor">Distributor</option>
-                </Select>
-              </div>
-              <div className="w-44">
-                <div className="block">
-                  <Label value="Search Supplier" />
+                {selectedState !== "default" ? (
+                  <div className="w-44">
+                    <div className="mb-2 block">
+                      <Label
+                        htmlFor="distributorSelect"
+                        value="Select Distributor"
+                      />
+                    </div>
+                    <Select
+                      value={selectedDistributor}
+                      onChange={(event) =>
+                        setSelectedDistributor(event.target.value)
+                      }
+                      id="distributorSelect"
+                    >
+                      <option value="default">Select Distributor</option>
+                      {selectedState
+                        ? activeDistributors
+                          .filter(
+                            (distributor) =>
+                              distributor?.stateId?._id === selectedState
+                          )
+                          .map((distributor) => (
+                            <option
+                              key={distributor._id}
+                              value={distributor._id}
+                            >
+                              {distributor.name} ({distributor.dbCode})
+                            </option>
+                          ))
+                        : null}
+                    </Select>
+                  </div>
+                ) : null}
+                <div className="w-56">
+                  <div className="mb-2 block">
+                    <Label htmlFor="supplierType" value="Select Supplier Type" />
+                  </div>
+                  <Select
+                    value={selectedSupplierType}
+                    onChange={(e) => setSelectedSupplierType(e.target.value)}
+                    id="supplierTypeSelect"
+                    required
+                  >
+                    <option value="default">All</option>
+                    <option value="C&Agent">C & Agent</option>
+                    <option value="Factory">Factory</option>
+                    <option value="Depo">Depo</option>
+                    <option value="Company">Company</option>
+                    <option value="Distributor">Distributor</option>
+                  </Select>
                 </div>
-                <TextInput
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search by Name or Code"
-                />
+                <div className="w-44">
+                  <div className="block">
+                    <Label value="Search Supplier" />
+                  </div>
+                  <TextInput
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search by Name or Code"
+                  />
+                </div>
               </div>
-            </div>
-            {/* btns */}
-            <div className="flex justify-center w-full items-center gap-2 flex-wrap">
-              <Button
-                className="text-xs"
-                size="sm"
-                color="success"
-                onClick={handleResetFilter}
-              >
-                <span className="flex justify-center items-center gap-2">
-                  <RiRefreshFill size={20} />
-                  Reset & Refresh
-                </span>
-              </Button>
-              {pagePermission?.create && (
+              {/* btns */}
+              <div className="flex justify-center w-full items-center gap-2 flex-wrap">
                 <Button
                   className="text-xs"
                   size="sm"
-                  onClick={() => setOpenModal(true)}
+                  color="success"
+                  onClick={handleResetFilter}
                 >
                   <span className="flex justify-center items-center gap-2">
-                    <IoMdAddCircle size={20} />
-                    Add Supplier
+                    <RiRefreshFill size={20} />
+                    Reset & Refresh
                   </span>
-                </Button>)}
-              <Button
-                className="text-xs"
-                color="light"
-                size="sm"
-                onClick={() => {
-                  handleCSVTemplateDownload();
-                }}
-              >
-                <span className="flex justify-center items-center gap-2">
-                  <MdSimCardDownload size={20} />
-                  Template
-                </span>
-              </Button>
-              {pagePermission?.view && (
+                </Button>
+                {pagePermission?.create && (
+                  <Button
+                    className="text-xs"
+                    size="sm"
+                    onClick={() => setOpenModal(true)}
+                  >
+                    <span className="flex justify-center items-center gap-2">
+                      <IoMdAddCircle size={20} />
+                      Add Supplier
+                    </span>
+                  </Button>)}
                 <Button
                   className="text-xs"
+                  color="light"
                   size="sm"
-                  color="blue"
                   onClick={() => {
-                    handleExportToCSV();
+                    handleCSVTemplateDownload();
                   }}
-                  disabled={suppliersLoading || csvLoading}
                 >
                   <span className="flex justify-center items-center gap-2">
-                    <BiSolidFileExport size={20} />
-                    {csvLoading ? "Downloading..." : "CSV Download"}
+                    <MdSimCardDownload size={20} />
+                    Template
                   </span>
-                </Button>)}
-              {/* <FileUpload
+                </Button>
+                {pagePermission?.view && (
+                  <Button
+                    className="text-xs"
+                    size="sm"
+                    color="blue"
+                    onClick={() => {
+                      handleExportToCSV();
+                    }}
+                    disabled={suppliersLoading || csvLoading}
+                  >
+                    <span className="flex justify-center items-center gap-2">
+                      <BiSolidFileExport size={20} />
+                      {csvLoading ? "Downloading..." : "CSV Download"}
+                    </span>
+                  </Button>)}
+                {/* <FileUpload
                 type="single-file"
                 page="bulk-import"
                 onSetFileUrl={(url) => {
                   handleCSVImport(url);
                 }}
               /> */}
-            </div>
-          </Card>
-        </div>
-
-        <div className="flex justify-end items-center w-full px-4 ">
-          <div className="flex overflow-x-auto sm:justify-center">
-            {totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-                showIcons
-              />
-            )}
+              </div>
+            </Card>
           </div>
-        </div>
 
-        {/* table */}
-        <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
-          <div className="overflow-x-auto w-full">
-            <Table striped>
-              <Table.Head className="text-center">
-                <Table.HeadCell>Supplier Code</Table.HeadCell>
-                <Table.HeadCell>Co Code</Table.HeadCell>
-                <Table.HeadCell>Supplier Name</Table.HeadCell>
-                <Table.HeadCell>Supplier Type</Table.HeadCell>
-                <Table.HeadCell>GST No</Table.HeadCell>
-                <Table.HeadCell>Contact No</Table.HeadCell>
-                <Table.HeadCell>Supplier City</Table.HeadCell>
-                <Table.HeadCell>State</Table.HeadCell>
-                <Table.HeadCell>Pincode</Table.HeadCell>
-                <Table.HeadCell>Distributors</Table.HeadCell>
-                <Table.HeadCell>Status</Table.HeadCell>
-                <Table.HeadCell>Action</Table.HeadCell>
-              </Table.Head>
-              <Table.Body>
-                {suppliersLoading ? (
-                  <Table.Row className="text-center bg-white dark:border-gray-700 dark:bg-gray-800">
-                    <Table.Cell
-                      colSpan="16"
-                      className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200"
-                    >
-                      <div
-                        className="w-full flex justify-center items-center"
-                        role="status"
+          <div className="flex justify-end items-center w-full px-4 ">
+            <div className="flex overflow-x-auto sm:justify-center">
+              {totalPages > 1 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={onPageChange}
+                  showIcons
+                />
+              )}
+            </div>
+          </div>
+
+          {/* table */}
+          <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
+            <div className="overflow-x-auto w-full">
+              <Table striped>
+                <Table.Head className="text-center">
+                  <Table.HeadCell>Supplier Code</Table.HeadCell>
+                  <Table.HeadCell>Co Code</Table.HeadCell>
+                  <Table.HeadCell>Supplier Name</Table.HeadCell>
+                  <Table.HeadCell>Supplier Type</Table.HeadCell>
+                  <Table.HeadCell>GST No</Table.HeadCell>
+                  <Table.HeadCell>Contact No</Table.HeadCell>
+                  <Table.HeadCell>Supplier City</Table.HeadCell>
+                  <Table.HeadCell>State</Table.HeadCell>
+                  <Table.HeadCell>Pincode</Table.HeadCell>
+                  <Table.HeadCell>Distributors</Table.HeadCell>
+                  <Table.HeadCell>Status</Table.HeadCell>
+                  <Table.HeadCell>Action</Table.HeadCell>
+                </Table.Head>
+                <Table.Body>
+                  {suppliersLoading ? (
+                    <Table.Row className="text-center bg-white dark:border-gray-700 dark:bg-gray-800">
+                      <Table.Cell
+                        colSpan="16"
+                        className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200"
                       >
-                        <Spinner aria-label="Loading data" size="xl" />
-                      </div>
-                    </Table.Cell>
-                  </Table.Row>
-                ) : (
-                  <>
-                    {suppliers?.map((supplier) => (
-                      <Table.Row
-                        key={supplier._id}
-                        className="text-center bg-white dark:border-gray-700 dark:bg-gray-800"
-                      >
-                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                          <UniqueCode
-                            text={supplier?.supplierCode}
-                            codeName="Supplier Code"
-                          />{" "}
-                        </Table.Cell>
-                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                          <UniqueCode
-                            text={supplier?.coCode}
-                            codeName="Co Code"
-                          />{" "}
-                        </Table.Cell>
-                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200 cursor-pointer hover:text-lime-600">
-                          <div className="flex gap-2 justify-center items-center">
-                            {supplier?.supplierName}{" "}
-                          </div>
-                        </Table.Cell>
-                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                          {supplier?.supplierType}
-                        </Table.Cell>
-                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                          {supplier?.gstNo}
-                        </Table.Cell>
-                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                          {supplier?.contactNo}
-                        </Table.Cell>
-                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                          {supplier?.city}
-                        </Table.Cell>
-                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                          {supplier?.stateId?.name} -
-                          <UniqueCode
-                            text={supplier?.stateId?.code}
-                            codeName="State Code"
-                          />
-                        </Table.Cell>
-                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                          {supplier?.pinCode}
-                        </Table.Cell>
-                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                          {/* {supplier?.distributorId?.length > 0
+                        <div
+                          className="w-full flex justify-center items-center"
+                          role="status"
+                        >
+                          <Spinner aria-label="Loading data" size="xl" />
+                        </div>
+                      </Table.Cell>
+                    </Table.Row>
+                  ) : (
+                    <>
+                      {suppliers?.map((supplier) => (
+                        <Table.Row
+                          key={supplier._id}
+                          className="text-center bg-white dark:border-gray-700 dark:bg-gray-800"
+                        >
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            <UniqueCode
+                              text={supplier?.supplierCode}
+                              codeName="Supplier Code"
+                            />{" "}
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            <UniqueCode
+                              text={supplier?.coCode}
+                              codeName="Co Code"
+                            />{" "}
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200 cursor-pointer hover:text-lime-600">
+                            <div className="flex gap-2 justify-center items-center">
+                              {supplier?.supplierName}{" "}
+                            </div>
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            {supplier?.supplierType}
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            {supplier?.gstNo}
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            {supplier?.contactNo}
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            {supplier?.city}
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            {supplier?.stateId?.name} -
+                            <UniqueCode
+                              text={supplier?.stateId?.code}
+                              codeName="State Code"
+                            />
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            {supplier?.pinCode}
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            {/* {supplier?.distributorId?.length > 0
                             ? supplier?.distributorId?.map((distributor) => (
                                 <div
                                   key={distributor._id}
@@ -774,150 +779,183 @@ export const SupplierMaster = () => {
                               ))
                             : ""} */}
 
-                          <div
-                            className="flex gap-2 justify-center items-center text-black dark:text-white cursor-pointer"
-                            onClick={() => handleOpenDBListModal(supplier)}
-                          >
-                            <CiCircleList size={20} /> View
-                          </div>
-                        </Table.Cell>
+                            <div
+                              className="flex gap-2 justify-center items-center text-black dark:text-white cursor-pointer"
+                              onClick={() => handleOpenDBListModal(supplier)}
+                            >
+                              <CiCircleList size={20} /> View
+                            </div>
+                          </Table.Cell>
 
-                        <Table.Cell
-                          className={`whitespace-nowrap font-medium `}
-                        >
-                          <StatusIndicatorNew
-                            status={supplier?.status}
-                            onClick={
-                              pagePermission?.update
-                                ? () => handleStatusUpdate(supplier)
-                                : undefined
-                            }
-                            className={`${pagePermission?.update
+                          <Table.Cell
+                            className={`whitespace-nowrap font-medium `}
+                          >
+                            <StatusIndicatorNew
+                              status={supplier?.status}
+                              onClick={
+                                pagePermission?.update
+                                  ? () => handleStatusUpdate(supplier)
+                                  : undefined
+                              }
+                              className={`${pagePermission?.update
                                 ? "cursor-pointer"
                                 : "cursor-not-allowed opacity-50"
-                              }`}
-                          />
+                                }`}
+                            />
 
-                        </Table.Cell>
-                        <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                          <div className="flex gap-2 justify-center items-center">
-                            {pagePermission?.update && (
-                              <EditButton
-                                onClick={() => handleSetEdit(supplier)}
-                              />)}
-                          </div>
-                        </Table.Cell>
-                      </Table.Row>
-                    ))}
-                    {suppliers?.length === 0 && (
-                      <Table.Row className="text-center bg-white dark:border-gray-700 dark:bg-gray-800">
-                        <Table.Cell
-                          colSpan={"100%"}
-                          className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200"
-                        >
-                          No data found
-                        </Table.Cell>
-                      </Table.Row>
-                    )}
-                  </>
-                )}
-              </Table.Body>
-            </Table>
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            <div className="flex gap-2 justify-center items-center">
+                              {pagePermission?.update && (
+                                <EditButton
+                                  onClick={() => handleSetEdit(supplier)}
+                                />)}
+                            </div>
+                          </Table.Cell>
+                        </Table.Row>
+                      ))}
+                      {suppliers?.length === 0 && (
+                        <Table.Row className="text-center bg-white dark:border-gray-700 dark:bg-gray-800">
+                          <Table.Cell
+                            colSpan={"100%"}
+                            className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200"
+                          >
+                            No data found
+                          </Table.Cell>
+                        </Table.Row>
+                      )}
+                    </>
+                  )}
+                </Table.Body>
+              </Table>
+            </div>
           </div>
-        </div>
 
-        {/* Add/Edit Modal  */}
-        <Modal show={openModal} onClose={onCloseModal}>
-          <Modal.Header>
-            {modalMode === "add" ? "Add Supplier" : "Edit Supplier"}
-          </Modal.Header>
-          <Modal.Body>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="supplier-code">Supplier Code</Label>
-                <TextInput
-                  id="supplier-code"
-                  value={formData.supplierCode}
-                  onChange={(e) =>
-                    setFormData({ ...formData, supplierCode: e.target.value })
-                  }
-                  placeholder="Enter Supplier Code"
-                />
-              </div>
-              <div>
-                <Label htmlFor="supplier-co-code">Supplier Co Code</Label>
-                <TextInput
-                  id="supplier-co-code"
-                  value={formData.coCode}
-                  onChange={(e) =>
-                    setFormData({ ...formData, coCode: e.target.value })
-                  }
-                  placeholder="Enter Supplier Co Code"
-                />
-              </div>
-              <div>
-                <Label htmlFor="supplier-name">Supplier Name</Label>
-                <TextInput
-                  id="supplier-name"
-                  value={formData.supplierName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, supplierName: e.target.value })
-                  }
-                  placeholder="Enter Supplier Name"
-                />
-              </div>
-              <div>
-                <Label htmlFor="supplier-type">Supplier Type</Label>
-                <Select
-                  id="supplier-type"
-                  value={formData.supplierType}
-                  onChange={(e) =>
-                    setFormData({ ...formData, supplierType: e.target.value })
-                  }
-                >
-                  <option value="">Select Supplier Type</option>
-                  <option value="C&Agent">C & Agent</option>
-                  <option value="Factory">Factory</option>
-                  <option value="Depo">Depo</option>
-                  <option value="Company">Company</option>
-                  <option value="Distributor">Distributor</option>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="supplier-state">State</Label>
-                <Select
-                  id="supplier-state"
-                  value={formData.stateId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, stateId: e.target.value })
-                  }
-                >
-                  <option value="">Select State</option>
-                  {activeStates?.map((state) => (
-                    <option key={state._id} value={state._id}>
-                      {state.name}
-                    </option>
-                  ))}
-                </Select>
-              </div>
-              <div className="mb-5">
-                <Label className="mb-2 block">Select Distributors</Label>
-
-                {/* Distributor Search Box */}
-                <div className="mb-3">
+          {/* Add/Edit Modal  */}
+          <Modal show={openModal} onClose={onCloseModal}>
+            <Modal.Header>
+              {modalMode === "add" ? "Add Supplier" : "Edit Supplier"}
+            </Modal.Header>
+            <Modal.Body>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="supplier-code">Supplier Code</Label>
                   <TextInput
-                    type="text"
-                    placeholder="Search Distributor by name or DB code..."
-                    value={searchDistributor}
-                    onChange={(e) => setSearchDistributor(e.target.value)}
+                    id="supplier-code"
+                    value={formData.supplierCode}
+                    onChange={(e) =>
+                      setFormData({ ...formData, supplierCode: e.target.value })
+                    }
+                    placeholder="Enter Supplier Code"
                   />
                 </div>
+                <div>
+                  <Label htmlFor="supplier-co-code">Supplier Co Code</Label>
+                  <TextInput
+                    id="supplier-co-code"
+                    value={formData.coCode}
+                    onChange={(e) =>
+                      setFormData({ ...formData, coCode: e.target.value })
+                    }
+                    placeholder="Enter Supplier Co Code"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="supplier-name">Supplier Name</Label>
+                  <TextInput
+                    id="supplier-name"
+                    value={formData.supplierName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, supplierName: e.target.value })
+                    }
+                    placeholder="Enter Supplier Name"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="supplier-type">Supplier Type</Label>
+                  <Select
+                    id="supplier-type"
+                    value={formData.supplierType}
+                    onChange={(e) =>
+                      setFormData({ ...formData, supplierType: e.target.value })
+                    }
+                  >
+                    <option value="">Select Supplier Type</option>
+                    <option value="C&Agent">C & Agent</option>
+                    <option value="Factory">Factory</option>
+                    <option value="Depo">Depo</option>
+                    <option value="Company">Company</option>
+                    <option value="Distributor">Distributor</option>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="supplier-state">State</Label>
+                  <Select
+                    id="supplier-state"
+                    value={formData.stateId}
+                    onChange={(e) =>
+                      setFormData({ ...formData, stateId: e.target.value })
+                    }
+                  >
+                    <option value="">Select State</option>
+                    {activeStates?.map((state) => (
+                      <option key={state._id} value={state._id}>
+                        {state.name}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+                <div className="mb-5">
+                  <Label className="mb-2 block">Select Distributors</Label>
 
-                {/* Filter distributors based on search */}
-                <div className="max-h-60 overflow-y-auto border p-2 rounded">
-                  <div className="grid grid-cols-2 gap-2">
-                    {activeDistributors
-                      .filter(
+                  {/* Distributor Search Box */}
+                  <div className="mb-3">
+                    <TextInput
+                      type="text"
+                      placeholder="Search Distributor by name or DB code..."
+                      value={searchDistributor}
+                      onChange={(e) => setSearchDistributor(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Filter distributors based on search */}
+                  <div className="max-h-60 overflow-y-auto border p-2 rounded">
+                    <div className="grid grid-cols-2 gap-2">
+                      {activeDistributors
+                        .filter(
+                          (d) =>
+                            d.name
+                              .toLowerCase()
+                              .includes(searchDistributor.toLowerCase()) ||
+                            d.dbCode
+                              .toLowerCase()
+                              .includes(searchDistributor.toLowerCase())
+                        )
+                        .map((d) => (
+                          <div key={d._id} className="flex items-center gap-2">
+                            <Checkbox
+                              id={`distributor-${d._id}`}
+                              checked={formData.distributorId.includes(d._id)}
+                              onChange={(e) => {
+                                const selected = [...formData.distributorId];
+                                if (e.target.checked) {
+                                  selected.push(d._id);
+                                } else {
+                                  const index = selected.indexOf(d._id);
+                                  if (index > -1) selected.splice(index, 1);
+                                }
+                                setFormData({
+                                  ...formData,
+                                  distributorId: selected,
+                                });
+                              }}
+                            />
+                            <Label htmlFor={`distributor-${d._id}`}>
+                              {d.name} ({d.dbCode})
+                            </Label>
+                          </div>
+                        ))}
+                      {activeDistributors.filter(
                         (d) =>
                           d.name
                             .toLowerCase()
@@ -925,174 +963,152 @@ export const SupplierMaster = () => {
                           d.dbCode
                             .toLowerCase()
                             .includes(searchDistributor.toLowerCase())
-                      )
-                      .map((d) => (
-                        <div key={d._id} className="flex items-center gap-2">
-                          <Checkbox
-                            id={`distributor-${d._id}`}
-                            checked={formData.distributorId.includes(d._id)}
-                            onChange={(e) => {
-                              const selected = [...formData.distributorId];
-                              if (e.target.checked) {
-                                selected.push(d._id);
-                              } else {
-                                const index = selected.indexOf(d._id);
-                                if (index > -1) selected.splice(index, 1);
-                              }
-                              setFormData({
-                                ...formData,
-                                distributorId: selected,
-                              });
-                            }}
-                          />
-                          <Label htmlFor={`distributor-${d._id}`}>
-                            {d.name} ({d.dbCode})
-                          </Label>
-                        </div>
-                      ))}
-                    {activeDistributors.filter(
-                      (d) =>
-                        d.name
-                          .toLowerCase()
-                          .includes(searchDistributor.toLowerCase()) ||
-                        d.dbCode
-                          .toLowerCase()
-                          .includes(searchDistributor.toLowerCase())
-                    ).length === 0 && (
-                        <div className="text-sm text-gray-500 col-span-2">
-                          No distributors found.
-                        </div>
-                      )}
+                      ).length === 0 && (
+                          <div className="text-sm text-gray-500 col-span-2">
+                            No distributors found.
+                          </div>
+                        )}
+                    </div>
                   </div>
+
+                  {/* Selected distributor badges */}
+                  {formData.distributorId.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {formData.distributorId.map((id) => {
+                        const distributor = activeDistributors.find(
+                          (d) => d._id === id
+                        );
+                        return (
+                          <Badge key={id} color="info">
+                            {distributor?.name || "Unknown"}
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
-                {/* Selected distributor badges */}
-                {formData.distributorId.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {formData.distributorId.map((id) => {
-                      const distributor = activeDistributors.find(
-                        (d) => d._id === id
-                      );
-                      return (
-                        <Badge key={id} color="info">
-                          {distributor?.name || "Unknown"}
-                        </Badge>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+                <div>
+                  <Label htmlFor="supplier-city">Supplier City</Label>
+                  <TextInput
+                    id="supplier-city"
+                    value={formData.city}
+                    onChange={(e) =>
+                      setFormData({ ...formData, city: e.target.value })
+                    }
+                    placeholder="Enter Supplier City"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="supplier-address">Supplier Address</Label>
+                  <Textarea
+                    id="supplier-address"
+                    value={formData.address}
+                    onChange={(e) =>
+                      setFormData({ ...formData, address: e.target.value })
+                    }
+                    placeholder="Enter Supplier Address"
+                    rows={2}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="supplier-pincode">Postal Code</Label>
+                  <TextInput
+                    id="supplier-pincode"
+                    type="number"
+                    value={formData.pinCode}
+                    onChange={(e) =>
+                      setFormData({ ...formData, pinCode: e.target.value })
+                    }
+                    placeholder="Enter Postal Code"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="supplier-gst">GST No</Label>
+                  <TextInput
+                    id="supplier-gst"
+                    value={formData.gstNo}
+                    onChange={(e) =>
+                      setFormData({ ...formData, gstNo: e.target.value })
+                    }
+                    placeholder="Enter GST No"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="supplier-pan">PAN No</Label>
+                  <TextInput
+                    id="supplier-pan"
+                    value={formData.panNo}
+                    onChange={(e) =>
+                      setFormData({ ...formData, panNo: e.target.value })
+                    }
+                    placeholder="Enter PAN No"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="supplier-contact">Contact No</Label>
+                  <TextInput
+                    id="supplier-contact"
+                    value={formData.contactNo}
+                    onChange={(e) =>
+                      setFormData({ ...formData, contactNo: e.target.value })
+                    }
+                    placeholder="Enter Contact No"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="supplier-email">Email</Label>
+                  <TextInput
+                    id="supplier-email"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    placeholder="Enter Email"
+                  />
+                </div>
 
-              <div>
-                <Label htmlFor="supplier-city">Supplier City</Label>
-                <TextInput
-                  id="supplier-city"
-                  value={formData.city}
-                  onChange={(e) =>
-                    setFormData({ ...formData, city: e.target.value })
-                  }
-                  placeholder="Enter Supplier City"
-                />
-              </div>
-              <div>
-                <Label htmlFor="supplier-address">Supplier Address</Label>
-                <Textarea
-                  id="supplier-address"
-                  value={formData.address}
-                  onChange={(e) =>
-                    setFormData({ ...formData, address: e.target.value })
-                  }
-                  placeholder="Enter Supplier Address"
-                  rows={2}
-                />
-              </div>
-              <div>
-                <Label htmlFor="supplier-pincode">Postal Code</Label>
-                <TextInput
-                  id="supplier-pincode"
-                  type="number"
-                  value={formData.pinCode}
-                  onChange={(e) =>
-                    setFormData({ ...formData, pinCode: e.target.value })
-                  }
-                  placeholder="Enter Postal Code"
-                />
-              </div>
-              <div>
-                <Label htmlFor="supplier-gst">GST No</Label>
-                <TextInput
-                  id="supplier-gst"
-                  value={formData.gstNo}
-                  onChange={(e) =>
-                    setFormData({ ...formData, gstNo: e.target.value })
-                  }
-                  placeholder="Enter GST No"
-                />
-              </div>
-              <div>
-                <Label htmlFor="supplier-contact">Contact No</Label>
-                <TextInput
-                  id="supplier-contact"
-                  value={formData.contactNo}
-                  onChange={(e) =>
-                    setFormData({ ...formData, contactNo: e.target.value })
-                  }
-                  placeholder="Enter Contact No"
-                />
-              </div>
-              <div>
-                <Label htmlFor="supplier-email">Email</Label>
-                <TextInput
-                  id="supplier-email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  placeholder="Enter Email"
-                />
-              </div>
+                <div className="flex justify-end space-x-2">
+                  <Button onClick={onCloseModal} color="gray">
+                    Cancel
+                  </Button>
+                  {modalMode === "add" ? (
+                    pagePermission?.create && (
+                      <Button
+                        onClick={handleAddSupplier}
+                        disabled={formLoading}
+                      >
+                        {formLoading && <Spinner className="mr-2" />}
+                        Add Supplier
+                      </Button>
+                    )
+                  ) : (
+                    pagePermission?.update && (
+                      <Button
+                        onClick={handleEditSupplier}
+                        disabled={formLoading}
+                      >
+                        {formLoading && <Spinner className="mr-2" />}
+                        Update Supplier
+                      </Button>
+                    )
+                  )}
 
-              <div className="flex justify-end space-x-2">
-                <Button onClick={onCloseModal} color="gray">
-                  Cancel
-                </Button>
-                {modalMode === "add" ? (
-                  pagePermission?.create && (
-                    <Button
-                      onClick={handleAddSupplier}
-                      disabled={formLoading}
-                    >
-                      {formLoading && <Spinner className="mr-2" />}
-                      Add Supplier
-                    </Button>
-                  )
-                ) : (
-                  pagePermission?.update && (
-                    <Button
-                      onClick={handleEditSupplier}
-                      disabled={formLoading}
-                    >
-                      {formLoading && <Spinner className="mr-2" />}
-                      Update Supplier
-                    </Button>
-                  )
-                )}
-
+                </div>
               </div>
-            </div>
-          </Modal.Body>
-        </Modal>
-      
+            </Modal.Body>
+          </Modal>
 
-      {/* DB List Modal */}
-      {openDBListModal && (
-        <DBListModal
-          openDBListModal={openDBListModal}
-          setOpenDBListModal={setOpenDBListModal}
-          DBList={selectedSupplierForDBList}
-        />
-      )}
-      </div>)}
+
+          {/* DB List Modal */}
+          {openDBListModal && (
+            <DBListModal
+              openDBListModal={openDBListModal}
+              setOpenDBListModal={setOpenDBListModal}
+              DBList={selectedSupplierForDBList}
+            />
+          )}
+        </div>)}
     </>
   );
 };
