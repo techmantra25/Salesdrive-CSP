@@ -696,6 +696,7 @@ export const SupplierMaster = () => {
                   <Table.HeadCell>Supplier Name</Table.HeadCell>
                   <Table.HeadCell>Supplier Type</Table.HeadCell>
                   <Table.HeadCell>GST No</Table.HeadCell>
+                  <Table.HeadCell>PAN No</Table.HeadCell>
                   <Table.HeadCell>Contact No</Table.HeadCell>
                   <Table.HeadCell>Supplier City</Table.HeadCell>
                   <Table.HeadCell>State</Table.HeadCell>
@@ -749,6 +750,11 @@ export const SupplierMaster = () => {
                           <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                             {supplier?.gstNo}
                           </Table.Cell>
+
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            {supplier?.panNo}
+                          </Table.Cell>
+
                           <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                             {supplier?.contactNo}
                           </Table.Cell>
