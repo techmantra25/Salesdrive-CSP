@@ -161,10 +161,11 @@ const Beat = () => {
   const validate = () => {
     if (
       name.trim() === "" ||
+      subDivisionId.trim() === "" ||
       regionId.trim() === "" ||
       distributorId.length === 0
     ) {
-      toast.error("Beat name or region or distributor is missing");
+      toast.error("Beat name, zone, region or distributor is missing");
       return false;
     }
     return true;
@@ -941,7 +942,7 @@ const Beat = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="subDivision">Zone</Label>
+                  <Label htmlFor="subDivision">Zone *</Label>
                   <Select
                     id="subDivision"
                     value={subDivisionId}
@@ -983,7 +984,6 @@ const Beat = () => {
                         {region.name}
                       </option>
                     ))}
-                    {console.log(activeRegions,'activeRegions')}
                   </Select>
                 </div>
 

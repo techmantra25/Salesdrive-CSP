@@ -130,11 +130,11 @@ const SubDivision = () => {
 
   const validate = () => {
     if (code.trim() === "") {
-      toast.error("Please enter sub-division code");
+      toast.error("Please enter Zone code");
       return false;
     }
     if (name.trim() === "") {
-      toast.error("Please enter sub-division name");
+      toast.error("Please enter Zone name");
       return false;
     }
     if (!formDistrictId) {
@@ -173,7 +173,7 @@ const SubDivision = () => {
       toast.error(
         error?.response?.data?.message ||
           error?.message ||
-          "Failed to add sub-division, try again"
+          "Failed to add Zone, try again"
       );
     } finally {
       setFormLoading(false);
@@ -184,7 +184,7 @@ const SubDivision = () => {
     if (!selectedSubDivision?._id) return;
 
     openConfirmationModel({
-      question: "Are you sure you want to update this sub-division?",
+      question: "Are you sure you want to update this Zone?",
       answer: ["Yes", "No"],
       onClose: async (result) => {
         if (!result) {
@@ -210,7 +210,7 @@ const SubDivision = () => {
           toast.error(
             error?.response?.data?.message ||
               error?.message ||
-              "Failed to update sub-division, try again"
+              "Failed to update Zone, try again"
           );
         } finally {
           setFormLoading(false);
@@ -230,7 +230,7 @@ const SubDivision = () => {
 
   const handleStatusUpdate = (row) => {
     openConfirmationModel({
-      question: `Are you sure you want to ${row.status ? "deactivate" : "activate"} this sub-division?`,
+      question: `Are you sure you want to ${row.status ? "deactivate" : "activate"} this Zone?`,
       answer: ["Yes", "No"],
       onClose: async (result) => {
         if (!result) return;
@@ -248,7 +248,7 @@ const SubDivision = () => {
           toast.error(
             error?.response?.data?.message ||
               error?.message ||
-              "Failed to update sub-division status"
+              "Failed to update Zone status"
           );
         }
       },
@@ -356,7 +356,7 @@ const SubDivision = () => {
       toast.error(
         error?.response?.data?.message ||
           error?.message ||
-          "Failed to import sub-divisions, try again",
+          "Failed to import Zones, try again",
       );
     } finally {
       setBulkUploading(false);
@@ -382,7 +382,7 @@ const SubDivision = () => {
     const csvString = csv.join("\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
-    a.setAttribute("download", "sub-division-error-log.csv");
+    a.setAttribute("download", "Zone-error-log.csv");
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -415,7 +415,7 @@ const SubDivision = () => {
 
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    a.setAttribute("download", "sub-divisions.csv");
+    a.setAttribute("download", "Zones.csv");
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
