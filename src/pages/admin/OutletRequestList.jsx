@@ -77,6 +77,8 @@ const OutletRequestList = () => {
 
     beatCode: "",
 
+    subDivisionCode: "",
+
     stateCode: "",
     region: "",
     distributor: "",
@@ -539,6 +541,8 @@ const OutletRequestList = () => {
 
         beatCode: "",
 
+        subDivisionCode: "",
+
         stateCode: "",
         region: "",
         distributor: "",
@@ -618,7 +622,7 @@ const OutletRequestList = () => {
         <div className="flex justify-start items-center flex-col gap-4 w-full">
 
           <div className="flex justify-between w-full items-center border-b-2 py-4">
-            <h1 className="text-2xl font-bold">Lead Approvals</h1>
+            <h1 className="text-2xl font-bold">Lead Approvals1</h1>
           </div>
 
           <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
@@ -1289,11 +1293,16 @@ const OutletRequestList = () => {
                           const selectedBeat = beats.find(
                             (beat) => beat.code === e.target.value
                           );
+                          console.log("selectedBeat:", selectedBeat);
+                          console.log("subDivisionId:", selectedBeat?.subDivisionId);
 
                           setSingleOutletForm({
                             ...singleOutletForm,
 
                             beatCode: selectedBeat?.code || "",
+
+                            subDivisionCode:
+                              selectedBeat?.subDivisionId?.code || "",
 
                             stateCode:
                               selectedBeat?.regionId?.stateId?.slug || "",
@@ -1395,6 +1404,20 @@ const OutletRequestList = () => {
 
                       <TextInput
                         value={singleOutletForm.beatType}
+                        readOnly
+                        className={commonInputClass}
+                      />
+                    </div>
+
+                    {/* Sub Division Code */}
+                    <div>
+                      <Label
+                        value="Sub Division Code"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                      />
+
+                      <TextInput
+                        value={singleOutletForm.subDivisionCode}
                         readOnly
                         className={commonInputClass}
                       />
