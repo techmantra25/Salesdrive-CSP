@@ -124,6 +124,7 @@ import MultiplierHistoryReport from "../pages/admin/AdminReports/MultiplierHisto
 import Announcements from "../pages/admin/Announcements";
 import AllNotifications from "../pages/admin/AllNotifications";
 import CreateNewPage from "../pages/admin/AdminReports/createNewPage";
+import SubDivision from "../pages/admin/SubDivision";
 // Helper to conditionally add routes
 const addIf = (condition, route) => (condition ? [route] : []);
 
@@ -165,7 +166,8 @@ export const MainRoutes = () => {
               { path: "distributer", element: <Distributor /> },
               { path: "pricing", element: <Pricing /> },
               { path: "price-update", element: <PriceUpdate /> },
-              { path: "zone", element: <Zone /> },
+              { path: "country", element: <Zone /> },
+              { path: "sub-division", element: <SubDivision /> },
               { path: "region", element: <Region /> },
               { path: "state", element: <State /> },
               { path: "district", element: <District /> },
@@ -386,6 +388,7 @@ export const MainRoutes = () => {
               { path: "pricing", element: <Pricing /> },
               { path: "price-update", element: <PriceUpdate /> },
               { path: "zone", element: <Zone /> },
+              { path: "sub-division", element: <SubDivision /> },
               { path: "region", element: <Region /> },
               { path: "state", element: <State /> },
               { path: "district", element: <District /> },
