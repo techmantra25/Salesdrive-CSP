@@ -4,7 +4,6 @@ import { BiDisc, BiSolidCategory } from "react-icons/bi";
 import { BsCollectionFill } from "react-icons/bs";
 import { CiSettings } from "react-icons/ci";
 import {
-  FaGift,
   FaLayerGroup,
   FaList,
   FaListAlt,
@@ -15,17 +14,12 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import { FaCodePullRequest, FaPerson, FaUsersGear } from "react-icons/fa6";
-import { FaMobileAlt } from "react-icons/fa";
 import { IoIosAdd, IoIosImages } from "react-icons/io";
 import { IoPricetags } from "react-icons/io5";
 import { LuBookDown } from "react-icons/lu";
 import { MdChecklist, MdVerifiedUser } from "react-icons/md";
-import { GrCatalogOption } from "react-icons/gr";
-import { GiTatteredBanner } from "react-icons/gi";
-import { LiaBorderStyleSolid } from "react-icons/lia";
-import { useSelector } from "react-redux";
-import { Sidebar } from "flowbite-react";
 import { TbMicrophone2 } from "react-icons/tb";
+
 
 // IF you here to add any page then u have to add for  Super admin , admin ,sub-admin, user, sales
 
@@ -129,11 +123,11 @@ export const adminSidebarConfig = [
     label: "Geo Hierarchy",
     icon: AiOutlineMenuUnfold,
     children: [
-      {
-        label: "Zone",
-        path: "/admin/country",
-        icon: BiSolidCategory,
-      },
+      // {
+      //   label: "Zone",
+      //   path: "/admin/country",
+      //   icon: BiSolidCategory,
+      // },
       {
         label: "State",
         path: "/admin/state",
