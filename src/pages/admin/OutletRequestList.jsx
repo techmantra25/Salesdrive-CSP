@@ -669,7 +669,7 @@ const OutletRequestList = () => {
                   </Select>
                 </div>
                 {/* filter 3 */}
-                <div className="w-56">
+                {/* <div className="w-56">
                   <div className="mb-2 block">
                     <Label htmlFor="regionSelect" value="Select Region" />
                   </div>
@@ -686,7 +686,7 @@ const OutletRequestList = () => {
                       </option>
                     ))}
                   </Select>
-                </div>
+                </div> */}
 
                 {/* filter 4 */}
                 <div className="w-64">
@@ -1382,7 +1382,7 @@ const OutletRequestList = () => {
                     </div>
 
                     {/* Region */}
-                    <div>
+                    {/* <div>
                       <Label
                         value="Region"
                         className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
@@ -1393,7 +1393,7 @@ const OutletRequestList = () => {
                         readOnly
                         className={commonInputClass}
                       />
-                    </div>
+                    </div> */}
 
                     {/* Beat Type */}
                     <div>
@@ -1513,8 +1513,9 @@ const OutletRequestList = () => {
                       />
 
                       <TextInput
+                        name="city"
                         value={singleOutletForm.city}
-                        readOnly
+                        onChange={handleSingleOutletChange}
                         className={commonInputClass}
                       />
                     </div>
@@ -1527,8 +1528,9 @@ const OutletRequestList = () => {
                       />
 
                       <TextInput
+                        name="pin"
                         value={singleOutletForm.pin}
-                        readOnly
+                        onChange={handleSingleOutletChange}
                         className={commonInputClass}
                       />
                     </div>
