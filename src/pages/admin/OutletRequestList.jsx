@@ -1444,7 +1444,11 @@ const OutletRequestList = () => {
                     {/* WhatsApp Number */}
                     <div>
                       <Label
-                        value="WhatsApp Number"
+                        value={
+                          <>
+                            WhatsApp Number <span className="text-red-500">*</span>
+                          </>
+                        }
                         className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
