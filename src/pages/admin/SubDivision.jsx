@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { ConfirmationModelContext } from "../../context/ContextProvider";
 import toast from "react-hot-toast";
+import Papa from "papaparse";
+import axios from "axios";
 
 import {
   Badge,
@@ -15,8 +17,9 @@ import {
 } from "flowbite-react";
 
 import { IoMdAddCircle } from "react-icons/io";
-import { BiSolidFileExport } from "react-icons/bi";
+import { BiSolidFileExport, BiSolidFileImport } from "react-icons/bi";
 import { RiRefreshFill } from "react-icons/ri";
+import { MdDownloadForOffline } from "react-icons/md";
 
 import { escapeCSVValue } from "../../utils/escapeCSVValue";
 
@@ -29,7 +32,8 @@ import {
   getSubDivisionList,
   updateSubDivision,
 } from "../../api/sub-divisionapi";
-import { AllDistrictList } from "../../api/api";
+import { AllDistrictList, bulkUpload } from "../../api/api";
+import { BACKEND_URL } from "../../constants";
 
 const SubDivision = () => {
   const { openConfirmationModel } = useContext(ConfirmationModelContext);
@@ -53,6 +57,12 @@ const SubDivision = () => {
 
   const [allDistricts, setAllDistricts] = useState([]);
   const activeDistricts = allDistricts.filter((d) => d.status === true);
+
+  const [openBulkUploadModal, setOpenBulkUploadModal] = useState(false);
+  const [bulkUploading, setBulkUploading] = useState(false);
+  const [bulkCsvData, setBulkCsvData] = useState([]);
+  const [openBulkConfirmModal, setOpenBulkConfirmModal] = useState(false);
+  const [errorLog, setErrorLog] = useState([]);
 
   async function fetchSubDivisions() {
     try {
@@ -245,6 +255,140 @@ const SubDivision = () => {
     });
   };
 
+  const handleCSVTemplateDownload = () => {
+    const csv = [
+      "Sub Division Code,Sub Division Name,District Code",
+      "SD-001,Sub Division 1,DIST-001",
+      "SD-002,Sub Division 2,DIST-002",
+    ];
+    const csvString = csv.join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
+    a.setAttribute("download", "sub_division_template.csv");
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  const parseCSVFile = (file) => {
+    return new Promise((resolve, reject) => {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        quoteChar: '\"',
+        escapeChar: '\"',
+        delimiter: ",",
+        complete: (results) => {
+          if (results.errors.length > 0) {
+            console.error("CSV Parse Errors:", results.errors);
+            reject("CSV format error. Check commas and quotes.");
+            return;
+          }
+          const rows = results.data;
+          if (!rows || rows.length === 0) {
+            reject("CSV file is empty or invalid");
+            return;
+          }
+          const parsedData = rows.map((row, index) => ({
+            rowNumber: index + 2,
+            ...row,
+          }));
+          resolve(parsedData);
+        },
+      });
+    });
+  };
+
+  const handleBulkUploadClick = () => {
+    setOpenBulkUploadModal(false);
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".csv";
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const parsed = await parseCSVFile(file);
+        setBulkCsvData(parsed);
+        setOpenBulkConfirmModal(true);
+      } catch (err) {
+        console.error(err);
+        toast.error("Invalid CSV file. Please check the format and try again.");
+      }
+    };
+    input.click();
+  };
+
+  const handleBulkConfirmSubmit = async () => {
+    try {
+      setBulkUploading(true);
+      const cleanData = bulkCsvData.map(({ rowNumber, ...rest }) => rest);
+      const formData = new FormData();
+      const csvString = Papa.unparse(cleanData);
+      const blob = new Blob([csvString], { type: "text/csv" });
+      formData.append("my_file", blob, "sub_division_upload.csv");
+      const uploadRes = await axios.post(
+        BACKEND_URL + "/api/v1/cloudinary/upload",
+        formData,
+      );
+      const url = uploadRes?.data?.secure_url;
+      if (!url) {
+        toast.error("Failed to upload file to cloud");
+        return;
+      }
+      const payload = { file: url };
+      const res = await bulkUpload(payload, "SubDivision");
+      if (res?.data?.skippedRows?.length > 0) {
+        toast.error(
+          `${res?.data?.skippedRows?.length} rows skipped, ${
+            res?.data?.data?.length ? res?.data?.data?.length : 0
+          } rows imported`,
+        );
+        setErrorLog(res?.data?.skippedRows);
+      } else {
+        toast.success(`${res?.data?.data?.length} rows imported`);
+      }
+      setOpenBulkConfirmModal(false);
+      setBulkCsvData([]);
+      fetchSubDivisions();
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to import sub-divisions, try again",
+      );
+    } finally {
+      setBulkUploading(false);
+    }
+  };
+
+  const handleErrorLogDownload = () => {
+    if (!errorLog || errorLog.length === 0) {
+      toast.error("No error log to download.");
+      return;
+    }
+    const headers = Array.from(
+      new Set(errorLog.flatMap((obj) => Object.keys(obj))),
+    );
+    const csv = [headers.join(",")];
+    errorLog.forEach((row) => {
+      const rowData = headers.map((header) => {
+        const value = row[header] !== undefined ? String(row[header]) : "";
+        return `\"${value.replace(/\"/g, '\"\"')}\"`;
+      });
+      csv.push(rowData.join(","));
+    });
+    const csvString = csv.join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
+    a.setAttribute("download", "sub-division-error-log.csv");
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setErrorLog([]);
+  };
+
   const handleExportToCSV = () => {
     const csvData = filteredSubDivisions.map((sd) => {
       return {
@@ -357,12 +501,29 @@ const SubDivision = () => {
                   </span>
                 </Button>
 
+                <Button className="text-xs" size="sm" color="warning" onClick={() => setOpenBulkUploadModal(true)}>
+                  <span className="flex justify-center items-center gap-2">
+                    <BiSolidFileImport size={20} />
+                    Bulk Upload
+                  </span>
+                </Button>
+
                 <Button className="text-xs" size="sm" color="blue" onClick={handleExportToCSV}>
                   <span className="flex justify-center items-center gap-2">
                     <BiSolidFileExport size={20} />
                     CSV Download
                   </span>
                 </Button>
+
+                {errorLog.length > 0 && (
+                  <Button className="text-xs" size="sm" color="red" onClick={handleErrorLogDownload}>
+                    <span className="flex justify-center items-center gap-2">
+                      <MdDownloadForOffline size={20} />
+                      Error Log
+                      <Badge color="gray">{errorLog.length}</Badge>
+                    </span>
+                  </Button>
+                )}
               </div>
             </Card>
           </div>
@@ -415,6 +576,58 @@ const SubDivision = () => {
               </div>
             )}
           </div>
+
+          <Modal show={openBulkUploadModal} onClose={() => setOpenBulkUploadModal(false)} size="3xl">
+            <Modal.Header>Bulk Upload Sub Divisions</Modal.Header>
+            <Modal.Body>
+              <div className="flex justify-center gap-6 py-10">
+                <Button
+                  color="blue"
+                  size="sm"
+                  className="px-6 py-2 text-sm font-medium rounded-lg shadow hover:shadow-md transition-all"
+                  onClick={() => {
+                    handleCSVTemplateDownload();
+                    setOpenBulkUploadModal(false);
+                  }}
+                >
+                  Download Template
+                </Button>
+                <Button
+                  color="green"
+                  size="sm"
+                  className="px-6 py-2 text-sm font-medium rounded-lg shadow hover:shadow-md transition-all"
+                  onClick={handleBulkUploadClick}
+                >
+                  Upload File
+                </Button>
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button color="gray" onClick={() => setOpenBulkUploadModal(false)}>Cancel</Button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal show={openBulkConfirmModal} onClose={() => setOpenBulkConfirmModal(false)} size="lg">
+            <Modal.Header>Confirm Bulk Upload</Modal.Header>
+            <Modal.Body>
+              <div className="flex flex-col items-center justify-center gap-4 py-10">
+                <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                  📄
+                </div>
+                <p className="text-sm text-white-600 text-center">
+                  CSV file selected successfully.<br />
+                  <strong>{bulkCsvData.length}</strong> rows found.<br />
+                  Click <strong>Confirm Upload</strong> to proceed.
+                </p>
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button color="gray" onClick={() => setOpenBulkConfirmModal(false)}>Cancel</Button>
+              <Button color="green" disabled={bulkUploading} onClick={handleBulkConfirmSubmit}>
+                {bulkUploading ? "Uploading..." : "Confirm Upload"}
+              </Button>
+            </Modal.Footer>
+          </Modal>
 
           <Modal show={openModal} size="sm" onClose={onCloseModal} popup>
             <Modal.Header />

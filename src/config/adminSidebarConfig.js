@@ -129,11 +129,11 @@ export const adminSidebarConfig = [
     label: "Geo Hierarchy",
     icon: AiOutlineMenuUnfold,
     children: [
-      // {
-      //   label: "Zone",
-      //   path: "/admin/zone",
-      //   icon: BiSolidCategory,
-      // },
+      {
+        label: "Zone",
+        path: "/admin/country",
+        icon: BiSolidCategory,
+      },
       {
         label: "State",
         path: "/admin/state",

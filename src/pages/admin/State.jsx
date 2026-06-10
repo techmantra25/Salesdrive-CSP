@@ -26,9 +26,6 @@ import StatusIndicator from "../../assets/common/StatusIndicator";
 import UniqueCode from "../../assets/common/UniqueCode";
 import { MdDownloadForOffline } from "react-icons/md";
 import { escapeCSVValue } from "../../utils/escapeCSVValue";
-import { getPagePermission } from "../../utils/permissionHelper";
-
-
 const State = () => {
   const dispatch = useDispatch();
   const { states, loading: statesLoading } = useSelector(
@@ -49,15 +46,7 @@ const State = () => {
   const [selectedZone, setSelectedZone] = useState("default");
   const { openConfirmationModel } = useContext(ConfirmationModelContext);
   const [errorLog, setErrorLog] = useState([]);
-  const permissionState = useSelector((state) => state.permission);
-  const [pagePermission, setPagePermission] = useState(null);
 
-  useEffect(() => {
-    if (!permissionState?.data?.data) return;
-    const slug = "state";
-    const permission = getPagePermission(permissionState, slug);
-    setPagePermission(permission);
-  }, [permissionState]);
 
 
   if (selectedStatus !== "default") {
@@ -92,6 +81,10 @@ const State = () => {
     }
     if (slug.trim() === "") {
       toast.error("Please enter state alpha code");
+      return false;
+    }
+    if (!zoneId) {
+      toast.error("Please select a zone");
       return false;
     }
     return true;
@@ -204,6 +197,7 @@ const State = () => {
 
   const handleAddState = async () => {
     try {
+      setFormLoading(true);
       if (!validate()) return;
       const payload = {
         code,
@@ -220,6 +214,8 @@ const State = () => {
       toast.error(
         error?.response?.data?.message || "Failed to add state, try again"
       );
+    } finally {
+      setFormLoading(false);
     }
   };
 
@@ -339,8 +335,7 @@ const State = () => {
 
   return (
     <>
-      {pagePermission?.view && (
-        <div className="flex justify-start items-center flex-col gap-4 w-full">
+      <div className="flex justify-start items-center flex-col gap-4 w-full">
           {/* page header */}
           <div className="flex justify-between w-full items-center border-b-2 py-4">
             <div className="flex justify-center items-center">
@@ -398,8 +393,7 @@ const State = () => {
               </div>
               {/* btns */}
               <div className="flex justify-center w-full items-center gap-2 flex-wrap">
-                {pagePermission?.view && (
-                  <Button
+                <Button
                     className="text-xs"
                     size="sm"
                     color="success"
@@ -410,10 +404,8 @@ const State = () => {
                       Reset & Refresh
                     </span>
                   </Button>
-                )}
 
-                {pagePermission?.create && (
-                  <Button
+                <Button
                     className="text-xs"
                     size="sm"
                     onClick={() => setOpenModal(true)}
@@ -423,10 +415,8 @@ const State = () => {
                       Add State
                     </span>
                   </Button>
-                )}
 
-                {pagePermission?.view && (
-                  <Button
+                <Button
                     className="text-xs"
                     size="sm"
                     color="blue"
@@ -439,9 +429,8 @@ const State = () => {
                       CSV Download
                     </span>
                   </Button>
-                )}
 
-                {errorLog.length > 0 && pagePermission?.view && (
+                {errorLog.length > 0 && (
                   <Button
                     className="text-xs"
                     size="sm"
@@ -506,18 +495,12 @@ const State = () => {
                         <Table.Cell className={`whitespace-nowrap font-medium `}>
                           <StatusIndicator
                             status={state.status}
-                            onClick={
-                              pagePermission?.update
-                                ? () => handleStatusUpdate(state)
-                                : undefined
-                            }
+                            onClick={() => handleStatusUpdate(state)}
                           />
                         </Table.Cell>
                         <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                           <div className="flex gap-2 justify-center items-center">
-                            {pagePermission?.update && (
-                              <EditButton onClick={() => handleSetEdit(state)} />
-                            )}
+                            <EditButton onClick={() => handleSetEdit(state)} />
                           </div>
                         </Table.Cell>
                       </Table.Row>
@@ -556,7 +539,48 @@ const State = () => {
                 </div>
 
                 <div className="w-full">
-                  {modalMode === "add" && pagePermission?.create && (
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label value="State Name" />
+                  </div>
+                  <TextInput
+                    placeholder="Enter State Name"
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="w-full">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label value="State Alpha Code" />
+                  </div>
+                  <TextInput
+                    placeholder="Enter State Alpha Code"
+                    value={slug}
+                    onChange={(event) => setSlug(event.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="w-full">
+                  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                    <Label value="Select Zone" />
+                  </div>
+                  <Select
+                    value={zoneId || ""}
+                    onChange={(event) => setZoneId(event.target.value || null)}
+                  >
+                    <option value="">Select Zone</option>
+                    {activeZones.map((zone) => (
+                      <option key={zone._id} value={zone._id}>
+                        {zone.name}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+
+                <div className="w-full">
+                  {modalMode === "add" && (
                     <Button onClick={handleAddState} disabled={formLoading}>
                       {formLoading ? (
                         <Spinner size="sm" aria-label="Loading spinner" />
@@ -566,7 +590,7 @@ const State = () => {
                     </Button>
                   )}
 
-                  {modalMode === "edit" && pagePermission?.update && (
+                  {modalMode === "edit" && (
                     <Button onClick={handleEditState} disabled={formLoading}>
                       {formLoading ? (
                         <Spinner size="sm" aria-label="Loading spinner" />
@@ -581,7 +605,6 @@ const State = () => {
           </Modal>
 
         </div>
-      )}
     </>
   );
 
