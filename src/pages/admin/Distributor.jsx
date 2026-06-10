@@ -1478,7 +1478,7 @@ const Distributor = () => {
                   </span>
                 </Button>
               )}
-              {pagePermission?.update && (
+              {/* {pagePermission?.update && (
                 <Button
                   className="text-xs"
                   size="sm"
@@ -1490,7 +1490,7 @@ const Distributor = () => {
                     Bulk RLP Edit
                   </span>
                 </Button>
-              )}
+              )} */}
 
               {errorLog.length > 0 && (
                 <Button
@@ -2404,7 +2404,7 @@ const Distributor = () => {
                 disabled={false}
               />
             </div>
-            <div>
+            {/* <div>
               <div className="mb-2 block">
                 <Label htmlFor="role" value="Distributor Type" />
                 <span className="text-red-500">*</span>
@@ -2417,8 +2417,8 @@ const Distributor = () => {
               >
                 <option value="GT">GT</option>
               </Select>
-            </div>
-            <div>
+            </div> */}
+            {/* <div>
               <div className="mb-2 block">
                 <Label htmlFor="role" value="RBP Scheme Mapped" />
                 <span className="text-red-500">*</span>
@@ -2433,10 +2433,10 @@ const Distributor = () => {
                 <option value="yes">Yes</option>
                 <option value="no">No</option>
               </Select>
-            </div>
+            </div> */}
 
             {/* PRIMARY INVOICE TYPE + conditional Old Date input (NEW) */}
-            <div>
+            {/* <div>
               <div className="mb-2 block">
                 <Label
                   htmlFor="primaryInvoiceType"
@@ -2451,7 +2451,7 @@ const Distributor = () => {
                 <option value="All">All</option>
                 <option value="New">New</option>
               </Select>
-            </div>
+            </div> */}
 
             {/* Show oldDate only when "All" is selected */}
             {primaryInvoiceType === "All" && (
@@ -2470,14 +2470,14 @@ const Distributor = () => {
             )}
 
             {/* ALLOW RLP EDIT TOGGLE */}
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <Checkbox
                 id="allowRLPEdit"
                 checked={allowRLPEdit}
                 onChange={(e) => setAllowRLPEdit(e.target.checked)}
               />
               <Label htmlFor="allowRLPEdit" value="Allow RLP Edit" />
-            </div>
+            </div> */}
 
             <div>
               <div className="mb-2 block">

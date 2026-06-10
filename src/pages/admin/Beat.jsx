@@ -731,11 +731,17 @@ const Beat = () => {
                   <Table.HeadCell className="whitespace-nowrap">
                     Beat Type
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap">
+                  {/* <Table.HeadCell className="whitespace-nowrap">
                     Region Code
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap">
                     Region Name
+                  </Table.HeadCell> */}
+                  <Table.HeadCell className="whitespace-nowrap">
+                    State Code
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    State Name
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap">
                     Distributor(s)
@@ -914,16 +920,17 @@ const Beat = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="region">Region *</Label>
+                  {/* <Label htmlFor="region">Region *</Label> */}
+                   <Label htmlFor="region">State *</Label>
                   <Select
                     id="region"
                     value={regionId}
                     onChange={(e) => {
                       setRegionId(e.target.value);
-                      setDistributorId([]); // Clear selected distributors when region changes
+                      setDistributorId([]); // Clear selected distributors when state changes
                     }}
                   >
-                    <option value="">Select Region</option>
+                    <option value="">Select State</option>
                     {activeRegions.map((region) => (
                       <option key={region._id} value={region._id}>
                         {region.name}
