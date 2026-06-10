@@ -263,7 +263,17 @@ export const Employee = () => {
           updatedRegions = updatedRegions.filter((id) => id !== value);
         }
 
-        return { ...prev, regionId: updatedRegions };
+        const firstRegionId = updatedRegions[0];
+        const firstRegion = regions.find((r) => r._id === firstRegionId);
+        const autoStateId = firstRegion?.stateId?._id || "";
+        const autoZoneId = firstRegion?.stateId?.zoneId || "";
+
+        return {
+          ...prev,
+          regionId: updatedRegions,
+          stateId: autoStateId,
+          zoneId: autoZoneId,
+        };
       });
     } else if (name === "area") {
       // Split the input value by commas and remove extra whitespace
@@ -815,7 +825,7 @@ export const Employee = () => {
                 {/* filter 2 */}
                 <div className="w-56">
                   <div className="mb-2 block">
-                    <Label htmlFor="regionSelect" value="Select Region" />
+                    <Label htmlFor="regionSelect" value="Select State" />
                   </div>
                   <Select
                     value={selectedRegion}
@@ -904,7 +914,7 @@ export const Employee = () => {
                   </Button>
                 )}
 
-                {pagePermission?.view && (
+                {/* {pagePermission?.view && (
                   <Button
                     className="text-xs"
                     color="light"
@@ -918,9 +928,9 @@ export const Employee = () => {
                       Template
                     </span>
                   </Button>
-                )}
+                )} */}
 
-                {importingCsv ? (
+                {/* {importingCsv ? (
                   <Button className="text-xs" size="sm" color="warning">
                     <span className="flex justify-center items-center gap-2">
                       <Spinner size="sm" />
@@ -935,7 +945,7 @@ export const Employee = () => {
                       handleCSVImport(url);
                     }}
                   />
-                )}
+                )} */}
 
                 {errorLog.length > 0 && (
                   <Button
@@ -1012,9 +1022,9 @@ export const Employee = () => {
                   <Table.HeadCell className="whitespace-nowrap text-center">
                     State
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap text-center">
+                  {/* <Table.HeadCell className="whitespace-nowrap text-center">
                     Region
-                  </Table.HeadCell>
+                  </Table.HeadCell> */}
                   <Table.HeadCell className="whitespace-nowrap text-center">
                     HQ
                   </Table.HeadCell>
@@ -1132,7 +1142,7 @@ export const Employee = () => {
                               ""
                             )}
                           </Table.Cell>
-                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                          {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                             {employee?.regionId ? (
                               <>
                                 {employee?.regionId?.name} (
@@ -1145,7 +1155,7 @@ export const Employee = () => {
                             ) : (
                               ""
                             )}
-                          </Table.Cell>
+                          </Table.Cell> */}
                           <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                             {employee.headquarter || ""}
                           </Table.Cell>
@@ -1442,123 +1452,12 @@ export const Employee = () => {
                         ))}
                     </Select>
                   </div>
-                  <div className="w-full">
-                    <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                      <Label value="Zone *" />
-                    </div>
-                    <Select
-                      name="zoneId"
-                      value={formData.zoneId}
-                      onChange={handleChange}
-                    >
-                      <option value="">Select Zone</option>
-                      {zones?.length > 0 &&
-                        zones?.map((zone) => (
-                          <option key={zone?._id} value={zone?._id}>
-                            {zone?.name}
-                          </option>
-                        ))}
-                    </Select>
-                  </div>
-                  <div className="w-full">
-                    <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                      <Label value="State" />
-                    </div>
-                    <Select
-                      name="stateId"
-                      value={formData.stateId}
-                      onChange={handleChange}
-                    >
-                      <option value="">Select State</option>
-                      {states?.length > 0 &&
-                        states?.map((state) => (
-                          <option key={state?._id} value={state?._id}>
-                            {state?.name}
-                          </option>
-                        ))}
-                    </Select>
-                  </div>
-                  <div className="w-full">
-                    <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                      <Label value="Area" />
-                    </div>
-                    <TextInput
-                      name="area"
-                      placeholder="Enter Areas (comma-separated)"
-                      value={formData?.area?.join(", ")}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  {formData?.desgId?.trim() !== "" &&
-                    getParentDesignation(formData?.desgId) && (
-                      <div className="w-full">
-                        <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                          <Label>
-                            Reporting Manager
-                            <span className="text-blue-500 ml-2">
-                              {manLoading && "[ Loading Manager ... ]"}
-                            </span>
-                            <span className="text-red-500 ml-2">
-                              {!manLoading &&
-                                activeReportingManger.length === 0 &&
-                                "[ No Manager found for this Designation ]"}
-                            </span>
-                          </Label>
-                        </div>
-                        <Select
-                          name="reporting_manager"
-                          value={formData?.reporting_manager}
-                          onChange={handleChange}
-                        >
-                          <option value="">Select Reporting Manager</option>
-                          {activeReportingManger.map((man) => {
-                            return (
-                              <option key={man?._id} value={man?._id}>
-                                {man?.name} [{man?.desgId?.name} - {man?.empId}]
-                                {man?.regionId?.name &&
-                                  man?.zoneId?.name &&
-                                  `[
-                                ${man?.regionId?.name}, ${man?.zoneId?.name}]`}
-                              </option>
-                            );
-                          })}
-                        </Select>
-                      </div>
-                    )}
-                  <div className="w-full">
-                    <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                      <Label value="Brand(s)" />
-                    </div>
-                    <div className="flex flex-row flex-wrap gap-4 justify-start items-center">
-                      {brands?.length > 0 &&
-                        brands
-                          ?.filter((brand) => brand.status == true)
-                          .map((brand) => (
-                            <div
-                              key={brand._id}
-                              className="flex items-center gap-2"
-                            >
-                              <Checkbox
-                                name="brandId"
-                                id={brand._id}
-                                value={brand._id}
-                                checked={formData?.brandId?.includes(brand?._id)}
-                                onChange={handleChange}
-                              />
-                              <Label
-                                htmlFor={`brand-${brand._id}`}
-                                value={`${brand?.name} (${brand?.desc})`}
-                              />
-                            </div>
-                          ))}
-                    </div>
-                  </div>
-                  <div className="w-full space-y-4">
-                    {/* Selected Regions & Distributors Display - Collapsible */}
+                   <div className="w-full space-y-4">
+                    {/* Selected States & Distributors Display - Collapsible */}
                     {formData.regionId.length > 0 && (
                       <div className="w-full">
                         <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                          <Label value="Selected Regions & Distributors" />
+                          <Label value="Selected States & Distributors" />
 
                         </div>
                         <div className="space-y-2">
@@ -1696,25 +1595,29 @@ export const Employee = () => {
                     {/* Region Dropdown */}
                     <div className="w-full">
                       <div className="mb-2 block text-gray-700 dark:text-gray">
-                        <Label value="Select Region" />
+                        <Label value="Select State" />
                       </div>
-
-                      {/* dropdown */}
 
                       <Select
                         value={currentDistributorSelection}
                         onChange={(e) => {
                           const selectedRegionId = e.target.value;
                           setCurrentRegionSelection(selectedRegionId);
-                          setCurrentDistributorSelection(""); //reset the distrbutor for the current region
+                          setCurrentDistributorSelection("");
 
                           if (
                             selectedRegionId &&
                             !formData.regionId.includes(selectedRegionId)
                           ) {
+                            const selectedRegion = regions.find((r) => r._id === selectedRegionId);
+                            const autoStateId = selectedRegion?.stateId?._id || "";
+                            const autoZoneId = selectedRegion?.stateId?.zoneId || "";
+
                             setFormData((prev) => ({
                               ...prev,
                               regionId: [...prev.regionId, selectedRegionId],
+                              stateId: prev.stateId || autoStateId,
+                              zoneId: prev.zoneId || autoZoneId,
                             }));
                           }
                         }}
@@ -1818,7 +1721,6 @@ export const Employee = () => {
                                   );
 
                                 if (e.target.checked) {
-                                  // Add all filtered distributors
                                   const newDistributorIds = regionDistributors
                                     .filter(
                                       (d) => !formData.distributorId.includes(d._id)
@@ -1833,7 +1735,6 @@ export const Employee = () => {
                                     ],
                                   }));
                                 } else {
-                                  // Remove all filtered distributors
                                   const distributorIdsToRemove =
                                     regionDistributors.map((d) => d._id);
                                   setFormData((prev) => ({
@@ -1946,6 +1847,117 @@ export const Employee = () => {
                         Clear & Choose Another Region
                       </Button>
                     )}
+                  </div>
+                  {/* <div className="w-full">
+                    <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                      <Label value="Zone (auto-filled from region)" />
+                    </div>
+                    <Select
+                      name="zoneId"
+                      value={formData.zoneId}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select Zone</option>
+                      {zones?.length > 0 &&
+                        zones?.map((zone) => (
+                          <option key={zone?._id} value={zone?._id}>
+                            {zone?.name}
+                          </option>
+                        ))}
+                    </Select>
+                  </div> */}
+                  {/* <div className="w-full">
+                    <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                      <Label value="State (auto-filled from region)" />
+                    </div>
+                    <Select
+                      name="stateId"
+                      value={formData.stateId}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select State</option>
+                      {states?.length > 0 &&
+                        states?.map((state) => (
+                          <option key={state?._id} value={state?._id}>
+                            {state?.name}
+                          </option>
+                        ))}
+                    </Select>
+                  </div> */}
+                  <div className="w-full">
+                    <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                      <Label value="Area" />
+                    </div>
+                    <TextInput
+                      name="area"
+                      placeholder="Enter Areas (comma-separated)"
+                      value={formData?.area?.join(", ")}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  {formData?.desgId?.trim() !== "" &&
+                    getParentDesignation(formData?.desgId) && (
+                      <div className="w-full">
+                        <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                          <Label>
+                            Reporting Manager
+                            <span className="text-blue-500 ml-2">
+                              {manLoading && "[ Loading Manager ... ]"}
+                            </span>
+                            <span className="text-red-500 ml-2">
+                              {!manLoading &&
+                                activeReportingManger.length === 0 &&
+                                "[ No Manager found for this Designation ]"}
+                            </span>
+                          </Label>
+                        </div>
+                        <Select
+                          name="reporting_manager"
+                          value={formData?.reporting_manager}
+                          onChange={handleChange}
+                        >
+                          <option value="">Select Reporting Manager</option>
+                          {activeReportingManger.map((man) => {
+                            return (
+                              <option key={man?._id} value={man?._id}>
+                                {man?.name} [{man?.desgId?.name} - {man?.empId}]
+                                {man?.regionId?.name &&
+                                  man?.zoneId?.name &&
+                                  `[
+                                ${man?.regionId?.name}, ${man?.zoneId?.name}]`}
+                              </option>
+                            );
+                          })}
+                        </Select>
+                      </div>
+                    )}
+                  <div className="w-full">
+                    <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                      <Label value="Brand(s)" />
+                    </div>
+                    <div className="flex flex-row flex-wrap gap-4 justify-start items-center">
+                      {brands?.length > 0 &&
+                        brands
+                          ?.filter((brand) => brand.status == true)
+                          .map((brand) => (
+                            <div
+                              key={brand._id}
+                              className="flex items-center gap-2"
+                            >
+                              <Checkbox
+                                name="brandId"
+                                id={brand._id}
+                                value={brand._id}
+                                checked={formData?.brandId?.includes(brand?._id)}
+                                onChange={handleChange}
+                              />
+                              <Label
+                                htmlFor={`brand-${brand._id}`}
+                                value={`${brand?.name} (${brand?.desc})`}
+                              />
+                            </div>
+                          ))}
+                    </div>
                   </div>
                   <div className="w-full">
                     <Button

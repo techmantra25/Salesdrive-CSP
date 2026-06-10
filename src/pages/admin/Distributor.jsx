@@ -2,7 +2,7 @@ import {
   Badge,
   Button,
   Card,
-  Checkbox,
+
   Label,
   Modal,
   Select,
@@ -459,9 +459,9 @@ const Distributor = () => {
     setBulkDeliveryConfigStatusSelection(null);
   };
 
-  const handleOpenBulkRLPEdit = () => {
-    setBulkRLPEditModal(true);
-  };
+  // const handleOpenBulkRLPEdit = () => {
+  //   setBulkRLPEditModal(true);
+  // };
 
   const handleCloseBulkRLPEdit = () => {
     setBulkRLPEditModal(false);
@@ -1252,10 +1252,10 @@ const Distributor = () => {
     setOpenBrandsModal(true);
   };
 
-  const handleShowRBPHistory = (distributor) => {
-    setSelectedDistributorForRBPHistory(distributor);
-    setShowRBPHistoryModal(true);
-  };
+  // const handleShowRBPHistory = (distributor) => {
+  //   setSelectedDistributorForRBPHistory(distributor);
+  //   setShowRBPHistoryModal(true);
+  // };
 
   const onCloseRBPHistoryModal = () => {
     setShowRBPHistoryModal(false);
@@ -1478,7 +1478,7 @@ const Distributor = () => {
                   </span>
                 </Button>
               )}
-              {pagePermission?.update && (
+              {/* {pagePermission?.update && (
                 <Button
                   className="text-xs"
                   size="sm"
@@ -1490,7 +1490,7 @@ const Distributor = () => {
                     Bulk RLP Edit
                   </span>
                 </Button>
-              )}
+              )} */}
 
               {errorLog.length > 0 && (
                 <Button
@@ -1543,15 +1543,9 @@ const Distributor = () => {
                     Owner
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    RBP Scheme <br /> Mapped
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    Mapping <br />
-                    Updated At
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
                     Email
                   </Table.HeadCell>
+
                   <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
                     Phone
                   </Table.HeadCell>
@@ -1583,17 +1577,9 @@ const Distributor = () => {
                     PAN
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    Primary Invoice Type
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    Allow RLP <br /> Edit
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    Region
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
                     State
                   </Table.HeadCell>
+
                   <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
                     Area
                   </Table.HeadCell>
@@ -1656,39 +1642,12 @@ const Distributor = () => {
                           {distributor?.ownerName || ""}
                         </span>
                       </Table.Cell>
-                      <Table.Cell className="px-2 py-2 text-sm text-gray-700 dark:text-gray-300 max-w-28 truncate">
-                        <span
-                          className={
-                            distributor?.RBPSchemeMapped === "yes"
-                              ? "px-2 py-1 text-xs font-bold bg-green-500 text-white rounded-md shadow-sm"
-                              : "px-2 py-1 text-xs font-bold bg-red-500 text-white rounded-md shadow-sm"
-                          }
-                        >
-                          {distributor?.RBPSchemeMapped === "yes"
-                            ? "YES"
-                            : "NO"}
-                        </span>
-                      </Table.Cell>
-
-                      <Table.Cell className="px-2 py-2 text-xs text-gray-700 dark:text-gray-300">
-                        {distributor?.RBPSchemeMappedLastUpdated ? (
-                          <div
-                            className="flex justify-center items-center text-blue-600 dark:text-blue-400 cursor-pointer hover:text-blue-800 dark:hover:text-blue-300"
-                            onClick={() => handleShowRBPHistory(distributor)}
-                            title="View RBP Scheme History"
-                          >
-                            <FaRegEye size={18} />
-                          </div>
-                        ) : (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </Table.Cell>
-
                       <Table.Cell className="px-2 py-2 text-xs text-gray-700 dark:text-gray-300 max-w-32 truncate">
                         <span title={distributor?.email}>
                           {distributor?.email || ""}
                         </span>
                       </Table.Cell>
+
                       <Table.Cell className="px-2 py-2 text-xs text-gray-700 dark:text-gray-300">
                         {distributor?.phone || ""}
                       </Table.Cell>
@@ -1734,43 +1693,12 @@ const Distributor = () => {
                         {distributor?.pan_no || ""}
                       </Table.Cell>
                       <Table.Cell className="px-2 py-2 text-xs text-gray-700 dark:text-gray-300">
-                        {distributor?.primaryInvoiceType === "All" &&
-                        distributor?.oldDate
-                          ? `All (${moment(distributor.oldDate).format("DD-MM-YYYY")})`
-                          : distributor?.primaryInvoiceType || "New"}
-                      </Table.Cell>
-                      <Table.Cell className="px-2 py-2 text-xs text-gray-700 dark:text-gray-300">
-                        <span
-                          className={
-                            distributor?.allowRLPEdit
-                              ? "px-2 py-1 text-xs font-bold bg-green-500 text-white rounded-md shadow-sm"
-                              : "px-2 py-1 text-xs font-bold bg-red-500 text-white rounded-md shadow-sm"
-                          }
-                        >
-                          {distributor?.allowRLPEdit ? "YES" : "NO"}
-                        </span>
-                      </Table.Cell>
-
-                      <Table.Cell className="px-2 py-2 text-xs text-gray-700 dark:text-gray-300">
-                        <div className="flex flex-col items-center gap-1">
-                          <UniqueCode
-                            text={distributor?.regionId?.code}
-                            codeName="Region"
-                          />
-                          <span
-                            className="text-xs truncate max-w-20"
-                            title={distributor?.regionId?.name}
-                          >
-                            {distributor?.regionId?.name || ""}
-                          </span>
-                        </div>
-                      </Table.Cell>
-                      <Table.Cell className="px-2 py-2 text-xs text-gray-700 dark:text-gray-300">
                         <div className="flex flex-col items-center gap-1">
                           <UniqueCode
                             text={distributor?.stateId?.code}
                             codeName="State"
                           />
+
                           <span
                             className="text-xs truncate max-w-20"
                             title={distributor?.stateId?.name}
@@ -1958,7 +1886,7 @@ const Distributor = () => {
                   {filteredDistributors?.length === 0 && (
                     <Table.Row className="text-center bg-white dark:border-gray-700 dark:bg-gray-800">
                       <Table.Cell
-                        colSpan={28}
+                        colSpan={23}
                         className="px-2 py-8 text-sm font-medium text-gray-500 dark:text-gray-400"
                       >
                         No distributors found
@@ -2404,7 +2332,7 @@ const Distributor = () => {
                 disabled={false}
               />
             </div>
-            <div>
+            {/* <div>
               <div className="mb-2 block">
                 <Label htmlFor="role" value="Distributor Type" />
                 <span className="text-red-500">*</span>
@@ -2417,8 +2345,8 @@ const Distributor = () => {
               >
                 <option value="GT">GT</option>
               </Select>
-            </div>
-            <div>
+            </div> */}
+            {/* <div>
               <div className="mb-2 block">
                 <Label htmlFor="role" value="RBP Scheme Mapped" />
                 <span className="text-red-500">*</span>
@@ -2433,10 +2361,10 @@ const Distributor = () => {
                 <option value="yes">Yes</option>
                 <option value="no">No</option>
               </Select>
-            </div>
+            </div> */}
 
             {/* PRIMARY INVOICE TYPE + conditional Old Date input (NEW) */}
-            <div>
+            {/* <div>
               <div className="mb-2 block">
                 <Label
                   htmlFor="primaryInvoiceType"
@@ -2451,7 +2379,7 @@ const Distributor = () => {
                 <option value="All">All</option>
                 <option value="New">New</option>
               </Select>
-            </div>
+            </div> */}
 
             {/* Show oldDate only when "All" is selected */}
             {primaryInvoiceType === "All" && (
@@ -2470,14 +2398,14 @@ const Distributor = () => {
             )}
 
             {/* ALLOW RLP EDIT TOGGLE */}
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <Checkbox
                 id="allowRLPEdit"
                 checked={allowRLPEdit}
                 onChange={(e) => setAllowRLPEdit(e.target.checked)}
               />
               <Label htmlFor="allowRLPEdit" value="Allow RLP Edit" />
-            </div>
+            </div> */}
 
             <div>
               <div className="mb-2 block">

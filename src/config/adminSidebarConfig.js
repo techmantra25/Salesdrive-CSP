@@ -131,7 +131,7 @@ export const adminSidebarConfig = [
     children: [
       {
         label: "Zone",
-        path: "/admin/zone",
+        path: "/admin/country",
         icon: BiSolidCategory,
       },
       {
@@ -139,15 +139,21 @@ export const adminSidebarConfig = [
         path: "/admin/state",
         icon: FaLayerGroup,
       },
-      {
-        label: "Region",
-        path: "/admin/region",
-        icon: BsCollectionFill,
-      },
+      // {
+      //   label: "Region",
+      //   path: "/admin/region",
+      //   icon: BsCollectionFill,
+      // },
       {
         label: "District",
         path: "/admin/district",
         icon: BsCollectionFill,
+      },
+      {
+        label: "Sub Division",
+        path: "/admin/sub-division",
+        icon: BsCollectionFill,
+        slug: "sub-division",
       },
     ],
   },
@@ -641,29 +647,35 @@ export const usersidebarconfig = [
     label: "Geo Hierarchy",
     icon: AiOutlineMenuUnfold,
     children: [
-      {
-        label: "Zone",
-        path: "/user/zone",
-        icon: BiSolidCategory,
-        slug: "zone",
-      },
+      // {
+      //   label: "Zone",
+      //   path: "/user/zone",
+      //   icon: BiSolidCategory,
+      //   slug: "zone",
+      // },
       {
         label: "State",
         path: "/user/state",
         icon: FaLayerGroup,
         slug: "state",
       },
-      {
-        label: "Region",
-        path: "/user/region",
-        icon: BsCollectionFill,
-        slug: "region",
-      },
+      // {
+      //   label: "Region",
+      //   path: "/user/region",
+      //   icon: BsCollectionFill,
+      //   slug: "region",
+      // },
       {
         label: "District",
         path: "/user/district",
         icon: BsCollectionFill,
         slug: "district",
+      },
+      {
+        label: "Sub Division",
+        path: "/user/sub-division",
+        icon: BsCollectionFill,
+        slug: "sub-division",
       },
     ],
   },
@@ -905,7 +917,6 @@ export const usersidebarconfig = [
       },
     ],
   },
-
 
   // {
   //   type: "collapse",
@@ -1212,6 +1223,12 @@ export const subadminssidebarconfig = [
         icon: BsCollectionFill,
         slug: "district",
       },
+      {
+        label: "Sub Division",
+        path: "/sub-admins/sub-division",
+        icon: BsCollectionFill,
+        slug: "sub-division",
+      },
     ],
   },
   {
@@ -1452,7 +1469,6 @@ export const subadminssidebarconfig = [
       },
     ],
   },
-
 
   // {
   //   type: "collapse",
@@ -1759,6 +1775,12 @@ export const aaadminsesidebarconfig = [
         icon: BsCollectionFill,
         slug: "district",
       },
+      {
+        label: "Sub Division",
+        path: "/admine/sub-division",
+        icon: BsCollectionFill,
+        slug: "sub-division",
+      },
     ],
   },
   {
@@ -2000,8 +2022,6 @@ export const aaadminsesidebarconfig = [
     ],
   },
 
-
-
   // {
   //   type: "collapse",
   //   label: "RBP App",
@@ -2089,8 +2109,6 @@ export const aaadminsesidebarconfig = [
   //     },
   //   ],
   // },
-
-
 
   {
     type: "collapse",
@@ -2309,6 +2327,12 @@ export const salessidebarconfig = [
         path: "/sales/district",
         icon: BsCollectionFill,
         slug: "district",
+      },
+      {
+        label: "Sub Division",
+        path: "/sales/sub-division",
+        icon: BsCollectionFill,
+        slug: "sub-division",
       },
     ],
   },

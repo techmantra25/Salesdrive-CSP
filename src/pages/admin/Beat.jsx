@@ -39,6 +39,7 @@ import { fetchDistributors } from "../../redux/distributorListSlice";
 import { fetchRegions } from "../../redux/regionSlice";
 import { FileUpload } from "../../uploadWidget/FileUpload";
 import { getPagePermission } from "../../utils/permissionHelper";
+import { getSubDivisionList } from "../../api/sub-divisionapi";
 
 const Beat = () => {
   const dispatch = useDispatch();
@@ -67,6 +68,8 @@ const Beat = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [openModal, setOpenModal] = useState(false);
   const [regionId, setRegionId] = useState("");
+  const [subDivisionId, setSubDivisionId] = useState("");
+  const [allSubDivisions, setAllSubDivisions] = useState([]);
   const [selectedBeat, setSelectedBeat] = useState(null);
   const [csvLoading, setCSVLoading] = useState(false);
   const [selectedBeatDetails, setSelectedBeatDetails] = useState(null);
@@ -222,6 +225,7 @@ const Beat = () => {
     setName(beat?.name);
     setBeatType(beat?.beat_type);
     setRegionId(beat?.regionId?._id);
+    setSubDivisionId(beat?.subDivisionId?._id || "");
     setDistributorId(beat?.distributorId?.map((dist) => dist._id) || []);
     setBeatIdsInput(beat?.beatIds?.join(", ") || "");
     setOpenModal(true);
@@ -235,6 +239,7 @@ const Beat = () => {
         name,
         beat_type: beatType,
         regionId,
+        subDivisionId: subDivisionId || undefined,
         distributorId,
         beatIds: beatIdsArray ?? [],
       };
@@ -259,6 +264,7 @@ const Beat = () => {
     setName("");
     setBeatType("normal");
     setRegionId("");
+    setSubDivisionId("");
     setDistributorId([]);
     setBeatIdsInput("");
     fetchOutletsPaginated();
@@ -278,6 +284,7 @@ const Beat = () => {
               name,
               beat_type: beatType,
               regionId,
+              subDivisionId: subDivisionId || undefined,
               distributorId,
               beatIds: beatIdsArray ?? [],
             };
@@ -352,8 +359,7 @@ const Beat = () => {
       "Beat Name",
       "Beat IDs",
       "Beat Type",
-      "Region Code",
-      "Region Name",
+      "Sub Division Code",
       "Distributor Codes",
     ];
 
@@ -361,8 +367,7 @@ const Beat = () => {
       "(Required)",
       "[Example: 74674,94899 - comma separated for multiple]",
       "(Required)[Example: normal, split]",
-      "(Required)[Example: RKA01]",
-      "[Example: Karnataka]",
+      "(Required)[Example: Budge Budge]",
       "(Required)[Example: DIS001,DIS002 - comma separated for multiple DB codes]",
     ];
 
@@ -487,7 +492,17 @@ const Beat = () => {
   useEffect(() => {
     dispatch(fetchRegions());
     dispatch(fetchDistributors());
+    fetchSubDivisions();
   }, [dispatch]);
+
+  const fetchSubDivisions = async () => {
+    try {
+      const res = await getSubDivisionList();
+      setAllSubDivisions(res?.data?.data || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     fetchOutletsPaginated();
@@ -732,10 +747,19 @@ const Beat = () => {
                     Beat Type
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap">
+                    Sub Division
+                  </Table.HeadCell>
+                  {/* <Table.HeadCell className="whitespace-nowrap">
                     Region Code
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap">
                     Region Name
+                  </Table.HeadCell> */}
+                  <Table.HeadCell className="whitespace-nowrap">
+                    State Code
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap">
+                    State Name
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap">
                     Distributor(s)
@@ -808,8 +832,11 @@ const Beat = () => {
                             {beat?.beat_type}{" "}
                           </Table.Cell>
                           <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            {beat?.subDivisionId ? `${beat?.subDivisionId?.name} (${beat?.subDivisionId?.code})` : "-"}
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                             <UniqueCode
-                              text={beat?.regionId?.code}
+                              text={beat?.regionId?.stateId?.slug}
                               codeName="Region"
                             />
                           </Table.Cell>
@@ -914,21 +941,49 @@ const Beat = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="region">Region *</Label>
+                  <Label htmlFor="subDivision">Sub Division</Label>
+                  <Select
+                    id="subDivision"
+                    value={subDivisionId}
+                    onChange={(e) => {
+                      const selectedSDId = e.target.value;
+                      setSubDivisionId(selectedSDId);
+                      setDistributorId([]);
+
+                      const selectedSD = allSubDivisions.find((sd) => sd._id === selectedSDId);
+                      const autoStateId = selectedSD?.districtId?.stateId?._id || "";
+                      const matchedRegion = activeRegions.find((r) => r?.stateId?._id === autoStateId);
+                      setRegionId(matchedRegion?._id || autoStateId);
+                    }}
+                  >
+                    <option value="">Select Sub Division</option>
+                    {allSubDivisions
+                      .filter((sd) => sd.status === true)
+                      .map((sd) => (
+                        <option key={sd._id} value={sd._id}>
+                          {sd.name} ({sd.code})
+                        </option>
+                      ))}
+                  </Select>
+                </div>
+                <div>
+                  {/* <Label htmlFor="region">Region *</Label> */}
+                   <Label htmlFor="region">State *</Label>
                   <Select
                     id="region"
                     value={regionId}
                     onChange={(e) => {
                       setRegionId(e.target.value);
-                      setDistributorId([]); // Clear selected distributors when region changes
+                      setDistributorId([]); // Clear selected distributors when state changes
                     }}
                   >
-                    <option value="">Select Region</option>
+                    <option value="">Select State</option>
                     {activeRegions.map((region) => (
                       <option key={region._id} value={region._id}>
                         {region.name}
                       </option>
                     ))}
+                    {console.log(activeRegions,'activeRegions')}
                   </Select>
                 </div>
 

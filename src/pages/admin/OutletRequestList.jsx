@@ -77,6 +77,8 @@ const OutletRequestList = () => {
 
     beatCode: "",
 
+    subDivisionCode: "",
+
     stateCode: "",
     region: "",
     distributor: "",
@@ -539,6 +541,8 @@ const OutletRequestList = () => {
 
         beatCode: "",
 
+        subDivisionCode: "",
+
         stateCode: "",
         region: "",
         distributor: "",
@@ -618,7 +622,7 @@ const OutletRequestList = () => {
         <div className="flex justify-start items-center flex-col gap-4 w-full">
 
           <div className="flex justify-between w-full items-center border-b-2 py-4">
-            <h1 className="text-2xl font-bold">Lead Approvals</h1>
+            <h1 className="text-2xl font-bold">Lead Approvals1</h1>
           </div>
 
           <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
@@ -665,7 +669,7 @@ const OutletRequestList = () => {
                   </Select>
                 </div>
                 {/* filter 3 */}
-                <div className="w-56">
+                {/* <div className="w-56">
                   <div className="mb-2 block">
                     <Label htmlFor="regionSelect" value="Select Region" />
                   </div>
@@ -682,7 +686,7 @@ const OutletRequestList = () => {
                       </option>
                     ))}
                   </Select>
-                </div>
+                </div> */}
 
                 {/* filter 4 */}
                 <div className="w-64">
@@ -1289,11 +1293,16 @@ const OutletRequestList = () => {
                           const selectedBeat = beats.find(
                             (beat) => beat.code === e.target.value
                           );
+                          console.log("selectedBeat:", selectedBeat);
+                          console.log("subDivisionId:", selectedBeat?.subDivisionId);
 
                           setSingleOutletForm({
                             ...singleOutletForm,
 
                             beatCode: selectedBeat?.code || "",
+
+                            subDivisionCode:
+                              selectedBeat?.subDivisionId?.code || "",
 
                             stateCode:
                               selectedBeat?.regionId?.stateId?.slug || "",
@@ -1373,7 +1382,7 @@ const OutletRequestList = () => {
                     </div>
 
                     {/* Region */}
-                    <div>
+                    {/* <div>
                       <Label
                         value="Region"
                         className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
@@ -1384,7 +1393,7 @@ const OutletRequestList = () => {
                         readOnly
                         className={commonInputClass}
                       />
-                    </div>
+                    </div> */}
 
                     {/* Beat Type */}
                     <div>
@@ -1395,6 +1404,20 @@ const OutletRequestList = () => {
 
                       <TextInput
                         value={singleOutletForm.beatType}
+                        readOnly
+                        className={commonInputClass}
+                      />
+                    </div>
+
+                    {/* Sub Division Code */}
+                    <div>
+                      <Label
+                        value="Sub Division Code"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                      />
+
+                      <TextInput
+                        value={singleOutletForm.subDivisionCode}
                         readOnly
                         className={commonInputClass}
                       />
@@ -1490,8 +1513,9 @@ const OutletRequestList = () => {
                       />
 
                       <TextInput
+                        name="city"
                         value={singleOutletForm.city}
-                        readOnly
+                        onChange={handleSingleOutletChange}
                         className={commonInputClass}
                       />
                     </div>
@@ -1504,8 +1528,9 @@ const OutletRequestList = () => {
                       />
 
                       <TextInput
+                        name="pin"
                         value={singleOutletForm.pin}
-                        readOnly
+                        onChange={handleSingleOutletChange}
                         className={commonInputClass}
                       />
                     </div>
