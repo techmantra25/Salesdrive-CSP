@@ -1012,9 +1012,9 @@ export const Employee = () => {
                   <Table.HeadCell className="whitespace-nowrap text-center">
                     State
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap text-center">
+                  {/* <Table.HeadCell className="whitespace-nowrap text-center">
                     Region
-                  </Table.HeadCell>
+                  </Table.HeadCell> */}
                   <Table.HeadCell className="whitespace-nowrap text-center">
                     HQ
                   </Table.HeadCell>
@@ -1132,7 +1132,7 @@ export const Employee = () => {
                               ""
                             )}
                           </Table.Cell>
-                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                          {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                             {employee?.regionId ? (
                               <>
                                 {employee?.regionId?.name} (
@@ -1145,7 +1145,7 @@ export const Employee = () => {
                             ) : (
                               ""
                             )}
-                          </Table.Cell>
+                          </Table.Cell> */}
                           <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                             {employee.headquarter || ""}
                           </Table.Cell>

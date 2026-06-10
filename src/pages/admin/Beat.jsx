@@ -359,8 +359,7 @@ const Beat = () => {
       "Beat Name",
       "Beat IDs",
       "Beat Type",
-      "Region Code",
-      "Region Name",
+      "Sub Division Code",
       "Distributor Codes",
     ];
 
@@ -368,8 +367,7 @@ const Beat = () => {
       "(Required)",
       "[Example: 74674,94899 - comma separated for multiple]",
       "(Required)[Example: normal, split]",
-      "(Required)[Example: RKA01]",
-      "[Example: Karnataka]",
+      "(Required)[Example: Budge Budge]",
       "(Required)[Example: DIS001,DIS002 - comma separated for multiple DB codes]",
     ];
 
@@ -838,7 +836,7 @@ const Beat = () => {
                           </Table.Cell>
                           <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                             <UniqueCode
-                              text={beat?.regionId?.code}
+                              text={beat?.regionId?.stateId?.slug}
                               codeName="Region"
                             />
                           </Table.Cell>
