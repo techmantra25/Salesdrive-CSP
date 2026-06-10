@@ -67,6 +67,8 @@ export const Employee = () => {
     name: "",
     empId: "",
     employeeLabel: "",
+    whatsapp: "",
+    alternateMobile: "",
     phone: "",
     email: "",
     dob: "",
@@ -278,16 +280,20 @@ export const Employee = () => {
 
   const validate = () => {
     if (
-      formData.name.trim() === "" ||
-      formData.empId.trim() === "" ||
-      formData.employeeLabel.trim() === ""
+      !formData.name?.trim() ||
+      !formData.phone?.trim() ||
+      !formData.whatsapp?.trim() ||
+      !formData.email?.trim() ||
+      !formData.desgId?.trim()
     ) {
-      toast.error("Please fill all required fields");
+      toast.error(
+        "Name, Phone, WhatsApp, Email and Designation are required"
+      );
       return false;
     }
+
     return true;
   };
-
   const handleSubmit = async (e) => {
     e?.preventDefault();
     if (!validate()) return;
@@ -603,10 +609,12 @@ export const Employee = () => {
       "RM Employee ID",
       "RM Designation Code",
       "State Code",
+
       "Distributor Code",
       "Brand Code",
       "Email",
       "Phone",
+      "WhatsApp",
       "Date of Birth",
       "Joining Date",
       "Headquarter",
@@ -614,17 +622,19 @@ export const Employee = () => {
     ];
 
     const descriptions = [
+      "(Optional)",
+      "(Optional)",
       "(Required)",
       "(Required)",
+      "(Optional)",
       "(Required)",
-      "(Required)",
-      "(Required)",
-      "(Required)",
-      "(Required)[example: WB]",
-      "(Required)[example: DB01,DB02]",
+      "(Optional)[example: WB]",
+
+      "(Optional)[example: DB01,DB02]",
       "(Optional)[example: CL,FT]",
-      "(Optional)",
-      "(Optional)",
+      "(Required)",
+      "(Required)",
+      "(Required)",
       "(Optional)",
       "(Optional)",
       "(Optional)",
@@ -977,15 +987,15 @@ export const Employee = () => {
                 {" "}
                 <Table.Head className="text-center">
                   <Table.HeadCell className="whitespace-nowrap text-center">
-                    Employee ID 
-                    
+                    Employee ID
+
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap text-center">
                     Employee Name
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap text-center">
-                    EMP Label 
-                 
+                    EMP Label
+
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap text-center">
                     Email
@@ -1305,7 +1315,7 @@ export const Employee = () => {
                   </div>
                   <div className="w-full">
                     <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                      <Label value="Employee Id (SFA field: Label)*" />
+                      <Label value="Employee Id (SFA field: Label)" />
                     </div>
                     <TextInput
                       name="empId"
@@ -1322,19 +1332,45 @@ export const Employee = () => {
                     <TextInput
                       name="email"
                       type="email"
-                      placeholder="Enter Email"
+                      placeholder="Enter Email *"
                       value={formData.email}
                       onChange={handleChange}
+                      required
                     />
                   </div>
                   <div className="w-full">
                     <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                      <Label value="Phone" />
+                      <Label value="WhatsApp *" />
+                    </div>
+                    <TextInput
+                      name="whatsapp"
+                      placeholder="Enter WhatsApp Number"
+                      value={formData.whatsapp || ""}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="w-full">
+                    <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                      <Label value="Phone *" />
                     </div>
                     <TextInput
                       name="phone"
                       placeholder="Enter Phone Number"
                       value={formData.phone}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div className="w-full">
+                    <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                      <Label value="Alternate Mobile Number" />
+                    </div>
+                    <TextInput
+                      name="alternateMobile"
+                      placeholder="Enter Alternate Mobile Number"
+                      value={formData.alternateMobile || ""}
                       onChange={handleChange}
                     />
                   </div>
