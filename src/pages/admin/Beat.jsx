@@ -359,7 +359,7 @@ const Beat = () => {
       "Beat Name",
       "Beat IDs",
       "Beat Type",
-      "Sub Division Code",
+      "Zone Code",
       "Distributor Codes",
     ];
 
@@ -747,7 +747,7 @@ const Beat = () => {
                     Beat Type
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap">
-                    Sub Division
+                    Zone
                   </Table.HeadCell>
                   {/* <Table.HeadCell className="whitespace-nowrap">
                     Region Code
@@ -941,7 +941,7 @@ const Beat = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="subDivision">Sub Division</Label>
+                  <Label htmlFor="subDivision">Zone</Label>
                   <Select
                     id="subDivision"
                     value={subDivisionId}
@@ -956,7 +956,7 @@ const Beat = () => {
                       setRegionId(matchedRegion?._id || autoStateId);
                     }}
                   >
-                    <option value="">Select Sub Division</option>
+                    <option value="">Select Zone</option>
                     {allSubDivisions
                       .filter((sd) => sd.status === true)
                       .map((sd) => (

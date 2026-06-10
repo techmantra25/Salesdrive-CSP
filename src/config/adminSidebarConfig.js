@@ -144,7 +144,7 @@ export const adminSidebarConfig = [
         icon: BsCollectionFill,
       },
       {
-        label: "Sub Division",
+        label: "Zone",
         path: "/admin/sub-division",
         icon: BsCollectionFill,
         slug: "sub-division",
@@ -666,7 +666,7 @@ export const usersidebarconfig = [
         slug: "district",
       },
       {
-        label: "Sub Division",
+        label: "Zone",
         path: "/user/sub-division",
         icon: BsCollectionFill,
         slug: "sub-division",
@@ -1218,7 +1218,7 @@ export const subadminssidebarconfig = [
         slug: "district",
       },
       {
-        label: "Sub Division",
+        label: "Zone",
         path: "/sub-admins/sub-division",
         icon: BsCollectionFill,
         slug: "sub-division",
@@ -1770,7 +1770,7 @@ export const aaadminsesidebarconfig = [
         slug: "district",
       },
       {
-        label: "Sub Division",
+        label: "Zone",
         path: "/admine/sub-division",
         icon: BsCollectionFill,
         slug: "sub-division",
@@ -2323,7 +2323,7 @@ export const salessidebarconfig = [
         slug: "district",
       },
       {
-        label: "Sub Division",
+        label: "Zone",
         path: "/sales/sub-division",
         icon: BsCollectionFill,
         slug: "sub-division",
