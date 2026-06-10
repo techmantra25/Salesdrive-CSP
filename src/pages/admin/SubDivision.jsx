@@ -74,7 +74,7 @@ const SubDivision = () => {
       toast.error(
         error?.response?.data?.message ||
           error?.message ||
-          "Failed to load Sub Divisions, try again"
+          "Failed to load Zones, try again"
       );
     } finally {
       setSubDivisionLoading(false);
@@ -130,11 +130,11 @@ const SubDivision = () => {
 
   const validate = () => {
     if (code.trim() === "") {
-      toast.error("Please enter sub-division code");
+      toast.error("Please enter Zone code");
       return false;
     }
     if (name.trim() === "") {
-      toast.error("Please enter sub-division name");
+      toast.error("Please enter Zone name");
       return false;
     }
     if (!formDistrictId) {
@@ -165,7 +165,7 @@ const SubDivision = () => {
       };
 
       await createSubDivision(payload);
-      toast.success("Sub Division added successfully");
+      toast.success("Zone added successfully");
       await fetchSubDivisions();
       onCloseModal();
     } catch (error) {
@@ -173,7 +173,7 @@ const SubDivision = () => {
       toast.error(
         error?.response?.data?.message ||
           error?.message ||
-          "Failed to add sub-division, try again"
+          "Failed to add Zone, try again"
       );
     } finally {
       setFormLoading(false);
@@ -184,7 +184,7 @@ const SubDivision = () => {
     if (!selectedSubDivision?._id) return;
 
     openConfirmationModel({
-      question: "Are you sure you want to update this sub-division?",
+      question: "Are you sure you want to update this Zone?",
       answer: ["Yes", "No"],
       onClose: async (result) => {
         if (!result) {
@@ -202,7 +202,7 @@ const SubDivision = () => {
           };
 
           await updateSubDivision(payload, selectedSubDivision._id);
-          toast.success("Sub Division updated successfully");
+          toast.success("Zone updated successfully");
           await fetchSubDivisions();
           onCloseModal();
         } catch (error) {
@@ -210,7 +210,7 @@ const SubDivision = () => {
           toast.error(
             error?.response?.data?.message ||
               error?.message ||
-              "Failed to update sub-division, try again"
+              "Failed to update Zone, try again"
           );
         } finally {
           setFormLoading(false);
@@ -230,7 +230,7 @@ const SubDivision = () => {
 
   const handleStatusUpdate = (row) => {
     openConfirmationModel({
-      question: `Are you sure you want to ${row.status ? "deactivate" : "activate"} this sub-division?`,
+      question: `Are you sure you want to ${row.status ? "deactivate" : "activate"} this Zone?`,
       answer: ["Yes", "No"],
       onClose: async (result) => {
         if (!result) return;
@@ -248,7 +248,7 @@ const SubDivision = () => {
           toast.error(
             error?.response?.data?.message ||
               error?.message ||
-              "Failed to update sub-division status"
+              "Failed to update Zone status"
           );
         }
       },
@@ -257,9 +257,9 @@ const SubDivision = () => {
 
   const handleCSVTemplateDownload = () => {
     const csv = [
-      "Sub Division Code,Sub Division Name,District Code",
-      "SD-001,Sub Division 1,DIST-001",
-      "SD-002,Sub Division 2,DIST-002",
+      "Zone Code,Zone Name,District Code",
+      "SD-001,Zone 1,DIST-001",
+      "SD-002,Zone 2,DIST-002",
     ];
     const csvString = csv.join("\n");
     const a = document.createElement("a");
@@ -356,7 +356,7 @@ const SubDivision = () => {
       toast.error(
         error?.response?.data?.message ||
           error?.message ||
-          "Failed to import sub-divisions, try again",
+          "Failed to import Zones, try again",
       );
     } finally {
       setBulkUploading(false);
@@ -382,7 +382,7 @@ const SubDivision = () => {
     const csvString = csv.join("\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
-    a.setAttribute("download", "sub-division-error-log.csv");
+    a.setAttribute("download", "Zone-error-log.csv");
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -392,16 +392,16 @@ const SubDivision = () => {
   const handleExportToCSV = () => {
     const csvData = filteredSubDivisions.map((sd) => {
       return {
-        "Sub Division Code": sd.code,
-        "Sub Division Name": sd.name,
+        "Zone Code": sd.code,
+        "Zone Name": sd.name,
         "District Name": sd.districtId?.name,
         Status: sd.status ? "Active" : "Inactive",
       };
     });
 
     const headers = Object.keys(csvData[0] || {
-      "Sub Division Code": "",
-      "Sub Division Name": "",
+      "Zone Code": "",
+      "Zone Name": "",
       "District Name": "",
       Status: "",
     });
@@ -415,7 +415,7 @@ const SubDivision = () => {
 
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    a.setAttribute("download", "sub-divisions.csv");
+    a.setAttribute("download", "Zones.csv");
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -426,7 +426,7 @@ const SubDivision = () => {
       <div className="flex justify-start items-center flex-col gap-4 w-full">
           <div className="flex justify-between w-full items-center border-b-2 py-4">
             <div className="flex justify-center items-center">
-              <h1 className="text-2xl font-bold">Sub Division Master</h1>
+              <h1 className="text-2xl font-bold">Zone Master</h1>
             </div>
           </div>
 
@@ -497,7 +497,7 @@ const SubDivision = () => {
                 <Button className="text-xs" size="sm" onClick={() => setOpenModal(true)}>
                   <span className="flex justify-center items-center gap-2">
                     <IoMdAddCircle size={20} />
-                    Add Sub Division
+                    Add Zone
                   </span>
                 </Button>
 
@@ -537,8 +537,8 @@ const SubDivision = () => {
               <div className="overflow-x-auto w-full">
                 <Table striped>
                   <Table.Head className="text-center">
-                    <Table.HeadCell>Sub Division Code</Table.HeadCell>
-                    <Table.HeadCell>Sub Division Name</Table.HeadCell>
+                    <Table.HeadCell>Zone Code</Table.HeadCell>
+                    <Table.HeadCell>Zone Name</Table.HeadCell>
                     <Table.HeadCell>District Name</Table.HeadCell>
                     <Table.HeadCell>Status</Table.HeadCell>
                     <Table.HeadCell>Action</Table.HeadCell>
@@ -548,7 +548,7 @@ const SubDivision = () => {
                     {filteredSubDivisions.map((sd) => (
                       <Table.Row key={sd?._id} className="text-center">
                         <Table.Cell>
-                          <UniqueCode text={sd?.code} codeName="Sub Division Code" />
+                          <UniqueCode text={sd?.code} codeName="Zone Code" />
                         </Table.Cell>
                         <Table.Cell>{sd?.name}</Table.Cell>
                         <Table.Cell>{sd?.districtId?.name}</Table.Cell>
@@ -578,7 +578,7 @@ const SubDivision = () => {
           </div>
 
           <Modal show={openBulkUploadModal} onClose={() => setOpenBulkUploadModal(false)} size="3xl">
-            <Modal.Header>Bulk Upload Sub Divisions</Modal.Header>
+            <Modal.Header>Bulk Upload Zones</Modal.Header>
             <Modal.Body>
               <div className="flex justify-center gap-6 py-10">
                 <Button
@@ -634,12 +634,12 @@ const SubDivision = () => {
             <Modal.Body>
               <div className="space-y-5">
                 <div className="w-full">
-                  <Label value="Sub Division Code" />
+                  <Label value="Zone Code" />
                   <TextInput value={code} onChange={(e) => setCode(e.target.value)} />
                 </div>
 
                 <div className="w-full">
-                  <Label value="Sub Division Name" />
+                  <Label value="Zone Name" />
                   <TextInput value={name} onChange={(e) => setName(e.target.value)} />
                 </div>
 
@@ -658,13 +658,13 @@ const SubDivision = () => {
                 <div className="w-full">
                   {modalMode === "add" && (
                     <Button onClick={handleAdd} disabled={formLoading}>
-                      {formLoading ? <Spinner size="sm" /> : "Add Sub Division"}
+                      {formLoading ? <Spinner size="sm" /> : "Add Zone"}
                     </Button>
                   )}
 
                   {modalMode === "edit" && (
                     <Button onClick={handleEdit} disabled={formLoading}>
-                      {formLoading ? <Spinner size="sm" /> : "Update Sub Division"}
+                      {formLoading ? <Spinner size="sm" /> : "Update Zone"}
                     </Button>
                   )}
                 </div>

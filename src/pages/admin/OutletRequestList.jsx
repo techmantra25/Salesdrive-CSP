@@ -1409,10 +1409,10 @@ const OutletRequestList = () => {
                       />
                     </div>
 
-                    {/* Sub Division Code */}
+                    {/* Zone Code */}
                     <div>
                       <Label
-                        value="Sub Division Code"
+                        value="Zone Code"
                         className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
