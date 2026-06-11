@@ -622,7 +622,7 @@ const OutletRequestList = () => {
         <div className="flex justify-start items-center flex-col gap-4 w-full">
 
           <div className="flex justify-between w-full items-center border-b-2 py-4">
-            <h1 className="text-2xl font-bold">Lead Approvals1</h1>
+            <h1 className="text-2xl font-bold">Lead Approvals</h1>
           </div>
 
           <div className="flex justify-start items-center flex-col gap-4 w-full p-4">

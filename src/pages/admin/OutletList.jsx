@@ -1396,9 +1396,11 @@ const OutletList = () => {
                   <FaSort className="inline ml-1" size={25} />
                 )}
               </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap">
+              {/* Source Ids column removed */}
+              {/* <Table.HeadCell className="whitespace-nowrap">
                 Source Ids
-              </Table.HeadCell>
+              </Table.HeadCell> */}
+
               {/* <Table.HeadCell className="whitespace-nowrap">
                 Current Point <br /> Balance
               </Table.HeadCell> */}
@@ -1428,6 +1430,9 @@ const OutletList = () => {
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
                 Beat
+              </Table.HeadCell>
+              <Table.HeadCell className="whitespace-nowrap">
+                Sub Division
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
                 City
@@ -1507,11 +1512,13 @@ const OutletList = () => {
                           </span>
                         </div>
                       </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200 ">
+                      {/* Source Ids column removed */}
+                      {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200 ">
                         {outlet?.massistRefIds?.length > 0
                           ? [...new Set(outlet.massistRefIds)].join(", ")
                           : " "}
-                      </Table.Cell>
+                      </Table.Cell> */}
+
                       {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         <div className="flex gap-4 justify-center items-center">
                           {outlet?.currentPointBalance != null
@@ -1577,22 +1584,27 @@ const OutletList = () => {
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.stateId?.name}
                       </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        {Array.isArray(outlet?.beatId) ? (
-                          outlet.beatId.map((beat, index) => (
-                            <div key={index} className="mb-1">
-                              {beat.name} - <UniqueCode text={beat.code} />
-                            </div>
-                          ))
-                        ) : (
-                          <>
-                            {outlet?.beatId?.name} -{" "}
-                            <UniqueCode text={outlet?.beatId?.code} />
-                          </>
-                        )}
-                      </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        {outlet?.city}
+                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                         {Array.isArray(outlet?.beatId) ? (
+                           outlet.beatId.map((beat, index) => (
+                             <div key={index} className="mb-1">
+                               {beat.name} - <UniqueCode text={beat.code} />
+                             </div>
+                           ))
+                         ) : (
+                           <>
+                             {outlet?.beatId?.name} -{" "}
+                             <UniqueCode text={outlet?.beatId?.code} />
+                           </>
+                         )}
+                       </Table.Cell>
+                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                         {Array.isArray(outlet?.beatId)
+                           ? outlet.beatId[0]?.subDivisionId?.name
+                           : outlet?.beatId?.subDivisionId?.name}
+                       </Table.Cell>
+                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                         {outlet?.city}
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.location}
