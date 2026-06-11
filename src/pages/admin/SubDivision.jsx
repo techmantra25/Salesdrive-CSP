@@ -264,7 +264,7 @@ const SubDivision = () => {
     const csvString = csv.join("\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
-    a.setAttribute("download", "sub_division_template.csv");
+    a.setAttribute("download", "zone_template.csv");
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
