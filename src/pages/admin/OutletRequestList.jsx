@@ -76,7 +76,6 @@ const OutletRequestList = () => {
     employeeName: "",
 
     beatCode: "",
-
     subDivisionCode: "",
 
     stateCode: "",
@@ -90,9 +89,14 @@ const OutletRequestList = () => {
     email: "",
 
     address1: "",
-
     city: "",
     pin: "",
+
+    // NEW
+    gstImage: "",
+    panImage: "",
+    aadhaarImage: "",
+    bankImage: "",
   });
 
   useEffect(() => {
@@ -510,6 +514,10 @@ const OutletRequestList = () => {
 
         pin:
           singleOutletForm.pin?.trim(),
+        gstImage: singleOutletForm.gstImage,
+        panImage: singleOutletForm.panImage,
+        aadhaarImage: singleOutletForm.aadhaarImage,
+        bankImage: singleOutletForm.bankImage,
       };
 
       console.log(
@@ -1570,7 +1578,133 @@ const OutletRequestList = () => {
               "
                       />
                     </div>
+                    {/* GST Upload */}
+
+
+
+
+
+
+                    <div className="md:col-span-2 mt-2">
+                      <Label
+                        value="Documents"
+                        className="mb-4 block text-sm font-semibold text-slate-200"
+                      />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                        {/* GST */}
+                        <div className="rounded-xl border border-slate-600 bg-slate-800 p-4">
+                          <p className="mb-3 text-sm font-medium text-white">
+                            GST Certificate
+                          </p>
+
+                          <FileUpload
+                            type="single-image"
+                            page="modal-form"
+                            onSetFileUrl={(url) =>
+                              setSingleOutletForm((prev) => ({
+                                ...prev,
+                                gstImage: url,
+                              }))
+                            }
+                          />
+
+                          {singleOutletForm.gstImage && (
+                            <img
+                              src={singleOutletForm.gstImage}
+                              alt="GST"
+                              className="mt-3 h-24 w-full rounded-lg object-cover border border-slate-600"
+                            />
+                          )}
+                        </div>
+
+                        {/* PAN */}
+                        <div className="rounded-xl border border-slate-600 bg-slate-800 p-4">
+                          <p className="mb-3 text-sm font-medium text-white">
+                            PAN Card
+                          </p>
+
+                          <FileUpload
+                            type="single-image"
+                            page="modal-form"
+                            onSetFileUrl={(url) =>
+                              setSingleOutletForm((prev) => ({
+                                ...prev,
+                                panImage: url,
+                              }))
+                            }
+                          />
+
+                          {singleOutletForm.panImage && (
+                            <img
+                              src={singleOutletForm.panImage}
+                              alt="PAN"
+                              className="mt-3 h-24 w-full rounded-lg object-cover border border-slate-600"
+                            />
+                          )}
+                        </div>
+
+                        {/* Aadhaar */}
+                        <div className="rounded-xl border border-slate-600 bg-slate-800 p-4">
+                          <p className="mb-3 text-sm font-medium text-white">
+                            Aadhaar Card
+                          </p>
+
+                          <FileUpload
+                            type="single-image"
+                            page="modal-form"
+                            onSetFileUrl={(url) =>
+                              setSingleOutletForm((prev) => ({
+                                ...prev,
+                                aadhaarImage: url,
+                              }))
+                            }
+                          />
+
+                          {singleOutletForm.aadhaarImage && (
+                            <img
+                              src={singleOutletForm.aadhaarImage}
+                              alt="Aadhaar"
+                              className="mt-3 h-24 w-full rounded-lg object-cover border border-slate-600"
+                            />
+                          )}
+                        </div>
+
+                        {/* Bank */}
+                        <div className="rounded-xl border border-slate-600 bg-slate-800 p-4">
+                          <p className="mb-3 text-sm font-medium text-white">
+                            Bank Details
+                          </p>
+
+                          <FileUpload
+                            type="single-image"
+                            page="modal-form"
+                            onSetFileUrl={(url) =>
+                              setSingleOutletForm((prev) => ({
+                                ...prev,
+                                bankImage: url,
+                              }))
+                            }
+                          />
+
+                          {singleOutletForm.bankImage && (
+                            <img
+                              src={singleOutletForm.bankImage}
+                              alt="Bank"
+                              className="mt-3 h-24 w-full rounded-lg object-cover border border-slate-600"
+                            />
+                          )}
+                        </div>
+
+                      </div>
+                    </div>
+
+
+
+
                   </div>
+
                 </div>
 
                 {/* Footer */}
