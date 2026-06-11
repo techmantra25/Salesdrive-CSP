@@ -1611,11 +1611,26 @@ const OutletRequestList = () => {
                           />
 
                           {singleOutletForm.gstImage && (
-                            <img
-                              src={singleOutletForm.gstImage}
-                              alt="GST"
-                              className="mt-3 h-24 w-full rounded-lg object-cover border border-slate-600"
-                            />
+                            <div className="relative mt-3">
+                              <img
+                                src={singleOutletForm.gstImage}
+                                alt="GST"
+                                className="h-24 w-full rounded-lg object-cover border border-slate-600"
+                              />
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setSingleOutletForm((prev) => ({
+                                    ...prev,
+                                    gstImage: "",
+                                  }))
+                                }
+                                className="absolute top-2 right-2 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
+                              >
+                                <FaTimesCircle size={18} />
+                              </button>
+                            </div>
                           )}
                         </div>
 
@@ -1637,11 +1652,26 @@ const OutletRequestList = () => {
                           />
 
                           {singleOutletForm.panImage && (
-                            <img
-                              src={singleOutletForm.panImage}
-                              alt="PAN"
-                              className="mt-3 h-24 w-full rounded-lg object-cover border border-slate-600"
-                            />
+                            <div className="relative mt-3">
+                              <img
+                                src={singleOutletForm.panImage}
+                                alt="PAN"
+                                className="h-24 w-full rounded-lg object-cover border border-slate-600"
+                              />
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setSingleOutletForm((prev) => ({
+                                    ...prev,
+                                    panImage: "",
+                                  }))
+                                }
+                                className="absolute top-2 right-2 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
+                              >
+                                <FaTimesCircle size={18} />
+                              </button>
+                            </div>
                           )}
                         </div>
 
@@ -1663,11 +1693,26 @@ const OutletRequestList = () => {
                           />
 
                           {singleOutletForm.aadhaarImage && (
-                            <img
-                              src={singleOutletForm.aadhaarImage}
-                              alt="Aadhaar"
-                              className="mt-3 h-24 w-full rounded-lg object-cover border border-slate-600"
-                            />
+                            <div className="relative mt-3">
+                              <img
+                                src={singleOutletForm.aadhaarImage}
+                                alt="Aadhaar"
+                                className="h-24 w-full rounded-lg object-cover border border-slate-600"
+                              />
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setSingleOutletForm((prev) => ({
+                                    ...prev,
+                                    aadhaarImage: "",
+                                  }))
+                                }
+                                className="absolute top-2 right-2 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
+                              >
+                                <FaTimesCircle size={18} />
+                              </button>
+                            </div>
                           )}
                         </div>
 
@@ -1689,11 +1734,26 @@ const OutletRequestList = () => {
                           />
 
                           {singleOutletForm.bankImage && (
-                            <img
-                              src={singleOutletForm.bankImage}
-                              alt="Bank"
-                              className="mt-3 h-24 w-full rounded-lg object-cover border border-slate-600"
-                            />
+                            <div className="relative mt-3">
+                              <img
+                                src={singleOutletForm.bankImage}
+                                alt="Bank"
+                                className="h-24 w-full rounded-lg object-cover border border-slate-600"
+                              />
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setSingleOutletForm((prev) => ({
+                                    ...prev,
+                                    bankImage: "",
+                                  }))
+                                }
+                                className="absolute top-2 right-2 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
+                              >
+                                <FaTimesCircle size={18} />
+                              </button>
+                            </div>
                           )}
                         </div>
 

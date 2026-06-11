@@ -18,6 +18,7 @@ import { FiExternalLink } from "react-icons/fi";
 import { IoSyncCircleSharp, IoWallet } from "react-icons/io5";
 import { MdDownloadForOffline } from "react-icons/md";
 import { RiRefreshFill } from "react-icons/ri";
+import { FiEye } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import {
   ApprovedOutletPaginated,
@@ -65,6 +66,9 @@ const OutletList = () => {
   const [editLoading, setEditLoading] = useState(false);
   const [outlets, setOutlets] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
+  const [openDocumentModal, setOpenDocumentModal] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState("");
+  const [documentTitle, setDocumentTitle] = useState("");
   const [totalItems, setTotalItems] = useState(0);
   const [newSourceId, setNewSourceId] = useState("");
   const [filteredCount, setFilteredCount] = useState(0);
@@ -198,16 +202,16 @@ const OutletList = () => {
         // Created Date filter
         ...(dateRange.startDate &&
           dateRange.endDate && {
-            fromDate: dateRange.startDate,
-            toDate: dateRange.endDate,
-          }),
+          fromDate: dateRange.startDate,
+          toDate: dateRange.endDate,
+        }),
 
         // Updated Date filter (SEPARATE)
         ...(updatedDateRange.startDate &&
           updatedDateRange.endDate && {
-            updatedFromDate: updatedDateRange.startDate,
-            updatedToDate: updatedDateRange.endDate,
-          }),
+          updatedFromDate: updatedDateRange.startDate,
+          updatedToDate: updatedDateRange.endDate,
+        }),
 
         ...(phoneSearch && { phoneSearch }),
         ...(outletNameSort && { outletname_sort: outletNameSort }),
@@ -222,8 +226,8 @@ const OutletList = () => {
     } catch (error) {
       toast.error(
         error?.response?.data?.message ||
-          error?.message ||
-          "Failed to fetch Outlets",
+        error?.message ||
+        "Failed to fetch Outlets",
       );
     } finally {
       setOutletsLoading(false);
@@ -316,8 +320,8 @@ const OutletList = () => {
     } catch (error) {
       toast.error(
         error?.response?.data?.message ||
-          error?.message ||
-          "Failed to update outlet",
+        error?.message ||
+        "Failed to update outlet",
       );
     } finally {
       setEditLoading(false);
@@ -420,7 +424,7 @@ const OutletList = () => {
         startDate: customSyncDateRange.startDate,
         endDate: customSyncDateRange.endDate,
       };
-      
+
       // Add distributor DBCode if selected
       if (selectedCustomSyncDistributor) {
         const selectedDist = distributors.find(d => d._id === selectedCustomSyncDistributor);
@@ -428,7 +432,7 @@ const OutletList = () => {
           queryParams.ClientCode = selectedDist.dbCode;
         }
       }
-      
+
       const res = await getCustomOutletSynced(queryParams);
       toast.success(
         `${res?.data?.metadata?.totalInserted || 0} outlet synced successfully! & ${res?.data?.metadata?.totalSkipped || 0} outlets skipped.`,
@@ -467,7 +471,7 @@ const OutletList = () => {
             console.error(error);
             toast.error(
               error?.response?.data?.message ||
-                "Failed to update sync outlet codes",
+              "Failed to update sync outlet codes",
             );
           } finally {
             setUpdatingSync(false);
@@ -499,8 +503,8 @@ const OutletList = () => {
             console.error(error);
             toast.error(
               error.message ||
-                error?.response?.data?.message ||
-                "Failed to fetch outlet balance",
+              error?.response?.data?.message ||
+              "Failed to fetch outlet balance",
             );
           } finally {
             setFetchingPointBalance(false);
@@ -529,9 +533,9 @@ const OutletList = () => {
       ...(searchTerm && { search: searchTerm }),
       ...(dateRange.startDate &&
         dateRange.endDate && {
-          fromDate: dateRange.startDate,
-          toDate: dateRange.endDate,
-        }),
+        fromDate: dateRange.startDate,
+        toDate: dateRange.endDate,
+      }),
       ...(outletNameSort && { outletname_sort: outletNameSort }),
     };
 
@@ -597,8 +601,8 @@ const OutletList = () => {
       console.error("Error fetching duplicate data:", error);
       toast.error(
         error?.response?.data?.message ||
-          error?.message ||
-          "Failed to fetch duplicate data",
+        error?.message ||
+        "Failed to fetch duplicate data",
       );
     } finally {
       setDuplicateDataLoading(false);
@@ -670,9 +674,8 @@ const OutletList = () => {
     const newStatus = !outlet.status;
 
     openConfirmationModel({
-      question: `Are you sure you want to ${
-        newStatus ? "activate" : "deactivate"
-      } this outlet?`,
+      question: `Are you sure you want to ${newStatus ? "activate" : "deactivate"
+        } this outlet?`,
       answer: ["Yes", "No"],
       onClose: async (result) => {
         if (!result) return;
@@ -894,7 +897,7 @@ const OutletList = () => {
             console.error(error);
             toast.error(
               error?.response?.data?.message ||
-                "Failed to clean current balance",
+              "Failed to clean current balance",
             );
           } finally {
             setCleanCurrentBalanceLoading(false);
@@ -924,7 +927,7 @@ const OutletList = () => {
             console.error(error);
             toast.error(
               error?.response?.data?.message ||
-                "Syncing all retailer balances failed",
+              "Syncing all retailer balances failed",
             );
           } finally {
             setSyncingRetailerBalances(false);
@@ -968,7 +971,7 @@ const OutletList = () => {
         } catch (error) {
           toast.error(
             error?.response?.data?.message ||
-              "This Main Source ID Can't Be Removed.",
+            "This Main Source ID Can't Be Removed.",
           );
         }
       },
@@ -1556,7 +1559,7 @@ const OutletList = () => {
                           <HiOutlineMenu size={16} />
                         </Button>
                       </Table.Cell>
-                    
+
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.ownerName}
                       </Table.Cell>
@@ -1584,27 +1587,27 @@ const OutletList = () => {
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.stateId?.name}
                       </Table.Cell>
-                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                         {Array.isArray(outlet?.beatId) ? (
-                           outlet.beatId.map((beat, index) => (
-                             <div key={index} className="mb-1">
-                               {beat.name} - <UniqueCode text={beat.code} />
-                             </div>
-                           ))
-                         ) : (
-                           <>
-                             {outlet?.beatId?.name} -{" "}
-                             <UniqueCode text={outlet?.beatId?.code} />
-                           </>
-                         )}
-                       </Table.Cell>
-                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                         {Array.isArray(outlet?.beatId)
-                           ? outlet.beatId[0]?.subDivisionId?.name
-                           : outlet?.beatId?.subDivisionId?.name}
-                       </Table.Cell>
-                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                         {outlet?.city}
+                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                        {Array.isArray(outlet?.beatId) ? (
+                          outlet.beatId.map((beat, index) => (
+                            <div key={index} className="mb-1">
+                              {beat.name} - <UniqueCode text={beat.code} />
+                            </div>
+                          ))
+                        ) : (
+                          <>
+                            {outlet?.beatId?.name} -{" "}
+                            <UniqueCode text={outlet?.beatId?.code} />
+                          </>
+                        )}
+                      </Table.Cell>
+                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                        {Array.isArray(outlet?.beatId)
+                          ? outlet.beatId[0]?.subDivisionId?.name
+                          : outlet?.beatId?.subDivisionId?.name}
+                      </Table.Cell>
+                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                        {outlet?.city}
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.location}
@@ -1733,16 +1736,16 @@ const OutletList = () => {
                         "Created At",
                         selectedOutletDetails?.createdAt
                           ? new Date(
-                              selectedOutletDetails?.createdAt,
-                            ).toLocaleString()
+                            selectedOutletDetails?.createdAt,
+                          ).toLocaleString()
                           : "",
                       ],
                       [
                         "Last Updated",
                         selectedOutletDetails?.updatedAt
                           ? new Date(
-                              selectedOutletDetails?.updatedAt,
-                            ).toLocaleString()
+                            selectedOutletDetails?.updatedAt,
+                          ).toLocaleString()
                           : "",
                       ],
                     ].map(([label, value]) => (
@@ -1759,7 +1762,9 @@ const OutletList = () => {
                       </div>
                     ))}
                   </div>
+
                 </div>
+
               </div>
             </div>
           </div>
@@ -1767,549 +1772,276 @@ const OutletList = () => {
       </Modal>
 
       {/* Edit Outlet Modal */}
-      <Modal show={openEditModal} onClose={onCloseEditModal} size="6xl">
-        <Modal.Header>Edit Outlet</Modal.Header>
+      {/* Outlet Details Modal */}
+      <Modal show={openModal} onClose={onCloseModal} size="6xl">
+        <Modal.Header>Outlet Details</Modal.Header>
+
         <Modal.Body>
-          <form onSubmit={handleEditSubmit} className="space-y-6">
-            {/* Basic Information */}
-            <div className="border-b pb-4">
-              <h3 className="text-lg font-semibold mb-4 dark:text-white">
-                Basic Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="outletName" value="Outlet Name *" />
-                  <TextInput
-                    id="outletName"
-                    type="text"
-                    value={editOutletData?.outletName || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        outletName: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
+          <div className="overflow-x-auto">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                {[
+                  ["Outlet Code", selectedOutletDetails?.outletCode],
+                  ["Outlet UID", selectedOutletDetails?.outletUID],
+                  ["Outlet Name", selectedOutletDetails?.outletName],
+                  ["Owner Name", selectedOutletDetails?.ownerName],
 
-                {/* Source IDs */}
-                {/* Source IDs */}
-                <div className="border-b pb-4">
-                  <h3 className="text-lg font-semibold mb-2 dark:text-white">
-                    Source IDs
-                  </h3>
+                  ["Mobile 1", selectedOutletDetails?.mobile1],
+                  ["Mobile 2", selectedOutletDetails?.mobile2],
 
-                  {/* Existing IDs */}
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {Array.isArray(editOutletData?.massistRefIds) &&
-                      [...new Set(editOutletData.massistRefIds)].map(
-                        (id, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-md"
-                          >
-                            <span>{id}</span>
+                  ["WhatsApp", selectedOutletDetails?.whatsappNumber],
+                  ["Email", selectedOutletDetails?.email],
 
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveSourceId(id)}
-                              className="hover:text-red-600"
-                            >
-                              <IoClose size={16} />
-                            </button>
-                          </div>
-                        ),
+                  [
+                    "GST IN",
+                    <div className="flex items-center gap-2">
+                      <span>{selectedOutletDetails?.gstin || "—"}</span>
+
+                      {selectedOutletDetails?.gstImage && (
+                        <Button
+                          size="xs"
+                          color="blue"
+                          pill
+                          onClick={() => {
+                            setDocumentTitle("GST Certificate");
+                            setSelectedDocument(
+                              selectedOutletDetails.gstImage
+                            );
+                            setOpenDocumentModal(true);
+                          }}
+                        >
+                          <FiEye size={14} />
+                        </Button>
                       )}
+                    </div>,
+                  ],
+
+                  [
+                    "PAN No",
+                    <div className="flex items-center gap-2">
+                      <span>{selectedOutletDetails?.panNumber || "—"}</span>
+
+                      {selectedOutletDetails?.panImage && (
+                        <Button
+                          size="xs"
+                          color="blue"
+                          pill
+                          onClick={() => {
+                            setDocumentTitle("PAN Card");
+                            setSelectedDocument(
+                              selectedOutletDetails.panImage
+                            );
+                            setOpenDocumentModal(true);
+                          }}
+                        >
+                          <FiEye size={14} />
+                        </Button>
+                      )}
+                    </div>,
+                  ],
+
+                  [
+                    "Aadhaar No",
+                    <div className="flex items-center gap-2">
+                      <span>{selectedOutletDetails?.aadharNumber || "—"}</span>
+
+                      {selectedOutletDetails?.aadharImage && (
+                        <Button
+                          size="xs"
+                          color="blue"
+                          pill
+                          onClick={() => {
+                            setDocumentTitle("Aadhaar Card");
+                            setSelectedDocument(
+                              selectedOutletDetails.aadharImage
+                            );
+                            setOpenDocumentModal(true);
+                          }}
+                        >
+                          <FiEye size={14} />
+                        </Button>
+                      )}
+                    </div>,
+                  ],
+
+                  [
+                    "Bank Document",
+                    selectedOutletDetails?.bankImage ? (
+                      <Button
+                        size="xs"
+                        color="blue"
+                        pill
+                        onClick={() => {
+                          setDocumentTitle("Bank Document");
+                          setSelectedDocument(
+                            selectedOutletDetails.bankImage
+                          );
+                          setOpenDocumentModal(true);
+                        }}
+                      >
+                        <FiEye size={14} />
+                      </Button>
+                    ) : (
+                      "—"
+                    ),
+                  ],
+
+                  [
+                    "Category Of Outlet",
+                    selectedOutletDetails?.categoryOfOutlet,
+                  ],
+
+                  ["Address", selectedOutletDetails?.address1],
+
+                  ["Pincode", selectedOutletDetails?.pin],
+
+                  ["City", selectedOutletDetails?.city],
+
+                  ["Location", selectedOutletDetails?.location],
+
+                  ["State", selectedOutletDetails?.stateId?.name],
+
+                  ["District", selectedOutletDetails?.district?.name],
+
+                  [
+                    "Beat",
+                    Array.isArray(selectedOutletDetails?.beatId)
+                      ? selectedOutletDetails.beatId
+                        .map((beat) => beat.name)
+                        .join(", ")
+                      : selectedOutletDetails?.beatId?.name,
+                  ],
+
+                  [
+                    "Employee Name",
+                    selectedOutletDetails?.employeeId?.name,
+                  ],
+
+                  [
+                    "Existing Retailer",
+                    selectedOutletDetails?.existingRetailer
+                      ? "Yes"
+                      : "No",
+                  ],
+
+                  [
+                    "Outlet Status",
+                    selectedOutletDetails?.status
+                      ? "Active"
+                      : "Inactive",
+                  ],
+
+                  [
+                    "Outlet Source",
+                    selectedOutletDetails?.outletSource,
+                  ],
+
+                  [
+                    "Tele Calling Slots",
+                    selectedOutletDetails?.teleCallingSlot?.join(
+                      ", "
+                    ),
+                  ],
+
+                  [
+                    "Selling Brands",
+                    selectedOutletDetails?.sellingBrands?.length
+                      ? selectedOutletDetails.sellingBrands
+                        .map((brand) => brand.name)
+                        .join(", ")
+                      : "—",
+                  ],
+
+                  [
+                    "Competitor Brands",
+                    selectedOutletDetails?.competitorBrands?.length
+                      ? selectedOutletDetails.competitorBrands.join(
+                        ", "
+                      )
+                      : "N/A",
+                  ],
+
+                  [
+                    "Created At",
+                    selectedOutletDetails?.createdAt
+                      ? new Date(
+                        selectedOutletDetails.createdAt
+                      ).toLocaleString()
+                      : "—",
+                  ],
+
+                  [
+                    "Updated At",
+                    selectedOutletDetails?.updatedAt
+                      ? new Date(
+                        selectedOutletDetails.updatedAt
+                      ).toLocaleString()
+                      : "—",
+                  ],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="flex border-b border-gray-200 dark:border-gray-700 py-3"
+                  >
+                    <div className="w-44 font-semibold text-gray-700 dark:text-gray-300">
+                      {label}
+                    </div>
+
+                    <div className="flex-1 text-gray-900 dark:text-gray-100">
+                      {value || (
+                        <span className="text-gray-400">—</span>
+                      )}
+                    </div>
                   </div>
-
-                  {/* Add new Source ID */}
-                  <div className="flex gap-2 items-center">
-                    <TextInput
-                      placeholder="Enter new Source ID"
-                      value={newSourceId}
-                      onChange={(e) => setNewSourceId(e.target.value)}
-                    />
-                    <Button
-                      size="sm"
-                      color="blue"
-                      disabled={!newSourceId.trim()}
-                      onClick={() => {
-                        setEditOutletData((prev) => ({
-                          ...prev,
-                          massistRefIds: prev.massistRefIds
-                            ? [
-                                ...new Set([
-                                  ...prev.massistRefIds,
-                                  newSourceId.trim(),
-                                ]),
-                              ]
-                            : [newSourceId.trim()],
-                        }));
-
-                        setNewSourceId("");
-                      }}
-                    >
-                      Add
-                    </Button>
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="ownerName" value="Owner Name *" />
-                  <TextInput
-                    id="ownerName"
-                    type="text"
-                    value={editOutletData?.ownerName || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        ownerName: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-                {/* <div>
-                  <Label htmlFor="contactPerson" value="Contact Person" />
-                  <TextInput
-                    id="contactPerson"
-                    type="text"
-                    value={editOutletData?.contactPerson || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        contactPerson: e.target.value,
-                      })
-                    }
-                  />
-                </div> */}
+                ))}
               </div>
             </div>
+          </div>
+        </Modal.Body>
+      </Modal>
 
-            {/* Contact Information */}
-            <div className="border-b pb-4 dark:text-white">
-              <h3 className="text-lg font-semibold mb-4 dark:text-white">
-                Contact Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="mobile1" value="Mobile Number" />
-                  <TextInput
-                    id="mobile1"
-                    type="tel"
-                    value={editOutletData?.mobile1 || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        mobile1: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="mobile2" value="Alternate Number" />
-                  <TextInput
-                    id="mobile2"
-                    type="tel"
-                    value={editOutletData?.mobile2 || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        mobile2: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="whatsappNumber" value="WhatsApp Number" />
-                  <TextInput
-                    id="whatsappNumber"
-                    type="tel"
-                    value={editOutletData?.whatsappNumber || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        whatsappNumber: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="email" value="Email" />
-                  <TextInput
-                    id="email"
-                    type="email"
-                    value={editOutletData?.email || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        email: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                {/* <div>
-                  <Label
-                    htmlFor="preferredLanguage"
-                    value="Preferred Language"
-                  />
-                  <Select
-                    id="preferredLanguage"
-                    value={editOutletData?.preferredLanguage || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        preferredLanguage: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="">Select Language</option>
-                    <option value="English">English</option>
-                    <option value="Hindi">Hindi</option>
-                    <option value="Bengali">Bengali</option>
-                    <option value="Tamil">Tamil</option>
-                    <option value="Telugu">Telugu</option>
-                    <option value="Marathi">Marathi</option>
-                    <option value="Gujarati">Gujarati</option>
-                    <option value="Kannada">Kannada</option>
-                    <option value="Malayalam">Malayalam</option>
-                    <option value="Punjabi">Punjabi</option>
-                  </Select>
-                </div> */}
-                {/* <div>
-                  <Label htmlFor="teleCallDay" value="Tele Call Day" />
-                  <TextInput
-                    id="teleCallDay"
-                    type="text"
-                    value={editOutletData?.teleCallDay || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        teleCallDay: e.target.value,
-                      })
-                    }
-                  />
-                </div> */}
-              </div>
-            </div>
+      {/* Document Preview Modal */}
+      <Modal
+        show={openDocumentModal}
+        onClose={() => setOpenDocumentModal(false)}
+        size="lg"
+      >
+        <Modal.Header>{documentTitle}</Modal.Header>
 
-            {/* Address Information */}
-            <div className="border-b pb-4 dark:text-white">
-              <h3 className="text-lg font-semibold mb-4 dark:text-white">
-                Address Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <Label value="Select Beat" />
-                  <SearchableSelect
-                    id="beatId"
-                    label="Select Beat"
-                    placeholder="Beat"
-                    multiple={true}
-                    options={beats}
-                    value={editOutletData?.beatId}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        beatId: e.target.value,
-                      })
-                    }
-                    displayKey="name"
-                    descKey="code"
-                    valueKey="_id"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="address1" value="Address" />
-                  <TextInput
-                    id="address1"
-                    type="text"
-                    value={editOutletData?.address1 || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        address1: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                {/* <div>
-                  <Label htmlFor="address2" value="Address Line 2" />
-                  <TextInput
-                    id="address2"
-                    type="text"
-                    value={editOutletData?.address2 || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        address2: e.target.value,
-                      })
-                    }
-                  />
-                </div> */}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                  <Label htmlFor="city" value="City" />
-                  <TextInput
-                    id="city"
-                    type="text"
-                    value={editOutletData?.city || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        city: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="pin" value="PIN Code" />
-                  <TextInput
-                    id="pin"
-                    type="text"
-                    value={editOutletData?.pin || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        pin: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                {/* <div>
-                  <Label htmlFor="location" value="Location" />
-                  <TextInput
-                    id="location"
-                    type="text"
-                    value={editOutletData?.location || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        location: e.target.value,
-                      })
-                    }
-                  />
-                </div> */}
-                {/* <div>
-                  <Label htmlFor="marketCenter" value="Market Center" />
-                  <TextInput
-                    id="marketCenter"
-                    type="text"
-                    value={editOutletData?.marketCenter || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        marketCenter: e.target.value,
-                      })
-                    }
-                  />
-                </div> */}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                {/* <div>
-                  <Label htmlFor="gpsLocation" value="GPS Location" />
-                  <TextInput
-                    id="gpsLocation"
-                    type="text"
-                    value={editOutletData?.gpsLocation || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        gpsLocation: e.target.value,
-                      })
-                    }
-                    placeholder="Latitude, Longitude"
-                  />
-                </div> */}
-                <div>
-                  <Label htmlFor="shipToAddress" value="Ship To Address" />
-                  <TextInput
-                    id="shipToAddress"
-                    type="text"
-                    value={editOutletData?.shipToAddress || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        shipToAddress: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-              </div>
-              <div className="mt-4">
-                <Label htmlFor="shipToPincode" value="Ship To PIN Code" />
-                <TextInput
-                  id="shipToPincode"
-                  type="text"
-                  value={editOutletData?.shipToPincode || ""}
-                  onChange={(e) =>
-                    setEditOutletData({
-                      ...editOutletData,
-                      shipToPincode: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div className="mt-4">
-                <Label htmlFor="googleMapLink" value="Google Map Link" />
-                <textarea
-                  id="googleMapLink"
-                  rows={3}
-                  className="w-full px-3 py-2 text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg dark:bg-gray-700 dark:text-white dark:border-gray-600 focus:ring-1 focus:border-cyan-500 focus:outline-none"
-                  placeholder="Paste Google Maps link here..."
-                  value={editOutletData?.googleMapLink || ""}
-                  onChange={(e) =>
-                    setEditOutletData({
-                      ...editOutletData,
-                      googleMapLink: e.target.value,
-                    })
-                  }
-                />
-              </div>
-            </div>
+        <Modal.Body>
+          <div className="flex justify-center">
+            {selectedDocument ? (
+              <img
+                src={selectedDocument}
+                alt={documentTitle}
+                className="max-h-[450px] w-auto object-contain rounded-lg border"
+              />
+            ) : (
+              <p>No document found</p>
+            )}
+          </div>
+        </Modal.Body>
+      </Modal>
 
-            {/* Business Information */}
-            <div className="border-b pb-4 dark:text-white">
-              <h3 className="text-lg font-semibold mb-4">
-                Business Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <Label
-                    htmlFor="categoryOfOutlet"
-                    value="Category of Outlet(required)"
-                  />
-                  <Select
-                    id="categoryOfOutlet"
-                    value={editOutletData?.categoryOfOutlet || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        categoryOfOutlet: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="">Select Category</option>
-                    <option value="Economy">Economy</option>
-                    <option value="Premium">Premium</option>
-                    <option value="RETAILER">Retailer</option>
-                  </Select>
-                </div>
-                <div>
-                  <Label
-                    htmlFor="retailerClass"
-                    value="Retailer Class (Required)"
-                  />
-                  <Select
-                    id="retailerClass"
-                    value={editOutletData?.retailerClass || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        retailerClass: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="">Select Class</option>
-                    <option value="A">Class A</option>
-                    <option value="B">Class B</option>
-                    <option value="C">Class C</option>
-                    <option value="D">Class D</option>
-                  </Select>
-                </div>
-                {/* <div>
-                  <Label htmlFor="enrolledStatus" value="Enrolled Status" />
-                  <Select
-                    id="enrolledStatus"
-                    value={editOutletData?.enrolledStatus || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        enrolledStatus: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="">Select Status</option>
-                    <option value="ENROLLED">Enrolled</option>
-                    <option value="NOT ENROLLED">Not Enrolled</option>
-                  </Select>
-                </div> */}
-              </div>
-            </div>
+      <Modal
+        show={openDocumentModal}
+        onClose={() => setOpenDocumentModal(false)}
+        size="lg"
+      >
+        <Modal.Header>{documentTitle}</Modal.Header>
 
-            {/* Legal Information */}
-            <div className="border-b pb-4 dark:text-white">
-              <h3 className="text-lg font-semibold mb-4">Legal Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="gstin" value="GST IN" />
-                  <TextInput
-                    id="gstin"
-                    type="text"
-                    value={editOutletData?.gstin || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        gstin: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="aadharNumber" value="Aadhar Number" />
-                  <TextInput
-                    id="aadharNumber"
-                    type="text"
-                    value={editOutletData?.aadharNumber || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        aadharNumber: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="panNumber" value="PAN Number" />
-                  <TextInput
-                    id="panNumber"
-                    type="text"
-                    value={editOutletData?.panNumber || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        panNumber: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Form Actions */}
-            <div className="flex justify-end gap-2 pt-4 dark:text-white">
-              <Button
-                type="button"
-                color="gray"
-                onClick={onCloseEditModal}
-                disabled={editLoading}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" color="blue" disabled={editLoading}>
-                {editLoading ? (
-                  <>
-                    <Spinner size="sm" className="mr-2" />
-                    Updating...
-                  </>
-                ) : (
-                  "Update Outlet"
-                )}
-              </Button>
-            </div>
-          </form>
+        <Modal.Body>
+          <div className="flex justify-center items-center">
+            {selectedDocument ? (
+              <img
+                src={selectedDocument}
+                alt={documentTitle}
+                className="max-h-[75vh] w-auto rounded-lg border shadow-md"
+              />
+            ) : (
+              <p>No document available</p>
+            )}
+          </div>
         </Modal.Body>
       </Modal>
       {/* Add Manual Points Modal */}
@@ -2430,7 +2162,7 @@ const OutletList = () => {
                   orientation="bottom"  // 👈 added here
                 />
               </div>
-              
+
             </div>
             <p className="text-sm text-gray-500">
               Select a date range and distributor to sync outlets from that specific period.
