@@ -1430,6 +1430,9 @@ const OutletList = () => {
                 Beat
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
+                Sub Division
+              </Table.HeadCell>
+              <Table.HeadCell className="whitespace-nowrap">
                 City
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
@@ -1577,22 +1580,27 @@ const OutletList = () => {
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.stateId?.name}
                       </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        {Array.isArray(outlet?.beatId) ? (
-                          outlet.beatId.map((beat, index) => (
-                            <div key={index} className="mb-1">
-                              {beat.name} - <UniqueCode text={beat.code} />
-                            </div>
-                          ))
-                        ) : (
-                          <>
-                            {outlet?.beatId?.name} -{" "}
-                            <UniqueCode text={outlet?.beatId?.code} />
-                          </>
-                        )}
-                      </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        {outlet?.city}
+                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                         {Array.isArray(outlet?.beatId) ? (
+                           outlet.beatId.map((beat, index) => (
+                             <div key={index} className="mb-1">
+                               {beat.name} - <UniqueCode text={beat.code} />
+                             </div>
+                           ))
+                         ) : (
+                           <>
+                             {outlet?.beatId?.name} -{" "}
+                             <UniqueCode text={outlet?.beatId?.code} />
+                           </>
+                         )}
+                       </Table.Cell>
+                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                         {Array.isArray(outlet?.beatId)
+                           ? outlet.beatId[0]?.subDivisionId?.name
+                           : outlet?.beatId?.subDivisionId?.name}
+                       </Table.Cell>
+                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                         {outlet?.city}
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.location}
