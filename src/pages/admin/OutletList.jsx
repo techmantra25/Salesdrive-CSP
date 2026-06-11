@@ -1396,9 +1396,11 @@ const OutletList = () => {
                   <FaSort className="inline ml-1" size={25} />
                 )}
               </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap">
+              {/* Source Ids column removed */}
+              {/* <Table.HeadCell className="whitespace-nowrap">
                 Source Ids
-              </Table.HeadCell>
+              </Table.HeadCell> */}
+
               {/* <Table.HeadCell className="whitespace-nowrap">
                 Current Point <br /> Balance
               </Table.HeadCell> */}
@@ -1510,11 +1512,13 @@ const OutletList = () => {
                           </span>
                         </div>
                       </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200 ">
+                      {/* Source Ids column removed */}
+                      {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200 ">
                         {outlet?.massistRefIds?.length > 0
                           ? [...new Set(outlet.massistRefIds)].join(", ")
                           : " "}
-                      </Table.Cell>
+                      </Table.Cell> */}
+
                       {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         <div className="flex gap-4 justify-center items-center">
                           {outlet?.currentPointBalance != null
