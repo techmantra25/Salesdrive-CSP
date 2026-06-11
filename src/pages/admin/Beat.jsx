@@ -738,9 +738,9 @@ const Beat = () => {
                   <Table.HeadCell className="whitespace-nowrap">
                     Beat Code
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap">
+                  {/* <Table.HeadCell className="whitespace-nowrap">
                     Associated Beat IDs
-                  </Table.HeadCell>{" "}
+                  </Table.HeadCell>{" "} */}
                   <Table.HeadCell className="whitespace-nowrap">
                     Beat Name
                   </Table.HeadCell>
@@ -802,7 +802,7 @@ const Beat = () => {
                               </span>
                             </button>
                           </Table.Cell>
-                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                          {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                             {beat?.beatIds && beat.beatIds.length > 0 ? (
                               <div className="flex flex-wrap justify-center items-center gap-1">
                                 {beat.beatIds
@@ -818,7 +818,7 @@ const Beat = () => {
                             ) : (
                               ""
                             )}
-                          </Table.Cell>
+                          </Table.Cell> */}
                           <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200 cursor-pointer hover:text-lime-600">
                             <div className="flex gap-2 justify-center items-center">
                               <button className="flex items-center justify-center gap-2">
@@ -917,7 +917,7 @@ const Beat = () => {
                     placeholder="Enter beat name"
                   />
                 </div>
-                <div>
+                {/* <div>
                   <div className="mb-2 block">
                     <Label htmlFor="associatedBeatIds">
                       Associated Beat IDs (comma-separated)
@@ -929,7 +929,7 @@ const Beat = () => {
                     onChange={(e) => setBeatIdsInput(e.target.value)}
                     placeholder=" Enter Beat Ids   e.g: 12345, 5654, 6789"
                   />
-                </div>
+                </div> */}
                 <div>
                   <Label htmlFor="beat-type">Beat Type </Label>
                   <Select
