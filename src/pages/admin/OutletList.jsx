@@ -1386,6 +1386,9 @@ const OutletList = () => {
               <Table.HeadCell className="whitespace-nowrap">
                 Outlet Code
               </Table.HeadCell>
+              <Table.HeadCell className="whitespace-nowrap">
+                View
+              </Table.HeadCell>
               <Table.HeadCell
                 className="whitespace-nowrap cursor-pointer select-none"
                 onClick={handleOutletNameSortToggle}
@@ -1503,6 +1506,16 @@ const OutletList = () => {
                             </button>
                           </div>
                         )}
+                      </Table.Cell>
+                      <Table.Cell className="whitespace-nowrap">
+                        <Button
+                          size="xs"
+                          color="blue"
+                          pill
+                          onClick={() => handleOutletDetails(outlet)}
+                        >
+                          <FiEye size={14} />
+                        </Button>
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200 cursor-pointer">
                         <div className="flex gap-2 justify-center items-center">
