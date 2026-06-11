@@ -1311,7 +1311,7 @@ export const Employee = () => {
                       required
                     />
                   </div>
-                  <div className="w-full">
+                  {/* <div className="w-full">
                     <div className="mb-2 block text-gray-700 dark:text-gray-100">
                       <Label value="Employee Label(SFA field: Emp_Id)*" />
                     </div>
@@ -1322,10 +1322,10 @@ export const Employee = () => {
                       onChange={handleChange}
                       required
                     />
-                  </div>
+                  </div> */}
                   <div className="w-full">
                     <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                      <Label value="Employee Id (SFA field: Label)" />
+                      <Label value="Employee Id" />
                     </div>
                     <TextInput
                       name="empId"
@@ -1337,12 +1337,12 @@ export const Employee = () => {
                   </div>
                   <div className="w-full">
                     <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                      <Label value="Email" />
+                      <Label value="Email *" />
                     </div>
                     <TextInput
                       name="email"
                       type="email"
-                      placeholder="Enter Email *"
+                      placeholder="Enter Email "
                       value={formData.email}
                       onChange={handleChange}
                       required
@@ -1452,7 +1452,7 @@ export const Employee = () => {
                         ))}
                     </Select>
                   </div>
-                   <div className="w-full space-y-4">
+                  <div className="w-full space-y-4">
                     {/* Selected States & Distributors Display - Collapsible */}
                     {formData.regionId.length > 0 && (
                       <div className="w-full">
