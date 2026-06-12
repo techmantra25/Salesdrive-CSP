@@ -289,7 +289,7 @@ const SalesBillReport = () => {
               .format("DD/MM/YYYY hh:mm a"),
             "Distributor Code": bill.distributorId?.dbCode,
             "Distributor Name": bill.distributorId?.name,
-            "Distributor's Zone": bill.distributorId?.stateId?.zoneId?.name,
+            // "Distributor's Zone": bill.distributorId?.stateId?.zoneId?.name,
             "Distributor's State": bill.distributorId?.stateId?.name,
             "Distributor's City": bill.distributorId?.city,
             // "Allocation No": bill?.loadSheetId?.allocationNo,
@@ -342,18 +342,18 @@ const SalesBillReport = () => {
             // "Bill Type": item?.itemBillType,
             "Goods Type": item?.goodsType,
             Remark: item?.remark,
-            "Base Point":
-              bill?.distributorId?.RBPSchemeMapped === "yes"
-                ? Number(
-                  Number(
-                    item?.useBasePoint ?? item?.product?.base_point ?? 0,
-                  ) * Number(item?.billQty ?? 0),
-                )
-                : 0,
-            "Total Bill Points":
-              bill?.distributorId?.RBPSchemeMapped === "yes"
-                ? Number(bill?.totalBasePoints ?? 0)
-                : 0,
+            // "Base Point":
+            //   bill?.distributorId?.RBPSchemeMapped === "yes"
+            //     ? Number(
+            //       Number(
+            //         item?.useBasePoint ?? item?.product?.base_point ?? 0,
+            //       ) * Number(item?.billQty ?? 0),
+            //     )
+            //     : 0,
+            // "Total Bill Points":
+            //   bill?.distributorId?.RBPSchemeMapped === "yes"
+            //     ? Number(bill?.totalBasePoints ?? 0)
+            //     : 0,
           }));
       });
       // --- End Transformation Step ---

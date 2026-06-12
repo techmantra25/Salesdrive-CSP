@@ -200,18 +200,18 @@ export const adminSidebarConfig = [
       // },
     ],
   },
-  {
-    type: "collapse",
-    label: "Plant Master",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      {
-        label: "Plant",
-        path: "/admin/plant",
-        icon: FaRegBuilding,
-      },
-    ],
-  },
+  // {
+  //   type: "collapse",
+  //   label: "Plant Master",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     {
+  //       label: "Plant",
+  //       path: "/admin/plant",
+  //       icon: FaRegBuilding,
+  //     },
+  //   ],
+  // },
   {
     type: "collapse",
     label: "Cancel Reason Master",
@@ -729,19 +729,19 @@ export const usersidebarconfig = [
       // },
     ],
   },
-  {
-    type: "collapse",
-    label: "Plant Master",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      {
-        label: "Plant",
-        path: "/user/plant",
-        icon: FaRegBuilding,
-        slug: "plant",
-      },
-    ],
-  },
+  // {
+  //   type: "collapse",
+  //   label: "Plant Master",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     {
+  //       label: "Plant",
+  //       path: "/user/plant",
+  //       icon: FaRegBuilding,
+  //       slug: "plant",
+  //     },
+  //   ],
+  // },
   {
     type: "collapse",
     label: "Cancel Reason Master",
@@ -1281,19 +1281,19 @@ export const subadminssidebarconfig = [
       // },
     ],
   },
-  {
-    type: "collapse",
-    label: "Plant Master",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      {
-        label: "Plant",
-        path: "/sub-admins/plant",
-        icon: FaRegBuilding,
-        slug: "plant",
-      },
-    ],
-  },
+  // {
+  //   type: "collapse",
+  //   label: "Plant Master",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     {
+  //       label: "Plant",
+  //       path: "/sub-admins/plant",
+  //       icon: FaRegBuilding,
+  //       slug: "plant",
+  //     },
+  //   ],
+  // },
   {
     type: "collapse",
     label: "Cancel Reason Master",
@@ -1833,19 +1833,19 @@ export const aaadminsesidebarconfig = [
       // },
     ],
   },
-  {
-    type: "collapse",
-    label: "Plant Master",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      {
-        label: "Plant",
-        path: "/admine/plant",
-        icon: FaRegBuilding,
-        slug: "plant",
-      },
-    ],
-  },
+  // {
+  //   type: "collapse",
+  //   label: "Plant Master",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     {
+  //       label: "Plant",
+  //       path: "/admine/plant",
+  //       icon: FaRegBuilding,
+  //       slug: "plant",
+  //     },
+  //   ],
+  // },
   {
     type: "collapse",
     label: "Cancel Reason Master",

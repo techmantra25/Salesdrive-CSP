@@ -2,7 +2,6 @@ import {
   Badge,
   Button,
   Card,
-
   Label,
   Modal,
   Select,
@@ -95,7 +94,7 @@ const Distributor = () => {
   const [selectedRegion, setSelectedRegion] = useState("default");
   const [selectedState, setSelectedState] = useState("default");
   const [role, setDisType] = useState("GT");
-  const [RBPSchemeMapped, setRBPSchemeMapped] = useState("");
+  const [RBPSchemeMapped, setRBPSchemeMapped] = useState("no");
   const [address1, setAddress1] = useState("");
   const [address2, setAddress2] = useState("");
   const [phone, setPhone] = useState("");
@@ -733,7 +732,7 @@ const Distributor = () => {
     setPincode("");
     setDayOff([]);
     setSelectedBrands([]);
-    setRBPSchemeMapped("");
+    setRBPSchemeMapped("no");
     setPrimaryInvoiceType("New");
     setAllowRLPEdit(false);
     setOldDate("");
@@ -1420,7 +1419,7 @@ const Distributor = () => {
                   </span>
                 </Button>
               )}
-              {pagePermission?.view && (
+              {/* {pagePermission?.view && (
                 <Button
                   size="sm"
                   color="light"
@@ -1433,9 +1432,9 @@ const Distributor = () => {
                     <span className="hidden sm:inline">Template</span>
                   </span>
                 </Button>
-              )}
+              )} */}
 
-              {formLoading ? (
+              {/* {formLoading ? (
                 <Button className="text-xs" size="sm" color="warning">
                   <span className="flex justify-center items-center gap-2">
                     <Spinner size="sm" />
@@ -1451,8 +1450,8 @@ const Distributor = () => {
                     onSetFileUrl={(url) => handleCSVImport(url)}
                   />
                 )
-              )}
-              {pagePermission?.view && (
+              )} */}
+              {/* {pagePermission?.view && (
                 <Button
                   className="text-xs"
                   color="blue"
@@ -1464,8 +1463,8 @@ const Distributor = () => {
                     CSV Download
                   </span>
                 </Button>
-              )}
-              {pagePermission?.update && (
+              )} */}
+              {/* {pagePermission?.update && (
                 <Button
                   className="text-xs"
                   size="sm"
@@ -1477,7 +1476,7 @@ const Distributor = () => {
                     Bill Delivery Configuration
                   </span>
                 </Button>
-              )}
+              )} */}
               {/* {pagePermission?.update && (
                 <Button
                   className="text-xs"
@@ -1591,9 +1590,6 @@ const Distributor = () => {
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
                     Updated Date Time
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    Delivery Configuration
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
                     Status
@@ -1731,121 +1727,6 @@ const Distributor = () => {
                           .format("DD-MM-YYYY hh:mm:ss A")}
                       </Table.Cell>
 
-                      <Table.Cell className="px-2 py-2 text-xs">
-                        {deliverySettingsLoading ? (
-                          <div className="flex justify-center items-center">
-                            <Spinner size="sm" />
-                          </div>
-                        ) : (
-                          <div className="flex flex-col gap-1">
-                            {/* Status Line */}
-                            <div className="flex items-center justify-center gap-2">
-                              {deliverySettingsMap?.[distributor?._id]
-                                ?.isActive === false ? (
-                                <Badge color="failure" className="w-fit">
-                                  DD: OFF
-                                </Badge>
-                              ) : deliverySettingsMap?.[distributor?._id]
-                                  ?.deliveryDurationDays ? (
-                                <Badge color="success" className="w-fit">
-                                  DD: ON (
-                                  {
-                                    deliverySettingsMap?.[distributor?._id]
-                                      ?.deliveryDurationDays
-                                  }
-                                  d)
-                                </Badge>
-                              ) : (
-                                <Badge color="warning" className="w-fit">
-                                  ⚙️ Not Set
-                                </Badge>
-                              )}
-
-                              {/* Backdate Billing Status */}
-                              {deliverySettingsMap?.[distributor?._id]
-                                ?.enableBackdateBilling === true ? (
-                                <Badge color="success" className="w-fit">
-                                  BDB: ON
-                                </Badge>
-                              ) : (
-                                <Badge color="failure" className="w-fit">
-                                  BDB: OFF
-                                </Badge>
-                              )}
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="flex justify-center gap-1">
-                              {/* Lock Status */}
-                              {(deliverySettingsMap?.[distributor?._id]
-                                ?.distributorId?.isPortalLocked ||
-                                distributor?.isPortalLocked) && (
-                                <Badge color="failure" className="mt-1.5 w-fit">
-                                  🔒
-                                </Badge>
-                              )}
-
-                              {/* Unlock Button*/}
-                              {(deliverySettingsMap?.[distributor?._id]
-                                ?.distributorId?.isPortalLocked ||
-                                distributor?.isPortalLocked) &&
-                                pagePermission?.update && (
-                                  <Button
-                                    size="xs"
-                                    color="green"
-                                    pill
-                                    onClick={() =>
-                                      handleUnlockDistributor(distributor)
-                                    }
-                                    disabled={
-                                      unlockingDistributorId ===
-                                      distributor?._id
-                                    }
-                                    title="Unlock portal"
-                                  >
-                                    {unlockingDistributorId === distributor?._id
-                                      ? "⏳"
-                                      : "🔓"}
-                                  </Button>
-                                )}
-                              {pagePermission?.update &&
-                                (() => {
-                                  const settings =
-                                    deliverySettingsMap?.[distributor?._id];
-                                  const isBillDeliveryActive =
-                                    settings?.isActive === true &&
-                                    settings?.deliveryDurationDays;
-                                  const isBackdateBillingActive =
-                                    settings?.enableBackdateBilling === true;
-                                  const activeCount =
-                                    (isBillDeliveryActive ? 1 : 0) +
-                                    (isBackdateBillingActive ? 1 : 0);
-
-                                  // Determine button color based on active count
-                                  let buttonColor = "blue"; // blue for none
-                                  if (activeCount === 2)
-                                    buttonColor = "success"; // green for both
-                                  else if (activeCount === 1)
-                                    buttonColor = "warning"; // yellow for one
-
-                                  return (
-                                    <Button
-                                      size="xs"
-                                      color={buttonColor}
-                                      onClick={() =>
-                                        handleOpenDeliveryConfig(distributor)
-                                      }
-                                      title="Configure delivery settings"
-                                    >
-                                      ⚙️
-                                    </Button>
-                                  );
-                                })()}
-                            </div>
-                          </div>
-                        )}
-                      </Table.Cell>
-
                       <Table.Cell className="px-2 py-2">
                         {pagePermission?.update ? (
                           <StatusIndicator
@@ -1886,7 +1767,7 @@ const Distributor = () => {
                   {filteredDistributors?.length === 0 && (
                     <Table.Row className="text-center bg-white dark:border-gray-700 dark:bg-gray-800">
                       <Table.Cell
-                        colSpan={23}
+                        colSpan={22}
                         className="px-2 py-8 text-sm font-medium text-gray-500 dark:text-gray-400"
                       >
                         No distributors found
@@ -2318,6 +2199,36 @@ const Distributor = () => {
             </div>
             <div>
               <div className="mb-2 block">
+                <Label htmlFor="regionId" value="State" />
+                <span className="text-red-500">*</span>
+              </div>
+              <SearchableSelect
+                id="regionId"
+                options={activeRegions}
+                value={regionId}
+                onChange={(e) => {
+                  const selectedRegionId = e.target.value;
+                  setRegionId(selectedRegionId);
+                  // Auto-fill state from selected region's stateId
+                  if (selectedRegionId) {
+                    const foundRegion = activeRegions.find(
+                      (r) => r._id === selectedRegionId,
+                    );
+                    if (foundRegion?.stateId?._id) {
+                      setStateId(foundRegion.stateId._id);
+                    }
+                  } else {
+                    setStateId("");
+                  }
+                }}
+                placeholder="Select State"
+                displayKey="name"
+                valueKey="_id"
+                disabled={false}
+              />
+            </div>
+            {/* <div>
+              <div className="mb-2 block">
                 <Label htmlFor="stateId" value="State" />
                 <span className="text-red-500">*</span>
               </div>
@@ -2326,12 +2237,12 @@ const Distributor = () => {
                 options={activeStates}
                 value={stateId}
                 onChange={(e) => setStateId(e.target.value)}
-                placeholder="Select State"
+                placeholder="Auto-filled from Region"
                 displayKey="name"
                 valueKey="_id"
-                disabled={false}
+                disabled={true}
               />
-            </div>
+            </div> */}
             {/* <div>
               <div className="mb-2 block">
                 <Label htmlFor="role" value="Distributor Type" />
@@ -2348,7 +2259,7 @@ const Distributor = () => {
             </div> */}
             {/* <div>
               <div className="mb-2 block">
-                <Label htmlFor="role" value="RBP Scheme Mapped" />
+                <Label htmlFor="RBPSchemeMapped" value="RBP Scheme Mapped" />
                 <span className="text-red-500">*</span>
               </div>
               <Select
@@ -2420,26 +2331,7 @@ const Distributor = () => {
                 onChange={(e) => setAddress1(e.target.value)}
               />
             </div>
-            {stateId && (
-              <div>
-                <div className="mb-2 block">
-                  <Label htmlFor="regionId" value="Region" />
-                  <span className="text-red-500">*</span>
-                </div>
-                <SearchableSelect
-                  id="regionId"
-                  options={activeRegions.filter(
-                    (region) => region?.stateId?._id === stateId,
-                  )}
-                  value={regionId}
-                  onChange={(e) => setRegionId(e.target.value)}
-                  placeholder="Select Region"
-                  displayKey="name"
-                  valueKey="_id"
-                  disabled={false}
-                />
-              </div>
-            )}
+
             {/* Add brand selection */}
             <div>
               <div className="mb-2 block">
