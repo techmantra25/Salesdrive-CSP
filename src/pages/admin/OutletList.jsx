@@ -694,7 +694,7 @@ const OutletList = () => {
 
   const downloadBulkTemplate = () => {
     const headers = [
-      "Outlet UID",
+      
       "Outlet Code",
       "Source ID",
       "Outlet Name",
@@ -720,8 +720,8 @@ const OutletList = () => {
     ];
 
     const requirements = [
-      "REQUIRED",
-      "(OPTIONAL)",
+     
+       "REQUIRED",
       '"(OPTIONAL) :[Example: 5985455, 588744]"',
       "(OPTIONAL)",
       "(OPTIONAL)",
