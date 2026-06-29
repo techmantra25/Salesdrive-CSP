@@ -2266,57 +2266,8 @@ const OutletList = () => {
             />
           </div>
 
-          {/* Source IDs */}
-          <div className="border-b pb-4">
-            <h3 className="text-lg font-semibold mb-2 dark:text-white">
-              Source IDs
-            </h3>
-
-            {/* Existing IDs */}
-            <div className="flex flex-wrap gap-2 mb-3">
-              {Array.isArray(editOutletData?.massistRefIds) &&
-                [...new Set(editOutletData.massistRefIds)].map((id, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-md"
-                  >
-                    <span>{id}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveSourceId(id)}
-                      className="hover:text-red-600"
-                    >
-                      <IoClose size={16} />
-                    </button>
-                  </div>
-                ))}
-            </div>
-
-            {/* Add new Source ID */}
-            <div className="flex gap-2 items-center">
-              <TextInput
-                placeholder="Enter new Source ID"
-                value={newSourceId}
-                onChange={(e) => setNewSourceId(e.target.value)}
-              />
-              <Button
-                size="sm"
-                color="blue"
-                disabled={!newSourceId.trim()}
-                onClick={() => {
-                  setEditOutletData((prev) => ({
-                    ...prev,
-                    massistRefIds: prev.massistRefIds
-                      ? [...new Set([...prev.massistRefIds, newSourceId.trim()])]
-                      : [newSourceId.trim()],
-                  }));
-                  setNewSourceId("");
-                }}
-              >
-                Add
-              </Button>
-            </div>
-          </div>
+        
+      
 
           <div>
             <Label htmlFor="ownerName" value="Owner Name *" />
