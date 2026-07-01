@@ -694,7 +694,7 @@ const OutletList = () => {
 
   const downloadBulkTemplate = () => {
     const headers = [
-      "Outlet UID",
+      
       "Outlet Code",
       "Source ID",
       "Outlet Name",
@@ -720,8 +720,8 @@ const OutletList = () => {
     ];
 
     const requirements = [
-      "REQUIRED",
-      "(OPTIONAL)",
+     
+       "REQUIRED",
       '"(OPTIONAL) :[Example: 5985455, 588744]"',
       "(OPTIONAL)",
       "(OPTIONAL)",
@@ -2239,6 +2239,318 @@ const OutletList = () => {
           )}
         </Modal.Body>
       </Modal>
+      {/* Edit Outlet Modal */}
+<Modal show={openEditModal} onClose={onCloseEditModal} size="6xl">
+  <Modal.Header>Edit Outlet</Modal.Header>
+  <Modal.Body>
+    <form onSubmit={handleEditSubmit} className="space-y-6">
+      {/* Basic Information */}
+      <div className="border-b pb-4">
+        <h3 className="text-lg font-semibold mb-4 dark:text-white">
+          Basic Information
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <Label htmlFor="outletName" value="Outlet Name *" />
+            <TextInput
+              id="outletName"
+              type="text"
+              value={editOutletData?.outletName || ""}
+              onChange={(e) =>
+                setEditOutletData({
+                  ...editOutletData,
+                  outletName: e.target.value,
+                })
+              }
+              required
+            />
+          </div>
+
+        
+      
+
+          <div>
+            <Label htmlFor="ownerName" value="Owner Name *" />
+            <TextInput
+              id="ownerName"
+              type="text"
+              value={editOutletData?.ownerName || ""}
+              onChange={(e) =>
+                setEditOutletData({
+                  ...editOutletData,
+                  ownerName: e.target.value,
+                })
+              }
+              required
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Contact Information */}
+      <div className="border-b pb-4 dark:text-white">
+        <h3 className="text-lg font-semibold mb-4 dark:text-white">
+          Contact Information
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <Label htmlFor="mobile1" value="Mobile Number" />
+            <TextInput
+              id="mobile1"
+              type="tel"
+              value={editOutletData?.mobile1 || ""}
+              onChange={(e) =>
+                setEditOutletData({ ...editOutletData, mobile1: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <Label htmlFor="mobile2" value="Alternate Number" />
+            <TextInput
+              id="mobile2"
+              type="tel"
+              value={editOutletData?.mobile2 || ""}
+              onChange={(e) =>
+                setEditOutletData({ ...editOutletData, mobile2: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <Label htmlFor="whatsappNumber" value="WhatsApp Number" />
+            <TextInput
+              id="whatsappNumber"
+              type="tel"
+              value={editOutletData?.whatsappNumber || ""}
+              onChange={(e) =>
+                setEditOutletData({
+                  ...editOutletData,
+                  whatsappNumber: e.target.value,
+                })
+              }
+            />
+          </div>
+          <div>
+            <Label htmlFor="email" value="Email" />
+            <TextInput
+              id="email"
+              type="email"
+              value={editOutletData?.email || ""}
+              onChange={(e) =>
+                setEditOutletData({ ...editOutletData, email: e.target.value })
+              }
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Address Information */}
+      <div className="border-b pb-4 dark:text-white">
+        <h3 className="text-lg font-semibold mb-4 dark:text-white">
+          Address Information
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <Label value="Select Beat" />
+            <SearchableSelect
+              id="beatId"
+              label="Select Beat"
+              placeholder="Beat"
+              multiple={true}
+              options={beats}
+              value={editOutletData?.beatId}
+              onChange={(e) =>
+                setEditOutletData({ ...editOutletData, beatId: e.target.value })
+              }
+              displayKey="name"
+              descKey="code"
+              valueKey="_id"
+            />
+          </div>
+          <div>
+            <Label htmlFor="address1" value="Address" />
+            <TextInput
+              id="address1"
+              type="text"
+              value={editOutletData?.address1 || ""}
+              onChange={(e) =>
+                setEditOutletData({
+                  ...editOutletData,
+                  address1: e.target.value,
+                })
+              }
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <Label htmlFor="city" value="City" />
+            <TextInput
+              id="city"
+              type="text"
+              value={editOutletData?.city || ""}
+              onChange={(e) =>
+                setEditOutletData({ ...editOutletData, city: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <Label htmlFor="pin" value="PIN Code" />
+            <TextInput
+              id="pin"
+              type="text"
+              value={editOutletData?.pin || ""}
+              onChange={(e) =>
+                setEditOutletData({ ...editOutletData, pin: e.target.value })
+              }
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div>
+            <Label htmlFor="shipToAddress" value="Ship To Address" />
+            <TextInput
+              id="shipToAddress"
+              type="text"
+              value={editOutletData?.shipToAddress || ""}
+              onChange={(e) =>
+                setEditOutletData({
+                  ...editOutletData,
+                  shipToAddress: e.target.value,
+                })
+              }
+            />
+          </div>
+        </div>
+        <div className="mt-4">
+          <Label htmlFor="shipToPincode" value="Ship To PIN Code" />
+          <TextInput
+            id="shipToPincode"
+            type="text"
+            value={editOutletData?.shipToPincode || ""}
+            onChange={(e) =>
+              setEditOutletData({
+                ...editOutletData,
+                shipToPincode: e.target.value,
+              })
+            }
+          />
+        </div>
+      </div>
+
+      {/* Business Information */}
+      <div className="border-b pb-4 dark:text-white">
+        <h3 className="text-lg font-semibold mb-4">Business Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <Label htmlFor="categoryOfOutlet" value="Category of Outlet (required)" />
+            <Select
+              id="categoryOfOutlet"
+              value={editOutletData?.categoryOfOutlet || ""}
+              onChange={(e) =>
+                setEditOutletData({
+                  ...editOutletData,
+                  categoryOfOutlet: e.target.value,
+                })
+              }
+            >
+              <option value="">Select Category</option>
+              <option value="Economy">Economy</option>
+              <option value="Premium">Premium</option>
+              <option value="RETAILER">Retailer</option>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="retailerClass" value="Retailer Class (Required)" />
+            <Select
+              id="retailerClass"
+              value={editOutletData?.retailerClass || ""}
+              onChange={(e) =>
+                setEditOutletData({
+                  ...editOutletData,
+                  retailerClass: e.target.value,
+                })
+              }
+            >
+              <option value="">Select Class</option>
+              <option value="A">Class A</option>
+              <option value="B">Class B</option>
+              <option value="C">Class C</option>
+              <option value="D">Class D</option>
+            </Select>
+          </div>
+        </div>
+      </div>
+
+      {/* Legal Information */}
+      <div className="border-b pb-4 dark:text-white">
+        <h3 className="text-lg font-semibold mb-4">Legal Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <Label htmlFor="gstin" value="GST IN" />
+            <TextInput
+              id="gstin"
+              type="text"
+              value={editOutletData?.gstin || ""}
+              onChange={(e) =>
+                setEditOutletData({ ...editOutletData, gstin: e.target.value })
+              }
+            />
+          </div>
+          <div>
+            <Label htmlFor="aadharNumber" value="Aadhar Number" />
+            <TextInput
+              id="aadharNumber"
+              type="text"
+              value={editOutletData?.aadharNumber || ""}
+              onChange={(e) =>
+                setEditOutletData({
+                  ...editOutletData,
+                  aadharNumber: e.target.value,
+                })
+              }
+            />
+          </div>
+          <div>
+            <Label htmlFor="panNumber" value="PAN Number" />
+            <TextInput
+              id="panNumber"
+              type="text"
+              value={editOutletData?.panNumber || ""}
+              onChange={(e) =>
+                setEditOutletData({
+                  ...editOutletData,
+                  panNumber: e.target.value,
+                })
+              }
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Form Actions */}
+      <div className="flex justify-end gap-2 pt-4 dark:text-white">
+        <Button
+          type="button"
+          color="gray"
+          onClick={onCloseEditModal}
+          disabled={editLoading}
+        >
+          Cancel
+        </Button>
+        <Button type="submit" color="blue" disabled={editLoading}>
+          {editLoading ? (
+            <>
+              <Spinner size="sm" className="mr-2" />
+              Updating...
+            </>
+          ) : (
+            "Update Outlet"
+          )}
+        </Button>
+      </div>
+    </form>
+  </Modal.Body>
+</Modal>
     </div>
   );
 };
