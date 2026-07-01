@@ -376,7 +376,7 @@ const Collection = () => {
           {/* page header */}
           <div className="flex justify-between w-full items-center border-b-2 py-4">
             <div className="flex justify-center items-center">
-              <h1 className="text-2xl font-bold">Collection Master</h1>
+              <h1 className="text-2xl font-bold">Collection / Product Type Master</h1>
             </div>
           </div>
 

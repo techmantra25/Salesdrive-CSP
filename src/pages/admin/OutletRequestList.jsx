@@ -36,6 +36,7 @@ import { getPagePermission } from "../../utils/permissionHelper";
 import { createSingleOutlet } from "../../api/api";
 import { TextInput } from "flowbite-react";
 import SearchableSelect from "../../components/SearchableSelect";
+import validatePhone from "../../utils/validatePhone";
 
 
 const OutletRequestList = () => {
@@ -402,9 +403,9 @@ const OutletRequestList = () => {
       "(Optional)",
       "(Required) [Example: BEAT-492,BEAT-183]",
       "(Required)[Example: WB]",
-      "(Required)",
       "(Optional)",
-      "(Required)",
+      "(Optional)",
+      "(Optional)",
       "(Optional)",
       "(Optional)",
       "(Optional)",
@@ -437,9 +438,16 @@ const OutletRequestList = () => {
 
 
   const handleSingleOutletChange = (e) => {
+    const { name, value } = e.target;
+    if (["mobile1", "mobile2", "whatsappNumber"].includes(name)) {
+      const cleaned = value.replace(/\D/g, "");
+      if (cleaned.length > 10) return;
+      setSingleOutletForm((prev) => ({ ...prev, [name]: cleaned }));
+      return;
+    }
     setSingleOutletForm({
       ...singleOutletForm,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
 
@@ -454,22 +462,38 @@ const OutletRequestList = () => {
         !singleOutletForm.outletCode?.trim() ||
         !singleOutletForm.outletName?.trim() ||
         !singleOutletForm.ownerName?.trim() ||
-        !singleOutletForm.beatCode?.trim() ||
-        !singleOutletForm.mobile1?.trim()
+        !singleOutletForm.beatCode?.trim()
       ) {
         toast.error("Please fill all required fields");
         return;
       }
 
       // =========================
-      // MOBILE VALIDATION
+      // MOBILE VALIDATION (Optional - only validate if provided)
       // =========================
 
-      const mobileRegex = /^[6-9]\d{9}$/;
+      if (singleOutletForm.mobile1?.trim()) {
+        const mobile1Result = validatePhone(singleOutletForm.mobile1);
+        if (!mobile1Result.valid) {
+          toast.error(mobile1Result.message);
+          return;
+        }
+      }
 
-      if (!mobileRegex.test(singleOutletForm.mobile1?.trim())) {
-        toast.error("Enter valid 10 digit mobile number");
-        return;
+      if (singleOutletForm.mobile2?.trim()) {
+        const mobile2Result = validatePhone(singleOutletForm.mobile2);
+        if (!mobile2Result.valid) {
+          toast.error(mobile2Result.message);
+          return;
+        }
+      }
+
+      if (singleOutletForm.whatsappNumber?.trim()) {
+        const whatsappResult = validatePhone(singleOutletForm.whatsappNumber);
+        if (!whatsappResult.valid) {
+          toast.error(whatsappResult.message);
+          return;
+        }
       }
 
       setSingleOutletLoading(true);
@@ -1434,18 +1458,13 @@ const OutletRequestList = () => {
                     {/* Mobile Number */}
                     <div>
                       <Label
-                        value={
-                          <>
-                            Mobile Number <span className="text-red-500">*</span>
-                          </>
-                        }
+                        value="Mobile Number"
                         className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
                         sizing="md"
                         shadow
-                        required
                         name="mobile1"
                         placeholder="Mobile number"
                         value={singleOutletForm.mobile1}
@@ -1475,11 +1494,7 @@ const OutletRequestList = () => {
                     {/* WhatsApp Number */}
                     <div>
                       <Label
-                        value={
-                          <>
-                            WhatsApp Number <span className="text-red-500">*</span>
-                          </>
-                        }
+                        value="WhatsApp Number"
                         className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
