@@ -18,6 +18,7 @@ import { IoMdAddCircle } from "react-icons/io";
 import { IoSyncCircleSharp } from "react-icons/io5";
 import { MdDownloadForOffline, MdSimCardDownload } from "react-icons/md";
 import { RiRefreshFill } from "react-icons/ri";
+import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -75,6 +76,10 @@ const Product = () => {
   const permissionState = useSelector((state) => state.permission);
   const [pagePermission, setPagePermission] = useState(null);
 
+  // Sorting state
+  const [sortBy, setSortBy] = useState("updatedAt");
+  const [sortOrder, setSortOrder] = useState("desc");
+
   useEffect(() => {
     if (permissionState) {
       const permission = getPagePermission(permissionState, "product");
@@ -96,6 +101,19 @@ const Product = () => {
   // Function to handle page change
   const onPageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  // Function to handle sorting when a column header is clicked
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      // Same column clicked again -> toggle direction
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      // New column -> default to ascending
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+    setCurrentPage(1);
   };
 
   let fetchSuppliersPaginatedWithOutDebounce = async () => {
@@ -129,6 +147,8 @@ const Product = () => {
       const queryParams = {
         page: currentPage,
         limit: itemsPerPage,
+        sortBy,
+        sortOrder,
       };
 
       // Add filters if selected
@@ -790,6 +810,8 @@ const Product = () => {
       startDate: null,
       endDate: null,
     });
+    setSortBy("updatedAt");
+    setSortOrder("desc");
     setCurrentPage(1);
     dispatch(fetchBrands());
     dispatch(fetchCategories());
@@ -867,7 +889,7 @@ const Product = () => {
     }
   }, [openModal, modalMode, supplierList]);
 
-  // Effect for fetching paginated products when filters or pagination change
+  // Effect for fetching paginated products when filters, sort, or pagination change
   useEffect(() => {
     fetchProductsPaginated();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -881,9 +903,11 @@ const Product = () => {
     searchQuery,
     dateRange.startDate,
     dateRange.endDate,
+    sortBy,
+    sortOrder,
   ]);
 
-  // Reset to first page when filters change
+  // Reset to first page when filters or sorting change
   useEffect(() => {
     // Only reset if not already on page 1
     if (currentPage !== 1) {
@@ -899,47 +923,11 @@ const Product = () => {
     searchQuery,
     dateRange.startDate,
     dateRange.endDate,
+    sortBy,
+    sortOrder,
   ]);
 
   let filteredProducts = [...paginatedProducts];
-
-  // sort by product code
-  // filteredProducts?.sort((a, b) => {
-  //   const codeA = a?.product_code?.toLowerCase() || "";
-  //   const codeB = b?.product_code?.toLowerCase() || "";
-  //   return codeA.localeCompare(codeB);
-  // });
-
-  // sort according to size
-  // const sizeOrder = getSize();
-  // filteredProducts?.sort((a, b) => {
-  //   const sizeA = a?.size ? sizeOrder.indexOf(a.size) : -1;
-  //   const sizeB = b?.size ? sizeOrder.indexOf(b.size) : -1;
-  //   return sizeA - sizeB;
-  // });
-
-  // first take the product according to the sku group code inside multiple arrays sort them then return them thn the filteredProducts
-  // const multiProductArray = filteredProducts.reduce((acc, product) => {
-  //   const skuGroupCode = product?.sku_group_id || "";
-  //   if (!acc[skuGroupCode]) {
-  //     acc[skuGroupCode] = [];
-  //   }
-  //   acc[skuGroupCode].push(product);
-  //   return acc;
-  // }, {});
-
-  // // Sort each group by size
-  // Object.keys(multiProductArray).forEach((skuGroupCode) => {
-  //   multiProductArray[skuGroupCode].sort((a, b) => {
-  //     const sizeOrder = getSize();
-  //     const sizeA = a?.size ? sizeOrder.indexOf(a.size) : -1;
-  //     const sizeB = b?.size ? sizeOrder.indexOf(b.size) : -1;
-  //     return sizeA - sizeB;
-  //   });
-  // });
-
-  // // Flatten the sorted groups back into a single array
-  // filteredProducts = Object.values(multiProductArray).flat();
 
   const handleUploadSubmit = async () => {
     try {
@@ -1007,6 +995,37 @@ const Product = () => {
       setUploadLoading(false);
     }
   };
+
+  // Renders a clickable, sortable table header cell.
+  // Clicking toggles asc/desc if it's already the active sort column,
+  // otherwise switches to sorting by this field ascending.
+  const SortableHeadCell = ({ field, children }) => {
+    const isActive = sortBy === field;
+    return (
+      <Table.HeadCell
+        onClick={() => handleSort(field)}
+        className="cursor-pointer select-none hover:text-blue-500"
+      >
+        <span className="flex items-center justify-center gap-1">
+          {children}
+          {isActive ? (
+            sortOrder === "asc" ? (
+              <FaSortUp className="shrink-0" size={12} aria-hidden="true" />
+            ) : (
+              <FaSortDown className="shrink-0" size={12} aria-hidden="true" />
+            )
+          ) : (
+            <FaSort
+              className="shrink-0 opacity-40"
+              size={12}
+              aria-hidden="true"
+            />
+          )}
+        </span>
+      </Table.HeadCell>
+    );
+  };
+
   return (
     <>
       {pagePermission?.view && (
@@ -1360,31 +1379,31 @@ const Product = () => {
 
                     {/* ================= HEAD ================= */}
                     <Table.Head className="text-center text-sm">
-                      <Table.HeadCell>SKU Group</Table.HeadCell>
-                      <Table.HeadCell>product_code</Table.HeadCell>
+                      <SortableHeadCell field="sku_group_id">SKU Group</SortableHeadCell>
+                      <SortableHeadCell field="product_code">product_code</SortableHeadCell>
                       <Table.HeadCell>EAN</Table.HeadCell>
-                      <Table.HeadCell>Description</Table.HeadCell>
+                      <SortableHeadCell field="name">Description</SortableHeadCell>
                       {/* <Table.HeadCell>Size</Table.HeadCell> */}
                       {/* <Table.HeadCell>Color</Table.HeadCell> */}
-                      <Table.HeadCell>Pack</Table.HeadCell>
+                      <SortableHeadCell field="pack">Pack</SortableHeadCell>
                       {/* <Table.HeadCell>Supplier</Table.HeadCell> */}
                       <Table.HeadCell>Brand</Table.HeadCell>
                       <Table.HeadCell>subBrand</Table.HeadCell>
                       <Table.HeadCell>Category</Table.HeadCell>
                       <Table.HeadCell>Collection</Table.HeadCell>
-                      <Table.HeadCell>SKU GROUPE NAME</Table.HeadCell>
-                      <Table.HeadCell>Product Type</Table.HeadCell>
-                      <Table.HeadCell>Valuation</Table.HeadCell>
-                      <Table.HeadCell>UOM</Table.HeadCell>
-                      <Table.HeadCell>Std Pkg</Table.HeadCell>
-                      <Table.HeadCell>HSN CODE</Table.HeadCell>
-                      <Table.HeadCell>CGST</Table.HeadCell>
-                      <Table.HeadCell>SGST</Table.HeadCell>
-                      <Table.HeadCell>IGST</Table.HeadCell>
+                      <SortableHeadCell field="sku_group__name">SKU GROUPE NAME</SortableHeadCell>
+                      <SortableHeadCell field="product_type">Product Type</SortableHeadCell>
+                      <SortableHeadCell field="product_valuation_type">Valuation</SortableHeadCell>
+                      <SortableHeadCell field="uom">UOM</SortableHeadCell>
+                      <SortableHeadCell field="no_of_pieces_in_a_box">Std Pkg</SortableHeadCell>
+                      <SortableHeadCell field="product_hsn_code">HSN CODE</SortableHeadCell>
+                      <SortableHeadCell field="cgst">CGST</SortableHeadCell>
+                      <SortableHeadCell field="sgst">SGST</SortableHeadCell>
+                      <SortableHeadCell field="igst">IGST</SortableHeadCell>
                       {/* <Table.HeadCell>Base Point</Table.HeadCell> */}
-                      <Table.HeadCell>Created</Table.HeadCell>
-                      <Table.HeadCell>Updated</Table.HeadCell>
-                      <Table.HeadCell>Status</Table.HeadCell>
+                      <SortableHeadCell field="createdAt">Created</SortableHeadCell>
+                      <SortableHeadCell field="updatedAt">Updated</SortableHeadCell>
+                      <SortableHeadCell field="status">Status</SortableHeadCell>
                       <Table.HeadCell>Action</Table.HeadCell>
                     </Table.Head>
 

@@ -15,7 +15,7 @@ import { BACKEND_URL } from "../../constants";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { BiSolidFileExport } from "react-icons/bi";
-import { FaRegEye } from "react-icons/fa";
+import { FaRegEye, FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { ImSpinner } from "react-icons/im";
 import { IoIosList, IoMdAddCircle } from "react-icons/io";
 import {
@@ -201,6 +201,44 @@ const Distributor = () => {
   // New: oldDate state to store custom date when Primary Invoice Type = "Old"
   const [oldDate, setOldDate] = useState("");
 
+  // ---- Table sorting state ----
+  // Sorting is now performed by the backend (GET /distributor/list?sortBy=&sortOrder=).
+  // These two just drive the header UI (which column / which direction is active);
+  // the actual ordering of `distributors` in the store comes from the API response.
+  const [sortField, setSortField] = useState(null);
+  const [sortDirection, setSortDirection] = useState("asc"); // "asc" | "desc"
+
+  const handleSort = (field) => {
+    const nextDirection =
+      sortField === field && sortDirection === "asc" ? "desc" : "asc";
+    setSortField(field);
+    setSortDirection(nextDirection);
+    dispatch(fetchDistributors({ sortBy: field, sortOrder: nextDirection }));
+  };
+
+  const SortIcon = ({ field }) => {
+    if (sortField !== field) {
+      return <FaSort className="inline ml-1 text-gray-400" size={10} />;
+    }
+    return sortDirection === "asc" ? (
+      <FaSortUp className="inline ml-1 text-gray-700 dark:text-gray-200" size={10} />
+    ) : (
+      <FaSortDown className="inline ml-1 text-gray-700 dark:text-gray-200" size={10} />
+    );
+  };
+
+  const SortableHeadCell = ({ field, children }) => (
+    <Table.HeadCell
+      className="whitespace-nowrap px-2 py-2 text-xs font-semibold cursor-pointer select-none hover:bg-gray-100 dark:hover:bg-gray-600"
+      onClick={() => handleSort(field)}
+    >
+      <span className="inline-flex items-center">
+        {children}
+        <SortIcon field={field} />
+      </span>
+    </Table.HeadCell>
+  );
+
   useEffect(() => {
     if (!permissionState?.data?.data) return;
     const permission = getPagePermission(permissionState, "distributor");
@@ -263,6 +301,11 @@ const Distributor = () => {
     });
   }
 
+  // NOTE: `distributors` arrives from Redux already sorted by the backend
+  // (see fetchDistributors / disList). The filters above only narrow the
+  // array down — they never reorder it — so sort order is preserved
+  // through search/status/region/state/date-range/lock-status filtering.
+
   const handleResetFilter = () => {
     setSelectedStatus("active");
     setDeliveryConfigFilter("all");
@@ -271,31 +314,24 @@ const Distributor = () => {
     setSelectedState("default");
     setDateRange({ startDate: null, endDate: null });
     setSearchTerm("");
-    dispatch(fetchDistributors());
+    setSortField(null);
+    setSortDirection("asc");
+    dispatch(fetchDistributors()); // no sortBy/sortOrder -> backend default ({ _id: -1 })
   };
 
   const fetchBillDeliverySettings = async () => {
     try {
       setDeliverySettingsLoading(true);
       const response = await getAllBillDeliverySettings();
-      console.log("🔍 Raw API Response:", response);
       const settings = response?.data?.data || [];
-      console.log("📦 Settings array:", settings);
       const nextMap = {};
       settings.forEach((setting) => {
         const distributorId =
           setting?.distributorId?._id || setting?.distributorId;
         if (distributorId) {
-          console.log(
-            "✅ Mapping distributor:",
-            distributorId,
-            "setting:",
-            setting,
-          );
           nextMap[distributorId] = setting;
         }
       });
-      console.log("🗺️ Final deliverySettingsMap:", nextMap);
       setDeliverySettingsMap(nextMap);
     } catch (error) {
       console.error("Failed to fetch delivery settings:", error);
@@ -308,9 +344,6 @@ const Distributor = () => {
   const handleOpenDeliveryConfig = (distributor) => {
     const draft = deliveryConfigDraftMap?.[distributor?._id];
     const setting = deliverySettingsMap?.[distributor?._id];
-    console.log("🚀 Opening modal for:", distributor?._id);
-    console.log("📝 Draft found:", draft);
-    console.log("💾 Saved setting found:", setting);
     setSelectedDeliveryDistributor(distributor);
     const formData = {
       isActive: draft?.isActive ?? setting?.isActive ?? true,
@@ -320,8 +353,6 @@ const Distributor = () => {
     };
     const backdateBilling =
       draft?.enableBackdateBilling ?? setting?.enableBackdateBilling ?? false;
-    console.log("🎯 Setting form to:", formData);
-    console.log("🎯 Setting backdate to:", backdateBilling);
     setDeliveryConfigForm(formData);
     setEnableBackdateBilling(backdateBilling);
     setBackdateBillingSelection(null);
@@ -424,19 +455,15 @@ const Distributor = () => {
           ? { enableBackdateBilling: enableBackdateBilling }
           : {}),
       };
-      console.log("💾 Saving payload:", payload);
-      const saveResponse = await createBillDeliverySetting(payload);
-      console.log("✅ Save response:", saveResponse);
+      await createBillDeliverySetting(payload);
       toast.success("Delivery configuration saved");
       // Clear draft cache so next open reads fresh saved values
       setDeliveryConfigDraftMap((prev) => {
         const next = { ...prev };
         delete next[selectedDeliveryDistributor._id];
-        console.log("🧹 Cleared draft for:", selectedDeliveryDistributor._id);
         return next;
       });
       handleCloseDeliveryConfig();
-      console.log("🔄 Refetching settings after save...");
       await fetchBillDeliverySettings();
     } catch (error) {
       console.error("Failed to save delivery configuration:", error);
@@ -458,10 +485,6 @@ const Distributor = () => {
     setBulkDeliveryConfigStatusSelection(null);
   };
 
-  // const handleOpenBulkRLPEdit = () => {
-  //   setBulkRLPEditModal(true);
-  // };
-
   const handleCloseBulkRLPEdit = () => {
     setBulkRLPEditModal(false);
   };
@@ -469,14 +492,6 @@ const Distributor = () => {
   useEffect(() => {
     const distributorId = selectedDeliveryDistributor?._id;
     if (!distributorId) return;
-
-    console.log("💾 Draft auto-save triggered for:", distributorId);
-    console.log(
-      "📝 Current form state:",
-      deliveryConfigForm,
-      "backdate:",
-      enableBackdateBilling,
-    );
 
     setDeliveryConfigDraftMap((prev) => ({
       ...prev,
@@ -693,8 +708,6 @@ const Distributor = () => {
         payload.oldDate = oldDate;
       }
 
-      // console.log(payload, "payload add");
-
       await addDistributor(payload);
       dispatch(fetchDistributors());
       onCloseModal();
@@ -747,8 +760,6 @@ const Distributor = () => {
     setOpenModal(false);
     resetDistributorForm();
   };
-
-  console.log(selectedDistributor, "selectedDistributor");
 
   const handleEditDistributor = async () => {
     openConfirmationModel({
@@ -872,7 +883,6 @@ const Distributor = () => {
           "Failed to fetch sales order data, try again",
       });
     } catch (error) {
-      // No need for toast.error here, toast.promise handles it
       console.error(error);
     } finally {
       setFetchSalesOrderLoading(false);
@@ -1251,11 +1261,6 @@ const Distributor = () => {
     setOpenBrandsModal(true);
   };
 
-  // const handleShowRBPHistory = (distributor) => {
-  //   setSelectedDistributorForRBPHistory(distributor);
-  //   setShowRBPHistoryModal(true);
-  // };
-
   const onCloseRBPHistoryModal = () => {
     setShowRBPHistoryModal(false);
     setSelectedDistributorForRBPHistory(null);
@@ -1419,77 +1424,6 @@ const Distributor = () => {
                   </span>
                 </Button>
               )}
-              {/* {pagePermission?.view && (
-                <Button
-                  size="sm"
-                  color="light"
-                  onClick={() => handleCSVTemplateDownload()}
-                  aria-label="Download Template"
-                  className="text-xs"
-                >
-                  <span className="flex items-center gap-1">
-                    <MdSimCardDownload size={16} />
-                    <span className="hidden sm:inline">Template</span>
-                  </span>
-                </Button>
-              )} */}
-
-              {/* {formLoading ? (
-                <Button className="text-xs" size="sm" color="warning">
-                  <span className="flex justify-center items-center gap-2">
-                    <Spinner size="sm" />
-                    Importing CSV...
-                  </span>
-                </Button>
-              ) : (
-                pagePermission?.create && (
-                  <FileUpload
-                    type="single-file"
-                    page="bulk-import"
-                    size="sm"
-                    onSetFileUrl={(url) => handleCSVImport(url)}
-                  />
-                )
-              )} */}
-              {/* {pagePermission?.view && (
-                <Button
-                  className="text-xs"
-                  color="blue"
-                  size="sm"
-                  onClick={handleExportToCSV}
-                >
-                  <span className="flex justify-center items-center gap-2">
-                    <BiSolidFileExport size={20} />
-                    CSV Download
-                  </span>
-                </Button>
-              )} */}
-              {/* {pagePermission?.update && (
-                <Button
-                  className="text-xs"
-                  size="sm"
-                  color="purple"
-                  onClick={handleOpenBulkDeliveryConfig}
-                >
-                  <span className="flex justify-center items-center gap-2">
-                    <IoIosList size={20} />
-                    Bill Delivery Configuration
-                  </span>
-                </Button>
-              )} */}
-              {/* {pagePermission?.update && (
-                <Button
-                  className="text-xs"
-                  size="sm"
-                  color="teal"
-                  onClick={handleOpenBulkRLPEdit}
-                >
-                  <span className="flex justify-center items-center gap-2">
-                    <IoIosList size={20} />
-                    Bulk RLP Edit
-                  </span>
-                </Button>
-              )} */}
 
               {errorLog.length > 0 && (
                 <Button
@@ -1525,75 +1459,38 @@ const Distributor = () => {
             <div className="overflow-x-auto w-full">
               <Table striped className="text-sm">
                 <Table.Head className="text-center">
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    DB Code
-                  </Table.HeadCell>
-
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    Name
-                  </Table.HeadCell>
+                  <SortableHeadCell field="dbCode">DB Code</SortableHeadCell>
+                  <SortableHeadCell field="name">Name</SortableHeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
                     Creds
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    Type
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    Owner
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    Email
-                  </Table.HeadCell>
-
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    Phone
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    Address
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    City
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    PIN
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    District
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    Day Off
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    SBU
-                  </Table.HeadCell>
+                  <SortableHeadCell field="role">Type</SortableHeadCell>
+                  <SortableHeadCell field="ownerName">Owner</SortableHeadCell>
+                  <SortableHeadCell field="email">Email</SortableHeadCell>
+                  <SortableHeadCell field="phone">Phone</SortableHeadCell>
+                  <SortableHeadCell field="address">Address</SortableHeadCell>
+                  <SortableHeadCell field="city">City</SortableHeadCell>
+                  <SortableHeadCell field="pincode">PIN</SortableHeadCell>
+                  <SortableHeadCell field="district">District</SortableHeadCell>
+                  <SortableHeadCell field="dayOff">Day Off</SortableHeadCell>
+                  <SortableHeadCell field="sbu">SBU</SortableHeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
                     Brands
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    GST
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    PAN
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    State
-                  </Table.HeadCell>
-
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    Area
-                  </Table.HeadCell>
+                  <SortableHeadCell field="gst_no">GST</SortableHeadCell>
+                  <SortableHeadCell field="pan_no">PAN</SortableHeadCell>
+                  <SortableHeadCell field="state">State</SortableHeadCell>
+                  <SortableHeadCell field="area">Area</SortableHeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
                     Beats
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
+                  <SortableHeadCell field="createdAt">
                     Created Date Time
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
+                  </SortableHeadCell>
+                  <SortableHeadCell field="updatedAt">
                     Updated Date Time
-                  </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
-                    Status
-                  </Table.HeadCell>
+                  </SortableHeadCell>
+                  <SortableHeadCell field="status">Status</SortableHeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-2 text-xs font-semibold">
                     Action
                   </Table.HeadCell>
@@ -2227,70 +2124,6 @@ const Distributor = () => {
                 disabled={false}
               />
             </div>
-            {/* <div>
-              <div className="mb-2 block">
-                <Label htmlFor="stateId" value="State" />
-                <span className="text-red-500">*</span>
-              </div>
-              <SearchableSelect
-                id="stateId"
-                options={activeStates}
-                value={stateId}
-                onChange={(e) => setStateId(e.target.value)}
-                placeholder="Auto-filled from Region"
-                displayKey="name"
-                valueKey="_id"
-                disabled={true}
-              />
-            </div> */}
-            {/* <div>
-              <div className="mb-2 block">
-                <Label htmlFor="role" value="Distributor Type" />
-                <span className="text-red-500">*</span>
-              </div>
-              <Select
-                id="role"
-                value={role}
-                onChange={(e) => setDisType(e.target.value)}
-                required
-              >
-                <option value="GT">GT</option>
-              </Select>
-            </div> */}
-            {/* <div>
-              <div className="mb-2 block">
-                <Label htmlFor="RBPSchemeMapped" value="RBP Scheme Mapped" />
-                <span className="text-red-500">*</span>
-              </div>
-              <Select
-                id="RBPSchemeMapped"
-                value={RBPSchemeMapped}
-                onChange={(e) => setRBPSchemeMapped(e.target.value)}
-                required
-              >
-                <option value="">Select Option</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-              </Select>
-            </div> */}
-
-            {/* PRIMARY INVOICE TYPE + conditional Old Date input (NEW) */}
-            {/* <div>
-              <div className="mb-2 block">
-                <Label
-                  htmlFor="primaryInvoiceType"
-                  value="Primary Invoice Type"
-                />
-              </div>
-              <Select
-                id="primaryInvoiceType"
-                value={primaryInvoiceType}
-                onChange={(e) => setPrimaryInvoiceType(e.target.value)}
-              >
-                <option value="All">All</option>
-                <option value="New">New</option>
-              </Select>
-            </div> */}
 
             {/* Show oldDate only when "All" is selected */}
             {primaryInvoiceType === "All" && (
@@ -2307,16 +2140,6 @@ const Distributor = () => {
                 />
               </div>
             )}
-
-            {/* ALLOW RLP EDIT TOGGLE */}
-            {/* <div className="flex items-center gap-2">
-              <Checkbox
-                id="allowRLPEdit"
-                checked={allowRLPEdit}
-                onChange={(e) => setAllowRLPEdit(e.target.checked)}
-              />
-              <Label htmlFor="allowRLPEdit" value="Allow RLP Edit" />
-            </div> */}
 
             <div>
               <div className="mb-2 block">

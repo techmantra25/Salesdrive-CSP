@@ -45,7 +45,7 @@ import { fetchDistributors } from "../../redux/distributorListSlice";
 import { fetchRegions } from "../../redux/regionSlice";
 import { getPagePermission } from "../../utils/permissionHelper";
 import { downloadFile } from "../../utils/downloadFile";
-
+import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 const Pricing = () => {
   const dispatch = useDispatch();
 
@@ -111,6 +111,8 @@ const Pricing = () => {
   const [bulkUploading, setBulkUploading] = useState(false);
   const [bulkUploadType, setBulkUploadType] = useState("material");
 
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [selectedPriceCode, setSelectedPriceCode] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("default");
   const [selectedBrand, setSelectedBrand] = useState("default");
@@ -148,6 +150,29 @@ const Pricing = () => {
 
   const onPageChange = (page) => setCurrentPage(page);
 
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+
+    setCurrentPage(1);
+  };
+
+  const renderSortIcon = (field) => {
+    if (sortBy !== field) {
+      return <FaSort className="inline ml-1 text-gray-400" />;
+    }
+
+    return sortOrder === "asc" ? (
+      <FaSortUp className="inline ml-1 text-blue-600" />
+    ) : (
+      <FaSortDown className="inline ml-1 text-blue-600" />
+    );
+  };
+
   const handleDateRangeChange = (range) => {
     setDateRange(range);
   };
@@ -166,6 +191,8 @@ const Pricing = () => {
       const query = {
         page: currentPage,
         limit: itemsPerPage,
+        sortBy,
+        sortOrder,
       };
 
       if (selectedProduct !== "default") {
@@ -245,8 +272,8 @@ const Pricing = () => {
       console.log(error);
       toast.error(
         error?.response?.data?.message ||
-          error?.message ||
-          "Failed to fetch pricing",
+        error?.message ||
+        "Failed to fetch pricing",
       );
     } finally {
       setPricingLoading(false);
@@ -340,10 +367,10 @@ const Pricing = () => {
     );
     setL2DiscountPercentage(
       pricing?.L2DiscountPercentage ??
-        pricing?.L2_discount_percentage ??
-        pricing?.customBasicDiscountPercentage ??
-        pricing?.custom_basic_discount_percentage ??
-        "",
+      pricing?.L2_discount_percentage ??
+      pricing?.customBasicDiscountPercentage ??
+      pricing?.custom_basic_discount_percentage ??
+      "",
     );
     setRegionId(pricing?.regionId?._id ? pricing.regionId._id : "");
     setDistributorId(
@@ -380,11 +407,11 @@ const Pricing = () => {
         mrp_price: mrpPrice,
         dlp_price: String(
           Number(mrpPrice) -
-            (Number(mrpPrice) * Number(L1DiscountPercentage)) / 100,
+          (Number(mrpPrice) * Number(L1DiscountPercentage)) / 100,
         ),
         rlp_price: String(
           Number(mrpPrice) -
-            (Number(mrpPrice) * Number(L2DiscountPercentage)) / 100,
+          (Number(mrpPrice) * Number(L2DiscountPercentage)) / 100,
         ),
         L1DiscountPercentage: L1DiscountPercentage,
         L2DiscountPercentage: L2DiscountPercentage,
@@ -426,11 +453,11 @@ const Pricing = () => {
               mrp_price: mrpPrice,
               dlp_price: String(
                 Number(mrpPrice) -
-                  (Number(mrpPrice) * Number(L1DiscountPercentage)) / 100,
+                (Number(mrpPrice) * Number(L1DiscountPercentage)) / 100,
               ),
               rlp_price: String(
                 Number(mrpPrice) -
-                  (Number(mrpPrice) * Number(L2DiscountPercentage)) / 100,
+                (Number(mrpPrice) * Number(L2DiscountPercentage)) / 100,
               ),
               L1DiscountPercentage: L1DiscountPercentage,
               L2DiscountPercentage: L2DiscountPercentage,
@@ -453,7 +480,7 @@ const Pricing = () => {
             console.error(error);
             toast.error(
               error?.response?.data?.message ||
-                "Failed to update price, try again",
+              "Failed to update price, try again",
             );
           } finally {
             setFormLoading(false);
@@ -468,9 +495,8 @@ const Pricing = () => {
 
   const handleStatusUpdate = async (pricing) => {
     openConfirmationModel({
-      question: `Are you sure you want to ${
-        pricing.status ? "deactivate" : "activate"
-      } this pricing?`,
+      question: `Are you sure you want to ${pricing.status ? "deactivate" : "activate"
+        } this pricing?`,
       answer: ["Yes", "No"],
       onClose: async (result) => {
         if (result) {
@@ -490,8 +516,8 @@ const Pricing = () => {
             console.error(error);
             toast.error(
               error?.message ??
-                error?.response?.data?.message ??
-                "Failed to update pricing status",
+              error?.response?.data?.message ??
+              "Failed to update pricing status",
             );
           }
         } else {
@@ -563,17 +589,17 @@ const Pricing = () => {
     document.body.removeChild(a);
   };
 
-const handleCategoryCSVTemplateDownload = () => {
-  const csv = ["Collection Code,L1(%),L2(%),Effective Date", "COL-01,10,5,31-12-2024"];
-  const csvString = csv.join("\n");
-  const a = document.createElement("a");
+  const handleCategoryCSVTemplateDownload = () => {
+    const csv = ["Collection Code,L1(%),L2(%),Effective Date", "COL-01,10,5,31-12-2024"];
+    const csvString = csv.join("\n");
+    const a = document.createElement("a");
 
-  a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
-  a.setAttribute("download", "category_pricing_template.csv");
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-};
+    a.href = URL.createObjectURL(new Blob([csvString], { type: "text/csv" }));
+    a.setAttribute("download", "category_pricing_template.csv");
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   const handleMRPPriceCSVTemplateDownload = () => {
     const csv = ["Product Code,MRP,Effective Date", "VOL-25,500,31-12-2024"];
@@ -629,8 +655,8 @@ const handleCategoryCSVTemplateDownload = () => {
       console.error(error);
       toast.error(
         error?.response?.data?.message ||
-          error?.message ||
-          "Failed to export error log, try again",
+        error?.message ||
+        "Failed to export error log, try again",
       );
     }
   };
@@ -726,8 +752,7 @@ const handleCategoryCSVTemplateDownload = () => {
 
       if (res?.data?.skippedRows?.length > 0) {
         toast.error(
-          `${res?.data?.skippedRows?.length} rows skipped, ${
-            res?.data?.data?.length ? res?.data?.data?.length : 0
+          `${res?.data?.skippedRows?.length} rows skipped, ${res?.data?.data?.length ? res?.data?.data?.length : 0
           } rows imported`,
         );
         setErrorLog(res?.data?.skippedRows);
@@ -742,8 +767,8 @@ const handleCategoryCSVTemplateDownload = () => {
       console.error(error);
       toast.error(
         error?.response?.data?.message ||
-          error?.message ||
-          "Failed to import pricing, try again",
+        error?.message ||
+        "Failed to import pricing, try again",
       );
     } finally {
       setBulkUploading(false);
@@ -764,10 +789,10 @@ const handleCategoryCSVTemplateDownload = () => {
     );
     setL2DiscountPercentage(
       pricing?.L2DiscountPercentage ??
-        pricing?.L2_discount_percentage ??
-        pricing?.customBasicDiscountPercentage ??
-        pricing?.custom_basic_discount_percentage ??
-        "",
+      pricing?.L2_discount_percentage ??
+      pricing?.customBasicDiscountPercentage ??
+      pricing?.custom_basic_discount_percentage ??
+      "",
     );
     setRegionId(pricing?.regionId?._id ? pricing.regionId._id : "");
     setDistributorId(
@@ -793,8 +818,8 @@ const handleCategoryCSVTemplateDownload = () => {
             console.error(error);
             toast.error(
               error?.response?.data?.message ||
-                error?.message ||
-                "Failed to inactivate expired prices",
+              error?.message ||
+              "Failed to inactivate expired prices",
             );
           }
         }
@@ -830,6 +855,8 @@ const handleCategoryCSVTemplateDownload = () => {
     dateRange,
     createdAtRange,
     expiresAtRange,
+    sortBy,
+    sortOrder,
   ]);
 
   useEffect(() => {
@@ -1122,11 +1149,11 @@ const handleCategoryCSVTemplateDownload = () => {
                   <Button
                     className="text-xs"
                     size="sm"
-                      onClick={() => {
-                        setRegionId("68385270baa10349c65aba46");
-                        setEffectiveDate(minEffectiveDate);
-                        setOpenModal(true);
-                      }}
+                    onClick={() => {
+                      setRegionId("68385270baa10349c65aba46");
+                      setEffectiveDate(minEffectiveDate);
+                      setOpenModal(true);
+                    }}
                   >
                     <span className="flex justify-center items-center gap-2">
                       <IoMdAddCircle size={20} />
@@ -1232,8 +1259,11 @@ const handleCategoryCSVTemplateDownload = () => {
               <Table className="text-sm whitespace-nowrap bg-white dark:bg-gray-800">
                 <Table.Head className="text-center text-sm bg-white dark:bg-gray-800 border-b-2 border-gray-200 dark:border-gray-700">
                   {/* Sticky Column 1 */}
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 sticky left-0 bg-white dark:bg-gray-800 border-r border-gray-300 dark:border-gray-700">
-                    Price Code
+                  <Table.HeadCell
+                    className="cursor-pointer whitespace-nowrap px-2 py-1 sticky left-0 bg-white dark:bg-gray-800 border-r border-gray-300 dark:border-gray-700"
+                    onClick={() => handleSort("code")}
+                  >
+                    Price Code{renderSortIcon("code")}
                   </Table.HeadCell>
 
                   {/* Sticky Column 2 */}
@@ -1242,8 +1272,11 @@ const handleCategoryCSVTemplateDownload = () => {
                   </Table.HeadCell>
 
                   {/* Price Type */}
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Price Type
+                  <Table.HeadCell
+                    className="cursor-pointer"
+                    onClick={() => handleSort("price_type")}
+                  >
+                    Price Type{renderSortIcon("price_type")}
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                     Region Code
@@ -1251,13 +1284,13 @@ const handleCategoryCSVTemplateDownload = () => {
                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                     Region Name
                   </Table.HeadCell>
-                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                     Product Name
-                   </Table.HeadCell>
-                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                     Collection Code
-                   </Table.HeadCell>
-                   {/* Brand, Category, UOM, Pieces in a box commented out */}
+                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                    Product Name
+                  </Table.HeadCell>
+                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
+                    Collection Code
+                  </Table.HeadCell>
+                  {/* Brand, Category, UOM, Pieces in a box commented out */}
                   {/* 
                    <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                      Brand
@@ -1272,41 +1305,71 @@ const handleCategoryCSVTemplateDownload = () => {
                      Pieces in a box
                    </Table.HeadCell>
                    */}
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    MRP
+                  <Table.HeadCell
+                    className="cursor-pointer"
+                    onClick={() => handleSort("mrp_price")}
+                  >
+                    MRP{renderSortIcon("mrp_price")}
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    L1 % 
+                  <Table.HeadCell
+                    className="cursor-pointer"
+                    onClick={() => handleSort("L1DiscountPercentage")}
+                  >
+                    L1 %{renderSortIcon("L1DiscountPercentage")}
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    L2 % 
+                  <Table.HeadCell
+                    className="cursor-pointer"
+                    onClick={() => handleSort("L2DiscountPercentage")}
+                  >
+                    L2 %{renderSortIcon("L2DiscountPercentage")}
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    DLP
+                  <Table.HeadCell
+                    className="cursor-pointer"
+                    onClick={() => handleSort("dlp_price")}
+                  >
+                    DLP{renderSortIcon("dlp_price")}
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    RLP
+                  <Table.HeadCell
+                    className="cursor-pointer"
+                    onClick={() => handleSort("rlp_price")}
+                  >
+                    RLP{renderSortIcon("rlp_price")}
                   </Table.HeadCell>
-                    <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                      Created Date
-                    </Table.HeadCell>
-                    <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                      Updated At
-                    </Table.HeadCell>
-                    <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                      Effective Date
-                    </Table.HeadCell>
+                  <Table.HeadCell
+                    className="cursor-pointer"
+                    onClick={() => handleSort("createdAt")}
+                  >
+                    Created Date{renderSortIcon("createdAt")}
+                  </Table.HeadCell>
+                  <Table.HeadCell
+                    className="cursor-pointer"
+                    onClick={() => handleSort("updatedAt")}
+                  >
+                    Updated At{renderSortIcon("updatedAt")}
+                  </Table.HeadCell>
+                  <Table.HeadCell
+                    className="cursor-pointer"
+                    onClick={() => handleSort("effective_date")}
+                  >
+                    Effective Date{renderSortIcon("effective_date")}
+                  </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                     Days Left
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Expires At
+                  <Table.HeadCell
+                    className="cursor-pointer"
+                    onClick={() => handleSort("expiresAt")}
+                  >
+                    Expires At{renderSortIcon("expiresAt")}
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                     Create New From Existing
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
-                    Status
+                  <Table.HeadCell
+                    className="cursor-pointer"
+                    onClick={() => handleSort("status")}
+                  >
+                    Status{renderSortIcon("status")}
                   </Table.HeadCell>
                   <Table.HeadCell className="whitespace-nowrap px-2 py-1 dark:bg-gray-800">
                     Action
@@ -1329,13 +1392,13 @@ const handleCategoryCSVTemplateDownload = () => {
                       </Table.Cell>
                     </Table.Row>
                   ) : pricing?.length > 0 ? (
-                     pricing?.map((price, index) => {
-                       const { remainingDays } = checkDateForPrice(
-                         price?.effective_date,
-                       );
-                       const isDateActive = remainingDays >= 0;
-                       const displayStatus = Boolean(price.status) && isDateActive;
-                       return (
+                    pricing?.map((price, index) => {
+                      const { remainingDays } = checkDateForPrice(
+                        price?.effective_date,
+                      );
+                      const isDateActive = remainingDays >= 0;
+                      const displayStatus = Boolean(price.status) && isDateActive;
+                      return (
                         <Table.Row
                           key={index}
                           className="hover-row text-center text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -1366,13 +1429,13 @@ const handleCategoryCSVTemplateDownload = () => {
                           <Table.Cell className="px-2 py-1">
                             {price?.regionId?.name ?? ""}
                           </Table.Cell>
-                           <Table.Cell className="px-2 py-1">
-                             {price?.productId?.name}
-                           </Table.Cell>
-                           <Table.Cell className="px-2 py-1">
-                             {price?.productId?.collection_id?.code ?? ""}
-                           </Table.Cell>
-                           {/* Brand, Category, UOM, Pieces in a box commented out */}
+                          <Table.Cell className="px-2 py-1">
+                            {price?.productId?.name}
+                          </Table.Cell>
+                          <Table.Cell className="px-2 py-1">
+                            {price?.productId?.collection_id?.code ?? ""}
+                          </Table.Cell>
+                          {/* Brand, Category, UOM, Pieces in a box commented out */}
                           {/* 
                            <Table.Cell className="px-2 py-1">
                              {price?.productId?.brand?.name} (
@@ -1420,7 +1483,7 @@ const handleCategoryCSVTemplateDownload = () => {
                               .tz("Asia/Kolkata")
                               .format("YYYY-MM-DD hh:mm A")}
                           </Table.Cell>
-                           <Table.Cell className="px-2 py-1">
+                          <Table.Cell className="px-2 py-1">
                             {moment(price?.updatedAt)
                               .tz("Asia/Kolkata")
                               .format("YYYY-MM-DD hh:mm A")}
@@ -1428,11 +1491,11 @@ const handleCategoryCSVTemplateDownload = () => {
                           <Table.Cell className="px-2 py-1">
                             {price?.effective_date
                               ? moment(price?.effective_date)
-                                  .tz("Asia/Kolkata")
-                                  .format("DD-MM-YYYY")
+                                .tz("Asia/Kolkata")
+                                .format("DD-MM-YYYY")
                               : ""}
                           </Table.Cell>
-                           <Table.Cell className="px-2 py-1 font-bold">
+                          <Table.Cell className="px-2 py-1 font-bold">
                             {remainingDays < 0 && price?.status === true ? (
                               <span className="text-blue-500">N/A</span>
                             ) : remainingDays < 0 && price?.status === false ? (
@@ -1448,8 +1511,8 @@ const handleCategoryCSVTemplateDownload = () => {
                           <Table.Cell className="px-2 py-1">
                             {price?.expiresAt
                               ? moment(price?.expiresAt)
-                                  .tz("Asia/Kolkata")
-                                  .format("DD-MM-YYYY  hh:mm A")
+                                .tz("Asia/Kolkata")
+                                .format("DD-MM-YYYY  hh:mm A")
                               : ""}
                           </Table.Cell>
                           <Table.Cell className="px-2 py-1 flex justify-center items-center">
@@ -1463,18 +1526,18 @@ const handleCategoryCSVTemplateDownload = () => {
                             )}
                           </Table.Cell>
                           <Table.Cell className="px-2 py-1">
-                             <StatusIndicator
-                               status={price.status}
-                               onClick={
-                                 pagePermission?.update
-                                   ? () => handleStatusUpdate(price)
-                                   : undefined
-                               }
-                               isDisabled={
-                                 !pagePermission?.update ||
-                                 (remainingDays < 0 && price?.status === false)
-                               }
-                             />
+                            <StatusIndicator
+                              status={price.status}
+                              onClick={
+                                pagePermission?.update
+                                  ? () => handleStatusUpdate(price)
+                                  : undefined
+                              }
+                              isDisabled={
+                                !pagePermission?.update ||
+                                (remainingDays < 0 && price?.status === false)
+                              }
+                            />
                           </Table.Cell>
 
                           <Table.Cell className="px-2 py-1">
@@ -1700,15 +1763,15 @@ const handleCategoryCSVTemplateDownload = () => {
                   <div className="mb-2 block text-gray-700 dark:text-gray-100">
                     <Label value="Effective Date" />
                   </div>
-                   <TextInput
-                     type="date"
-                     disabled={modalMode === "edit"}
-                     min={modalMode === "add" ? minEffectiveDate : undefined}
-                     name="effective_date"
-                     className=" text-gray-700 dark:text-gray-100"
-                     value={effectiveDate}
-                     onChange={(event) => setEffectiveDate(event.target.value)}
-                   />
+                  <TextInput
+                    type="date"
+                    disabled={modalMode === "edit"}
+                    min={modalMode === "add" ? minEffectiveDate : undefined}
+                    name="effective_date"
+                    className=" text-gray-700 dark:text-gray-100"
+                    value={effectiveDate}
+                    onChange={(event) => setEffectiveDate(event.target.value)}
+                  />
                 </div>
 
                 <div className="w-full">
@@ -1717,9 +1780,8 @@ const handleCategoryCSVTemplateDownload = () => {
                       modalMode === "add" ? handleAddPricing : handleEditPricing
                     }
                     disabled={formLoading}
-                    className={`${
-                      formLoading ? "opacity-60 cursor-not-allowed" : ""
-                    }`}
+                    className={`${formLoading ? "opacity-60 cursor-not-allowed" : ""
+                      }`}
                   >
                     {formLoading ? (
                       <Spinner size="sm" aria-label="Loading spinner" />
@@ -1837,10 +1899,10 @@ const handleCategoryCSVTemplateDownload = () => {
                   color="blue"
                   size="sm"
                   className="px-6 py-2 text-sm font-medium rounded-lg shadow hover:shadow-md transition-all"
-                   onClick={() => {
-                     handleMRPPriceCSVTemplateDownload();
-                     setOpenMrpPriceUploadModal(false);
-                   }}
+                  onClick={() => {
+                    handleMRPPriceCSVTemplateDownload();
+                    setOpenMrpPriceUploadModal(false);
+                  }}
                 >
                   Download Template
                 </Button>
