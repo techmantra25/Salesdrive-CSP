@@ -910,9 +910,9 @@ const OutletRequestList = () => {
                   <Table.HeadCell className="whitespace-nowrap">
                     Outlet Code
                   </Table.HeadCell>
-                  <Table.HeadCell className="whitespace-nowrap">
+                  {/* <Table.HeadCell className="whitespace-nowrap">
                     Outlet UID
-                  </Table.HeadCell>
+                  </Table.HeadCell> */}
                   <Table.HeadCell className="whitespace-nowrap">
                     Outlet Name
                   </Table.HeadCell>
@@ -1022,7 +1022,7 @@ const OutletRequestList = () => {
                                 </span>
                               </div>
                             </Table.Cell>
-                            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                               <div className="flex gap-2 justify-center items-center">
                                 <UniqueCode
                                   text={outlet?.outletUID}
@@ -1035,7 +1035,7 @@ const OutletRequestList = () => {
                                   <FiExternalLink color="#3795BD" />
                                 </span>
                               </div>
-                            </Table.Cell>
+                            </Table.Cell> */}
                             <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200 cursor-pointer">
                               <div className="flex gap-2 justify-center items-center">
                                 {outlet?.outletName}
@@ -1100,7 +1100,7 @@ const OutletRequestList = () => {
                         {selectedOutletDetails &&
                           [
                             ["Outlet Code", selectedOutletDetails?.outletCode],
-                            ["Outlet UID", selectedOutletDetails?.outletUID],
+                            // ["Outlet UID", selectedOutletDetails?.outletUID],
                             ["Outlet Name", selectedOutletDetails?.outletName],
                             ["Owner Name", selectedOutletDetails?.ownerName],
                             ["Mobile 1", selectedOutletDetails?.mobile1],
