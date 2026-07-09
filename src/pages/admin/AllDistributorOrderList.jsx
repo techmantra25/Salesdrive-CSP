@@ -19,7 +19,7 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { fetchDistributors } from "../../redux/distributorListSlice";
 import SearchableSelect from "../../components/SearchableSelect";
 import { AllDBpaginatedOrderList } from "../../api/orderApi";
-import { getApprovedOutletList, ApprovedOutletPaginated,SearchOutletsDropdown } from "../../api/api";
+import { getApprovedOutletList, ApprovedOutletPaginated, SearchOutletsDropdown } from "../../api/api";
 import PaginatedSearchableSelect from "../../components/PaginatedSearchableSelect";
 import { getPagePermission } from "../../utils/permissionHelper";
 
@@ -97,8 +97,8 @@ const AllDistributorOrderList = () => {
         console.error(error);
         toast.error(
           error?.response?.data?.message ||
-            error?.message ||
-            "Failed to fetch outlet list"
+          error?.message ||
+          "Failed to fetch outlet list"
         );
         return { data: [], hasMore: false };
       }
@@ -145,8 +145,8 @@ const AllDistributorOrderList = () => {
       console.error(error);
       toast.error(
         error?.response?.data?.message ||
-          error?.message ||
-          "Failed to fetch Sales Orders"
+        error?.message ||
+        "Failed to fetch Sales Orders"
       );
     } finally {
       setSalesOrdersLoading(false);
@@ -258,7 +258,7 @@ const AllDistributorOrderList = () => {
                     disabled={salesOrdersLoading}
                     placeholder="Select Retailer"
                     displayKey="outletName"
-                    descKey="outletUID"
+                    descKey="outletCode"
                     valueKey="_id"
                     searchPlaceholder="Search Retailer..."
                   />
@@ -390,8 +390,8 @@ const AllDistributorOrderList = () => {
                                 {order?.retailerId?.outletName}
                                 (
                                 <UniqueCode
-                                  text={order?.retailerId?.outletUID}
-                                  codeName={"Retailer ID"}
+                                  text={order?.retailerId?.outletCode}
+                                  codeName={"Retailer Code"}
                                 />
                                 )
                               </>

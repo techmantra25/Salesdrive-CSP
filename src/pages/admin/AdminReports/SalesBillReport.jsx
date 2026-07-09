@@ -305,7 +305,7 @@ const SalesBillReport = () => {
             "Route Code": bill.routeId?.code,
             "Route Name": bill.routeId?.name,
             "Retailer Code": bill.retailerId?.outletCode,
-            "Retailer UID": bill.retailerId?.outletUID,
+            // "Retailer UID": bill.retailerId?.outletUID,
             "Retailer Name": bill.retailerId?.outletName,
             // --- Line Item Information ---
             "Product Code": item.product?.product_code,

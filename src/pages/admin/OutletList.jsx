@@ -65,7 +65,7 @@ const SORTABLE_COLUMNS = new Set([
   "outletName",
   "ownerName",
   "outletCode",
-  "outletUID",
+  // "outletUID",
   "mobile1",
   "mobile2",
   "email",
@@ -1279,9 +1279,9 @@ const OutletList = () => {
         <div className="overflow-x-auto w-full">
           <Table striped>
             <Table.Head className="text-center">
-              <Table.HeadCell className="whitespace-nowrap">
+              {/* <Table.HeadCell className="whitespace-nowrap">
                 <SortableHeader field="outletUID">Outlet UID</SortableHeader>
-              </Table.HeadCell>
+              </Table.HeadCell> */}
               <Table.HeadCell className="whitespace-nowrap">
                 <SortableHeader field="outletCode">Outlet Code</SortableHeader>
               </Table.HeadCell>
@@ -1361,14 +1361,14 @@ const OutletList = () => {
                       key={index}
                       className="text-center bg-white dark:border-gray-700 dark:bg-gray-800"
                     >
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                      {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.outletUID && (
                           <UniqueCode
                             text={outlet?.outletUID}
                             codeName="Outlet UID"
                           />
                         )}
-                      </Table.Cell>
+                      </Table.Cell> */}
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.outletCode && (
                           <div className="flex gap-2 justify-center items-center">
@@ -1521,7 +1521,7 @@ const OutletList = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
                 {[
                   ["Outlet Code", selectedOutletDetails?.outletCode],
-                  ["Outlet UID", selectedOutletDetails?.outletUID],
+                  // ["Outlet UID", selectedOutletDetails?.outletUID],
                   ["Outlet Name", selectedOutletDetails?.outletName],
                   ["Owner Name", selectedOutletDetails?.ownerName],
 
