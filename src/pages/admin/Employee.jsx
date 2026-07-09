@@ -328,6 +328,17 @@ export const Employee = () => {
       } else {
         console.log(cleanedFormData, "cleanedFormData");
         console.log(selectedEmployee._id, "selectedEmployee._id");
+        console.log("formData", formData);
+
+console.log(
+  "Selected Region Object",
+  regions.find((r) => r._id === formData.regionId[0])
+);
+
+console.log(
+  "Selected State Object",
+  states.find((s) => s._id === formData.stateId)
+);
         await updateEmployee(cleanedFormData, selectedEmployee._id);
         toast.success("Employee updated successfully");
       }
@@ -367,6 +378,18 @@ export const Employee = () => {
   };
   const handleEditEmployee = (employee) => {
     setSelectedEmployee(employee);
+
+    const empRegionIds = Array.isArray(employee.regionId)
+      ? employee.regionId.map((region) => region._id)
+      : employee.regionId?._id
+        ? [employee.regionId._id]
+        : [];
+    const firstRegion = regions.find((r) => r._id === empRegionIds[0]);
+    const derivedStateId =
+      firstRegion?.stateId?._id || employee?.stateId?._id || "";
+    const derivedZoneId =
+      firstRegion?.stateId?.zoneId || employee?.zoneId?._id || "";
+
     setFormData({
       name: employee?.name,
       empId: employee?.empId,
@@ -381,14 +404,10 @@ export const Employee = () => {
         : "",
       headquarter: employee?.headquarter || "",
       tenure: employee?.tenure || "",
-      stateId: employee?.stateId?._id || "",
+      stateId: derivedStateId,
       desgId: employee.desgId?._id,
-      zoneId: employee.zoneId?._id,
-      regionId: Array.isArray(employee.regionId)
-        ? employee.regionId.map((region) => region._id)
-        : employee.regionId?._id
-          ? [employee.regionId._id]
-          : [],
+      zoneId: derivedZoneId,
+      regionId: empRegionIds,
       brandId: employee.brandId?.map((brand) => brand._id),
       area: employee.area.map((area) => area),
       reporting_manager: employee?.empMappingId?.rmEmpId?._id,
@@ -1528,20 +1547,30 @@ export const Employee = () => {
                                         >
                                           No, Cancel
                                         </Button>
-                                        <Button
+                                       <Button
                                           size="xs"
                                           color="failure"
                                           onClick={(e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                            setFormData((prev) => ({
-                                              ...prev,
-                                              regionId: prev.regionId.filter((id) => id !== regId),
-                                              distributorId: prev.distributorId.filter((distId) => {
-                                                const dist = distributors.find((d) => d._id === distId);
-                                                return dist?.regionId?._id !== regId;
-                                              }),
-                                            }));
+                                         setFormData((prev) => {
+                                              const remainingRegionIds = prev.regionId.filter(
+                                                (id) => id !== regId
+                                              );
+                                              const nextRegion = regions.find(
+                                                (r) => r._id === remainingRegionIds[0]
+                                              );
+                                              return {
+                                                ...prev,
+                                                regionId: remainingRegionIds,
+                                                distributorId: prev.distributorId.filter((distId) => {
+                                                  const dist = distributors.find((d) => d._id === distId);
+                                                  return dist?.regionId?._id !== regId;
+                                                }),
+                                                stateId: nextRegion?.stateId?._id || "",
+                                                zoneId: nextRegion?.stateId?.zoneId || "",
+                                              };
+                                            });
                                             setRegionToRemove(null);
                                           }}
                                         >
@@ -1616,8 +1645,8 @@ export const Employee = () => {
                             setFormData((prev) => ({
                               ...prev,
                               regionId: [...prev.regionId, selectedRegionId],
-                              stateId: prev.stateId || autoStateId,
-                              zoneId: prev.zoneId || autoZoneId,
+                             stateId: autoStateId,
+                              zoneId: autoZoneId,
                             }));
                           }
                         }}

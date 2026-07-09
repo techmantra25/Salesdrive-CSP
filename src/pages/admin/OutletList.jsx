@@ -53,8 +53,37 @@ import SearchableSelect from "../../components/SearchableSelect";
 import AddManualPointsModal from "../../components/OutLetComp/AddManualPointsModal";
 import { BulkRebuildRetailerTransaction } from "../../api/rbp/transaction";
 import { IoClose } from "react-icons/io5";
-import { FaSort, FaSortAlphaDown, FaSortAlphaUp } from "react-icons/fa";
+import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { downloadFile } from "../../utils/downloadFile";
+
+// Keep this in sync with the backend SORTABLE_FIELDS whitelist
+// (controllers/outletApproved/paginatedOutletApproved.js). Only fields that
+// live directly on the OutletApproved document can be sorted — populated
+// fields (stateId.name, beatId.name, district.name, etc.) can't be, since
+// population happens after the sort/query resolves.
+const SORTABLE_COLUMNS = new Set([
+  "outletName",
+  "ownerName",
+  "outletCode",
+  "outletUID",
+  "mobile1",
+  "mobile2",
+  "email",
+  "city",
+  "pin",
+  "location",
+  "address1",
+  "gstin",
+  "panNumber",
+  "aadharNumber",
+  "status",
+  "outletSource",
+  "retailerClass",
+  "categoryOfOutlet",
+  "createdAt",
+  "updatedAt",
+  "beat",
+]);
 
 const OutletList = () => {
   // State
@@ -115,7 +144,12 @@ const OutletList = () => {
   });
   const [customSyncing, setCustomSyncing] = useState(false);
   const [selectedCustomSyncDistributor, setSelectedCustomSyncDistributor] = useState("");
-  const [outletNameSort, setOutletNameSort] = useState(null); // null | "a_to_z" | "z_to_a"
+
+  // Generic column sort state — replaces the old single-purpose
+  // outletNameSort. `field` is any key in SORTABLE_COLUMNS, `order` is
+  // "asc" | "desc". Both null means "no explicit sort" (backend defaults
+  // to newest-first).
+  const [sortConfig, setSortConfig] = useState({ field: null, order: null });
 
   const { openConfirmationModel } = useContext(ConfirmationModelContext);
   const [openDistributorModal, setOpenDistributorModal] = useState(false);
@@ -162,7 +196,7 @@ const OutletList = () => {
     searchTerm,
     phoneSearch,
     selectedOutletSource,
-    outletNameSort,
+    sortConfig,
   ]);
   // Reset page on filter change
   useEffect(() => {
@@ -176,7 +210,7 @@ const OutletList = () => {
     searchTerm,
     phoneSearch,
     selectedOutletSource,
-    outletNameSort,
+    sortConfig,
   ]);
   // Debounced fetch
   const fetchOutletsPaginated = useDebounce(async () => {
@@ -214,7 +248,12 @@ const OutletList = () => {
         }),
 
         ...(phoneSearch && { phoneSearch }),
-        ...(outletNameSort && { outletname_sort: outletNameSort }),
+
+        // Generic column sort — mirrors backend SORTABLE_FIELDS whitelist
+        ...(sortConfig.field && {
+          sortBy: sortConfig.field,
+          sortOrder: sortConfig.order,
+        }),
       };
 
       const response = await ApprovedOutletPaginated(query);
@@ -247,16 +286,46 @@ const OutletList = () => {
     fetchOutletsPaginated();
     setSelectedOutletSource("default");
     setUpdatedDateRange({ startDate: null, endDate: null });
-    setOutletNameSort(null);
+    setSortConfig({ field: null, order: null });
   };
 
-  const handleOutletNameSortToggle = () => {
-    setOutletNameSort((prev) => {
-      if (prev === null) return "a_to_z";
-      if (prev === "a_to_z") return "z_to_a";
-      return null;
+  // Generic sort toggle for any whitelisted column: asc -> desc -> none.
+  // Clicking a different column starts that column fresh at "asc".
+  const handleSortToggle = (field) => {
+    if (!SORTABLE_COLUMNS.has(field)) return;
+
+    setSortConfig((prev) => {
+      if (prev.field !== field) return { field, order: "asc" };
+      if (prev.order === "asc") return { field, order: "desc" };
+      return { field: null, order: null };
     });
   };
+
+  // Renders the appropriate sort icon for a given column header based on
+  // current sortConfig — neutral icon when this column isn't the active
+  // sort, up/down triangle when it is.
+  const renderSortIcon = (field) => {
+    if (sortConfig.field !== field) {
+      return <FaSort className="inline ml-1 opacity-40" size={14} />;
+    }
+    return sortConfig.order === "asc" ? (
+      <FaSortUp className="inline ml-1" size={14} />
+    ) : (
+      <FaSortDown className="inline ml-1" size={14} />
+    );
+  };
+
+  // Small helper for sortable <Table.HeadCell> content so every column
+  // wires into the same handler/icon instead of one-off implementations.
+  const SortableHeader = ({ field, children }) => (
+    <span
+      className="inline-flex items-center cursor-pointer select-none"
+      onClick={() => handleSortToggle(field)}
+    >
+      {children}
+      {renderSortIcon(field)}
+    </span>
+  );
 
   const handleOutletDetails = (outlet) => {
     setSelectedOutletDetails(outlet);
@@ -536,7 +605,12 @@ const OutletList = () => {
         fromDate: dateRange.startDate,
         toDate: dateRange.endDate,
       }),
-      ...(outletNameSort && { outletname_sort: outletNameSort }),
+      // NOTE: hits the separate outlet-report endpoint — only include
+      // sort params if that endpoint has been updated to honor them too.
+      ...(sortConfig.field && {
+        sortBy: sortConfig.field,
+        sortOrder: sortConfig.order,
+      }),
     };
 
     const params = new URLSearchParams(query).toString();
@@ -622,27 +696,6 @@ const OutletList = () => {
     fetchOutletsPaginated();
   };
 
-  // const handleRebuildBalance = async (outletId) => {
-  //   setRebuildingBalance((prev) => new Set(prev).add(outletId));
-  //   try {
-  //     await toast.promise(rebuildBalance(outletId), {
-  //       loading: "Rebuilding balance...",
-  //       success: "Balance rebuilt successfully",
-  //       error: (err) =>
-  //         err?.response?.data?.message || "Failed to rebuild balance",
-  //     });
-  //     fetchOutletsPaginated();
-  //   } catch (error) {
-  //     console.error(error);
-  //   } finally {
-  //     setRebuildingBalance((prev) => {
-  //       const newSet = new Set(prev);
-  //       newSet.delete(outletId);
-  //       return newSet;
-  //     });
-  //   }
-  // };
-
   const handleRebuildBalance = async (outletId) => {
     setRebuildingBalance((prev) => new Set(prev).add(outletId));
     try {
@@ -694,7 +747,7 @@ const OutletList = () => {
 
   const downloadBulkTemplate = () => {
     const headers = [
-      "Outlet UID",
+
       "Outlet Code",
       "Source ID",
       "Outlet Name",
@@ -720,8 +773,8 @@ const OutletList = () => {
     ];
 
     const requirements = [
+
       "REQUIRED",
-      "(OPTIONAL)",
       '"(OPTIONAL) :[Example: 5985455, 588744]"',
       "(OPTIONAL)",
       "(OPTIONAL)",
@@ -1007,53 +1060,6 @@ const OutletList = () => {
           <div className="w-full flex flex-wrap justify-center items-center gap-2">
             <Badge color="warning">Total Count: {totalItems}</Badge>
             <Badge color="warning">Filtered Count: {filteredCount}</Badge>
-            {/* <Button
-              className="text-xs"
-              size="sm"
-              color="none"
-              disabled={fetchingPointBalance}
-              onClick={() => {
-                fetchPointBalance();
-              }}
-            >
-              <span className="flex justify-center items-center gap-2">
-                {fetchingPointBalance ? (
-                  <IoSyncCircleSharp size={20} />
-                ) : (
-                  <IoWallet size={20} />
-                )}
-              </span>
-            </Button> */}
-            {/* <Button
-              className="text-xs"
-              size="sm"
-              color="none"
-              disabled={syncingRetailerBalances}
-              onClick={() => {
-                SyncingAllRetailerBalances();
-              }}
-              title="Sync Retailer's Balance"
-            >
-              <span className="flex justify-center items-center gap-2">
-                {syncingRetailerBalances ? (
-                  <>
-                    <IoSyncCircleSharp size={20} />
-                    loading ...
-                  </>
-                ) : (
-                  <IoWallet size={20} />
-                )}
-              </span>
-            </Button> */}
-            {/* <Button
-              size="xs"
-              color="blue"
-              onClick={() => cleanCurrentBalanceHnandler()}
-            >
-              <span className="flex justify-center items-center gap-2">
-                <RiRefreshFill size={20} />
-              </span>
-            </Button> */}
           </div>
           <div className="flex flex-wrap justify-center w-full items-center gap-4">
             {/* Status Filter */}
@@ -1120,37 +1126,6 @@ const OutletList = () => {
                 </Select>
               </div>
             )}
-            {/* Beat Filter */}
-            {/* {selectedDistributor !== "default" && (
-              <div className="w-56">
-                <Label
-                  htmlFor="beatSelect"
-                  value="Select Beat"
-                  className="mb-2 block"
-                />
-                <Select
-                  value={selectedBeat}
-                  onChange={(e) => setSelectedBeat(e.target.value)}
-                  id="beatSelect"
-                  required
-                >
-                  <option value="default">All</option>
-                  {beats
-                    .filter(
-                      (b) =>
-                        Array.isArray(b?.distributorId) &&
-                        b.distributorId
-                          .map((d) => d._id)
-                          .includes(selectedDistributor)
-                    )
-                    .map((b) => (
-                      <option key={b._id} value={b._id}>
-                        {b?.name} ({b?.code})
-                      </option>
-                    ))}
-                </Select>
-              </div>
-            )} */}
 
             <div className="w-64">
               <div className="mb-2 block">
@@ -1235,36 +1210,6 @@ const OutletList = () => {
               Reset & Refresh
             </Button>
 
-            {/* <Button
-              className="text-xs"
-              size="sm"
-              color="blue"
-              disabled={syncingOutlets}
-              onClick={() => {
-                handleSyncOutlets();
-              }}
-            >
-              <span className="flex justify-center items-center gap-2">
-                <IoSyncCircleSharp size={20} />
-                {syncingOutlets ? "Syncing..." : "Sync outlets"}
-              </span>
-            </Button>
-
-            <Button
-              className="text-xs"
-              size="sm"
-              color="purple"
-              disabled={updatingSync}
-              onClick={() => {
-                handleUpdateSync();
-              }}
-            >
-              <span className="flex justify-center items-center gap-2">
-                <IoSyncCircleSharp size={20} />
-                {updatingSync ? "Updating..." : "Update Sync"}
-              </span>
-            </Button> */}
-
             {errorLog.length > 0 && (
               <Button
                 className="text-xs"
@@ -1314,52 +1259,6 @@ const OutletList = () => {
               </span>
             </Button>
           </div>
-          <div className="flex justify-end gap-2">
-            {/* <Button
-              className="text-xs"
-              size="xs"
-              color="blue"
-              disabled={syncingOutlets || updatingSync}
-              onClick={() => {
-                handleSyncOutlets();
-              }}
-            >
-              <span className="flex justify-center items-center gap-2">
-                <IoSyncCircleSharp size={20} />
-                {syncingOutlets ? "Syncing..." : "Sync outlets"}
-              </span>
-            </Button> */}
-
-            {/* <Button
-              className="text-xs"
-              size="xs"
-              color="purple"
-              disabled={updatingSync || syncingOutlets}
-              onClick={() => {
-                handleUpdateSync();
-              }}
-            >
-              <span className="flex justify-center items-center gap-2">
-                <IoSyncCircleSharp size={20} />
-                {updatingSync ? "Updating..." : "Update Sync"}
-              </span>
-            </Button> */}
-
-            {/* <Button
-              className="text-xs"
-              size="xs"
-              color="warning"
-              disabled={customSyncing}
-              onClick={() => {
-                setOpenCustomSyncModal(true);
-              }}
-            >
-              <span className="flex justify-center items-center gap-2">
-                <IoSyncCircleSharp size={20} />
-                {customSyncing ? "Syncing..." : "Custom Sync"}
-              </span>
-            </Button> */}
-          </div>
         </Card>
       </div>
 
@@ -1381,79 +1280,60 @@ const OutletList = () => {
           <Table striped>
             <Table.Head className="text-center">
               <Table.HeadCell className="whitespace-nowrap">
-                Outlet UID
+                <SortableHeader field="outletUID">Outlet UID</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
-                Outlet Code
+                <SortableHeader field="outletCode">Outlet Code</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
                 View
               </Table.HeadCell>
-              <Table.HeadCell
-                className="whitespace-nowrap cursor-pointer select-none"
-                onClick={handleOutletNameSortToggle}
-              >
-                Outlet Name{" "}
-                {outletNameSort === "a_to_z" ? (
-                  <FaSortAlphaDown className="inline ml-1" size={25} />
-                ) : outletNameSort === "z_to_a" ? (
-                  <FaSortAlphaUp className="inline ml-1" size={25} />
-                ) : (
-                  <FaSort className="inline ml-1" size={25} />
-                )}
+              <Table.HeadCell className="whitespace-nowrap">
+                <SortableHeader field="outletName">Outlet Name</SortableHeader>
               </Table.HeadCell>
-              {/* Source Ids column removed */}
-              {/* <Table.HeadCell className="whitespace-nowrap">
-                Source Ids
-              </Table.HeadCell> */}
-
-              {/* <Table.HeadCell className="whitespace-nowrap">
-                Current Point <br /> Balance
-              </Table.HeadCell> */}
               <Table.HeadCell className="whitespace-nowrap">
                 Distributor
               </Table.HeadCell>
-              {/* <Table.HeadCell className="whitespace-nowrap">
-                Add Manual Points
-              </Table.HeadCell> */}
               <Table.HeadCell className="whitespace-nowrap">
-                Owner Name
+                <SortableHeader field="ownerName">Owner Name</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
-                Phone Number
+                <SortableHeader field="mobile1">Phone Number</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
-                GST IN
+                <SortableHeader field="gstin">GST IN</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
-                PAN no
+                <SortableHeader field="panNumber">PAN no</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
-                Outlet Status
+                <SortableHeader field="status">Outlet Status</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
                 State
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
-                Beat
+                <SortableHeader field="beat">Beat</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
                 Sub Division
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
-                City
+                <SortableHeader field="city">City</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
-                Location
+                <SortableHeader field="location">Location</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
-                Outlet Source
+                <SortableHeader field="outletSource">
+                  Outlet Source
+                </SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
-                Created At
+                <SortableHeader field="createdAt">Created At</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
-                Updated At
+                <SortableHeader field="updatedAt">Updated At</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
                 Action
@@ -1528,40 +1408,6 @@ const OutletList = () => {
                           </span>
                         </div>
                       </Table.Cell>
-                      {/* Source Ids column removed */}
-                      {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200 ">
-                        {outlet?.massistRefIds?.length > 0
-                          ? [...new Set(outlet.massistRefIds)].join(", ")
-                          : " "}
-                      </Table.Cell> */}
-
-                      {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        <div className="flex gap-4 justify-center items-center">
-                          {outlet?.currentPointBalance != null
-                            ? Number.isInteger(outlet.currentPointBalance)
-                              ? outlet.currentPointBalance
-                              : Number(outlet.currentPointBalance).toFixed(2)
-                            : 0}
-
-                          {outlet?.mergedPoints > 0 && (
-                            <>
-                              {" - "}({" "}
-                              <span className="text-pink-400 text-xs font-bold">
-                                {outlet.mergedPoints} Merged Points
-                              </span>
-                              )
-                            </>
-                          )}
-                          <Button
-                            size="xs"
-                            color="none"
-                            onClick={() => handleRebuildBalance(outlet._id)}
-                            disabled={rebuildingBalance.has(outlet._id)}
-                          >
-                            <IoWallet size={16} />
-                          </Button>
-                        </div>
-                      </Table.Cell> */}
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         <Button
                           size="xs"
@@ -1665,126 +1511,6 @@ const OutletList = () => {
         </div>
       </div>
 
-      {/* Outlet Details Modal */}
-      <Modal show={openModal} onClose={onCloseModal} size="6xl">
-        <Modal.Header>Outlet Details</Modal.Header>
-        <Modal.Body>
-          <div className="overflow-x-auto">
-            <div className="w-full">
-              <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-4">
-                <div className="w-full">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
-                    {[
-                      ["Outlet Code", selectedOutletDetails?.outletCode],
-                      ["Outlet UID", selectedOutletDetails?.outletUID],
-                      ["Outlet Name", selectedOutletDetails?.outletName],
-                      ["Owner Name", selectedOutletDetails?.ownerName],
-                      ["Mobile 1", selectedOutletDetails?.mobile1],
-                      ["Mobile 2", selectedOutletDetails?.mobile2],
-                      ["Email", selectedOutletDetails?.email],
-                      ["GST In", selectedOutletDetails?.gstin],
-                      ["PAN No", selectedOutletDetails?.panNumber],
-                      ["Adhaar No", selectedOutletDetails?.aadharNumber],
-
-                      [
-                        "Category of Outlet",
-                        selectedOutletDetails?.categoryOfOutlet,
-                      ],
-                      ["Address", selectedOutletDetails?.address1],
-                      ["Pincode", selectedOutletDetails?.pin],
-                      ["City", selectedOutletDetails?.city],
-                      ["Location", selectedOutletDetails?.location],
-                      ["State", selectedOutletDetails?.stateId?.name],
-                      [
-                        "Region",
-                        selectedOutletDetails?.distributorId?.regionId?.name,
-                      ],
-                      ["District", selectedOutletDetails?.district?.name],
-                      ["Beat Name", selectedOutletDetails?.beatId?.name],
-                      [
-                        "Employee Name",
-                        selectedOutletDetails?.employeeId?.name,
-                      ],
-                      ["ASM Name", selectedOutletDetails?.asm?.name],
-                      ["RSM Name", selectedOutletDetails?.rsm?.name],
-                      [
-                        "Existing Retailer",
-                        selectedOutletDetails?.existingRetailer ? "Yes" : "No",
-                      ],
-                      [
-                        "Outlet Status",
-                        selectedOutletDetails?.status ? "Active" : "Inactive",
-                      ],
-                      ["Outlet Source", selectedOutletDetails?.outletSource],
-                      ["Outlet Class", selectedOutletDetails?.retailerClass],
-                      [
-                        "Tele Calling Slots",
-                        selectedOutletDetails?.teleCallingSlot?.join(", "),
-                      ],
-                      [
-                        "Selling Brands",
-                        selectedOutletDetails?.sellingBrands
-                          ?.map((brand) => brand.name)
-                          .join(", "),
-                      ],
-                      [
-                        "Competitor Brands",
-                        selectedOutletDetails?.competitorBrands?.length > 0
-                          ? selectedOutletDetails.competitorBrands.join(", ")
-                          : "N/A",
-                      ],
-                      [
-                        "Shipping Address",
-                        selectedOutletDetails?.shipToAddress,
-                      ],
-                      [
-                        "Shipping Pincode",
-                        selectedOutletDetails?.shipToPincode,
-                      ],
-                      [
-                        "Preferred Language",
-                        selectedOutletDetails?.preferredLanguage,
-                      ],
-                      [
-                        "Created At",
-                        selectedOutletDetails?.createdAt
-                          ? new Date(
-                            selectedOutletDetails?.createdAt,
-                          ).toLocaleString()
-                          : "",
-                      ],
-                      [
-                        "Last Updated",
-                        selectedOutletDetails?.updatedAt
-                          ? new Date(
-                            selectedOutletDetails?.updatedAt,
-                          ).toLocaleString()
-                          : "",
-                      ],
-                    ].map(([label, value]) => (
-                      <div
-                        key={label}
-                        className="flex border-b border-gray-100 dark:border-gray-800 py-2"
-                      >
-                        <div className="w-40 font-semibold text-gray-700 dark:text-gray-300">
-                          {label}:
-                        </div>
-                        <div className="flex-1 text-gray-900 dark:text-gray-100">
-                          {value || <span className="text-gray-400">—</span>}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                </div>
-
-              </div>
-            </div>
-          </div>
-        </Modal.Body>
-      </Modal>
-
-      {/* Edit Outlet Modal */}
       {/* Outlet Details Modal */}
       <Modal show={openModal} onClose={onCloseModal} size="6xl">
         <Modal.Header>Outlet Details</Modal.Header>
@@ -2022,28 +1748,6 @@ const OutletList = () => {
         <Modal.Header>{documentTitle}</Modal.Header>
 
         <Modal.Body>
-          <div className="flex justify-center">
-            {selectedDocument ? (
-              <img
-                src={selectedDocument}
-                alt={documentTitle}
-                className="max-h-[450px] w-auto object-contain rounded-lg border"
-              />
-            ) : (
-              <p>No document found</p>
-            )}
-          </div>
-        </Modal.Body>
-      </Modal>
-
-      <Modal
-        show={openDocumentModal}
-        onClose={() => setOpenDocumentModal(false)}
-        size="lg"
-      >
-        <Modal.Header>{documentTitle}</Modal.Header>
-
-        <Modal.Body>
           <div className="flex justify-center items-center">
             {selectedDocument ? (
               <img
@@ -2237,6 +1941,315 @@ const OutletList = () => {
           ) : (
             <p className="text-center !text-white">No distributor mapped</p>
           )}
+        </Modal.Body>
+      </Modal>
+      {/* Edit Outlet Modal */}
+      <Modal show={openEditModal} onClose={onCloseEditModal} size="6xl">
+        <Modal.Header>Edit Outlet</Modal.Header>
+        <Modal.Body>
+          <form onSubmit={handleEditSubmit} className="space-y-6">
+            {/* Basic Information */}
+            <div className="border-b pb-4">
+              <h3 className="text-lg font-semibold mb-4 dark:text-white">
+                Basic Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="outletName" value="Outlet Name *" />
+                  <TextInput
+                    id="outletName"
+                    type="text"
+                    value={editOutletData?.outletName || ""}
+                    onChange={(e) =>
+                      setEditOutletData({
+                        ...editOutletData,
+                        outletName: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="ownerName" value="Owner Name *" />
+                  <TextInput
+                    id="ownerName"
+                    type="text"
+                    value={editOutletData?.ownerName || ""}
+                    onChange={(e) =>
+                      setEditOutletData({
+                        ...editOutletData,
+                        ownerName: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Information */}
+            <div className="border-b pb-4 dark:text-white">
+              <h3 className="text-lg font-semibold mb-4 dark:text-white">
+                Contact Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="mobile1" value="Mobile Number" />
+                  <TextInput
+                    id="mobile1"
+                    type="tel"
+                    value={editOutletData?.mobile1 || ""}
+                    onChange={(e) =>
+                      setEditOutletData({ ...editOutletData, mobile1: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="mobile2" value="Alternate Number" />
+                  <TextInput
+                    id="mobile2"
+                    type="tel"
+                    value={editOutletData?.mobile2 || ""}
+                    onChange={(e) =>
+                      setEditOutletData({ ...editOutletData, mobile2: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="whatsappNumber" value="WhatsApp Number" />
+                  <TextInput
+                    id="whatsappNumber"
+                    type="tel"
+                    value={editOutletData?.whatsappNumber || ""}
+                    onChange={(e) =>
+                      setEditOutletData({
+                        ...editOutletData,
+                        whatsappNumber: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="email" value="Email" />
+                  <TextInput
+                    id="email"
+                    type="email"
+                    value={editOutletData?.email || ""}
+                    onChange={(e) =>
+                      setEditOutletData({ ...editOutletData, email: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Address Information */}
+            <div className="border-b pb-4 dark:text-white">
+              <h3 className="text-lg font-semibold mb-4 dark:text-white">
+                Address Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <Label value="Select Beat" />
+                  <SearchableSelect
+                    id="beatId"
+                    label="Select Beat"
+                    placeholder="Beat"
+                    multiple={true}
+                    options={beats}
+                    value={editOutletData?.beatId}
+                    onChange={(e) =>
+                      setEditOutletData({ ...editOutletData, beatId: e.target.value })
+                    }
+                    displayKey="name"
+                    descKey="code"
+                    valueKey="_id"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="address1" value="Address" />
+                  <TextInput
+                    id="address1"
+                    type="text"
+                    value={editOutletData?.address1 || ""}
+                    onChange={(e) =>
+                      setEditOutletData({
+                        ...editOutletData,
+                        address1: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <Label htmlFor="city" value="City" />
+                  <TextInput
+                    id="city"
+                    type="text"
+                    value={editOutletData?.city || ""}
+                    onChange={(e) =>
+                      setEditOutletData({ ...editOutletData, city: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="pin" value="PIN Code" />
+                  <TextInput
+                    id="pin"
+                    type="text"
+                    value={editOutletData?.pin || ""}
+                    onChange={(e) =>
+                      setEditOutletData({ ...editOutletData, pin: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                  <Label htmlFor="shipToAddress" value="Ship To Address" />
+                  <TextInput
+                    id="shipToAddress"
+                    type="text"
+                    value={editOutletData?.shipToAddress || ""}
+                    onChange={(e) =>
+                      setEditOutletData({
+                        ...editOutletData,
+                        shipToAddress: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="mt-4">
+                <Label htmlFor="shipToPincode" value="Ship To PIN Code" />
+                <TextInput
+                  id="shipToPincode"
+                  type="text"
+                  value={editOutletData?.shipToPincode || ""}
+                  onChange={(e) =>
+                    setEditOutletData({
+                      ...editOutletData,
+                      shipToPincode: e.target.value,
+                    })
+                  }
+                />
+              </div>
+            </div>
+
+            {/* Business Information */}
+            <div className="border-b pb-4 dark:text-white">
+              <h3 className="text-lg font-semibold mb-4">Business Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="categoryOfOutlet" value="Category of Outlet (required)" />
+                  <Select
+                    id="categoryOfOutlet"
+                    value={editOutletData?.categoryOfOutlet || ""}
+                    onChange={(e) =>
+                      setEditOutletData({
+                        ...editOutletData,
+                        categoryOfOutlet: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">Select Category</option>
+                    <option value="Economy">Economy</option>
+                    <option value="Premium">Premium</option>
+                    <option value="RETAILER">Retailer</option>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="retailerClass" value="Retailer Class (Required)" />
+                  <Select
+                    id="retailerClass"
+                    value={editOutletData?.retailerClass || ""}
+                    onChange={(e) =>
+                      setEditOutletData({
+                        ...editOutletData,
+                        retailerClass: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">Select Class</option>
+                    <option value="A">Class A</option>
+                    <option value="B">Class B</option>
+                    <option value="C">Class C</option>
+                    <option value="D">Class D</option>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            {/* Legal Information */}
+            <div className="border-b pb-4 dark:text-white">
+              <h3 className="text-lg font-semibold mb-4">Legal Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="gstin" value="GST IN" />
+                  <TextInput
+                    id="gstin"
+                    type="text"
+                    value={editOutletData?.gstin || ""}
+                    onChange={(e) =>
+                      setEditOutletData({ ...editOutletData, gstin: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="aadharNumber" value="Aadhar Number" />
+                  <TextInput
+                    id="aadharNumber"
+                    type="text"
+                    value={editOutletData?.aadharNumber || ""}
+                    onChange={(e) =>
+                      setEditOutletData({
+                        ...editOutletData,
+                        aadharNumber: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="panNumber" value="PAN Number" />
+                  <TextInput
+                    id="panNumber"
+                    type="text"
+                    value={editOutletData?.panNumber || ""}
+                    onChange={(e) =>
+                      setEditOutletData({
+                        ...editOutletData,
+                        panNumber: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Form Actions */}
+            <div className="flex justify-end gap-2 pt-4 dark:text-white">
+              <Button
+                type="button"
+                color="gray"
+                onClick={onCloseEditModal}
+                disabled={editLoading}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" color="blue" disabled={editLoading}>
+                {editLoading ? (
+                  <>
+                    <Spinner size="sm" className="mr-2" />
+                    Updating...
+                  </>
+                ) : (
+                  "Update Outlet"
+                )}
+              </Button>
+            </div>
+          </form>
         </Modal.Body>
       </Modal>
     </div>

@@ -11,9 +11,11 @@ const initialState = {
 // Create an async thunk to fetch distributor data
 export const fetchDistributors = createAsyncThunk(
   "distributors/fetchDistributors",
-  async (_, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      let res = await AllDistributorList();
+      // params: { sortBy, sortOrder } — both optional. Called with no
+      // args (fetchDistributors()) still works exactly as before.
+      let res = await AllDistributorList(params);
       return res?.data?.data || [];
     } catch (error) {
       return rejectWithValue(error.response.data);

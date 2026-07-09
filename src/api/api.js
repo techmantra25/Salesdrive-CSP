@@ -606,10 +606,11 @@ export const updatePricing = async (payload, id) => {
   }
 };
 
-export const AllDistributorList = async () => {
+export const AllDistributorList = async (params = {}) => {
   try {
     const response = await axios.get(BACKEND_URL + `/api/v1/distributor/list`, {
       headers: setAuthHeader(),
+      params, // e.g. { sortBy: "dbCode", sortOrder: "asc" }
     });
     return response;
   } catch (error) {
@@ -620,6 +621,7 @@ export const AllDistributorList = async () => {
     );
   }
 };
+
 
 export const addDistributor = async (payload) => {
   try {
