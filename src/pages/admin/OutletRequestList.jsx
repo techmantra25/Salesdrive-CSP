@@ -71,6 +71,7 @@ const OutletRequestList = () => {
   const [singleOutletForm, setSingleOutletForm] = useState({
     outletCode: "",
     outletName: "",
+    sudoName: "",
     ownerName: "",
 
     employeeCode: "",
@@ -373,6 +374,7 @@ const OutletRequestList = () => {
     const headers = [
       "Outlet Code",
       "Outlet Name",
+      "Sudo Name",
       "Owner Name",
       "Employee Code",
       "Beat Code",
@@ -399,6 +401,7 @@ const OutletRequestList = () => {
     const descriptions = [
       "(Required)",
       "(Required)",
+      "(Optional)",
       "(Required)",
       "(Optional)",
       "(Required) [Example: BEAT-492,BEAT-183]",
@@ -506,6 +509,9 @@ const OutletRequestList = () => {
         outletName:
           singleOutletForm.outletName?.trim(),
 
+        sudoName:
+          singleOutletForm.sudoName?.trim(),
+
         ownerName:
           singleOutletForm.ownerName?.trim(),
 
@@ -566,6 +572,7 @@ const OutletRequestList = () => {
       setSingleOutletForm({
         outletCode: "",
         outletName: "",
+        sudoName: "",
         ownerName: "",
 
         employeeCode: "",
@@ -1038,7 +1045,11 @@ const OutletRequestList = () => {
                             </Table.Cell> */}
                             <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200 cursor-pointer">
                               <div className="flex gap-2 justify-center items-center">
-                                {outlet?.outletName}
+                                <span>
+                                  {outlet?.outletName}
+                                  {outlet?.sudoName && ` (${outlet.sudoName})`}
+                                </span>
+
                                 <span
                                   className="cursor-pointer"
                                   onClick={() => handleOutletDetails(outlet)}
@@ -1102,6 +1113,7 @@ const OutletRequestList = () => {
                             ["Outlet Code", selectedOutletDetails?.outletCode],
                             // ["Outlet UID", selectedOutletDetails?.outletUID],
                             ["Outlet Name", selectedOutletDetails?.outletName],
+                            ["Sudo Name", selectedOutletDetails?.sudoName],
                             ["Owner Name", selectedOutletDetails?.ownerName],
                             ["Mobile 1", selectedOutletDetails?.mobile1],
                             ["Mobile 2", selectedOutletDetails?.mobile2],
@@ -1279,6 +1291,24 @@ const OutletRequestList = () => {
                         name="outletName"
                         placeholder="Enter outlet name"
                         value={singleOutletForm.outletName}
+                        onChange={handleSingleOutletChange}
+                        className={commonInputClass}
+                      />
+                    </div>
+
+                    {/* Sudo Name */}
+                    <div>
+                      <Label
+                        value="Sudo Name"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                      />
+
+                      <TextInput
+                        sizing="md"
+                        shadow
+                        name="sudoName"
+                        placeholder="Enter sudo name"
+                        value={singleOutletForm.sudoName}
                         onChange={handleSingleOutletChange}
                         className={commonInputClass}
                       />

@@ -63,6 +63,7 @@ import { downloadFile } from "../../utils/downloadFile";
 // population happens after the sort/query resolves.
 const SORTABLE_COLUMNS = new Set([
   "outletName",
+  "sudoName",
   "ownerName",
   "outletCode",
   // "outletUID",
@@ -335,6 +336,7 @@ const OutletList = () => {
   const handleEditOutlet = (outlet) => {
     setEditOutletData({
       outletName: outlet?.outletName || "",
+      sudoName: outlet?.sudoName || "",
       ownerName: outlet?.ownerName || "",
       mobile1: outlet?.mobile1 || "",
       mobile2: outlet?.mobile2 || "",
@@ -1399,7 +1401,11 @@ const OutletList = () => {
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200 cursor-pointer">
                         <div className="flex gap-2 justify-center items-center">
-                          {outlet?.outletName}
+                          <span>
+                            {outlet?.outletName}
+                            {outlet?.sudoName ? ` (${outlet.sudoName})` : ""}
+                          </span>
+
                           <span
                             className="cursor-pointer"
                             onClick={() => handleOutletDetails(outlet)}
@@ -1523,6 +1529,7 @@ const OutletList = () => {
                   ["Outlet Code", selectedOutletDetails?.outletCode],
                   // ["Outlet UID", selectedOutletDetails?.outletUID],
                   ["Outlet Name", selectedOutletDetails?.outletName],
+                  ["Sudo Name", selectedOutletDetails?.sudoName],
                   ["Owner Name", selectedOutletDetails?.ownerName],
 
                   ["Mobile 1", selectedOutletDetails?.mobile1],
@@ -1967,6 +1974,22 @@ const OutletList = () => {
                       })
                     }
                     required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="sudoName" value="Sudo Name" />
+                  <TextInput
+                    id="sudoName"
+                    type="text"
+                    value={editOutletData?.sudoName || ""}
+                    onChange={(e) =>
+                      setEditOutletData({
+                        ...editOutletData,
+                        sudoName: e.target.value,
+                      })
+                    }
+                    placeholder="Enter sudo name"
                   />
                 </div>
 
