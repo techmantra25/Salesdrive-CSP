@@ -1161,7 +1161,7 @@ const OutletList = () => {
               <TextInput
                 type="text"
                 className="px-3 rounded-sm w-full"
-                placeholder="Search Outlet by Name"
+                placeholder="Search Outlet"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
