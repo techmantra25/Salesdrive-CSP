@@ -353,6 +353,7 @@ const OutletList = () => {
       aadharNumber: outlet?.aadharNumber || "",
       panNumber: outlet?.panNumber || "",
       retailerClass: outlet?.retailerClass || "",
+      empId: outlet?.employeeId?.empId || "",
       enrolledStatus: outlet?.enrolledStatus || "",
       shipToAddress: outlet?.shipToAddress || "",
       shipToPincode: outlet?.shipToPincode || "",
@@ -2006,6 +2007,21 @@ const OutletList = () => {
                       })
                     }
                     required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="empId" value="Employee Code" />
+                  <TextInput
+                    id="empId"
+                    type="text"
+                    value={editOutletData?.empId || ""}
+                    onChange={(e) =>
+                      setEditOutletData((prev) => ({
+                        ...prev,
+                        empId: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter Employee Code"
                   />
                 </div>
               </div>

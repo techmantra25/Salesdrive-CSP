@@ -1402,15 +1402,25 @@ const OutletRequestList = () => {
                     </div>
 
                     {/* Employee Code */}
+                    {/* Employee Code */}
                     <div>
                       <Label
-                        value="Employee Code"
+                        value={
+                          <>
+                            Employee Code <span className="text-red-500">*</span>
+                          </>
+                        }
                         className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
+                        sizing="md"
+                        shadow
+                        required
+                        name="employeeCode"
+                        placeholder="Enter employee code"
                         value={singleOutletForm.employeeCode}
-                        readOnly
+                        onChange={handleSingleOutletChange}
                         className={commonInputClass}
                       />
                     </div>
