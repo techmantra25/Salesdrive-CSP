@@ -67,6 +67,7 @@ const SORTABLE_COLUMNS = new Set([
   "ownerName",
   "outletCode",
   // "outletUID",
+  "cso",
   "mobile1",
   "mobile2",
   "email",
@@ -1302,6 +1303,9 @@ const OutletList = () => {
                 <SortableHeader field="ownerName">Owner Name</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
+  <SortableHeader field="cso">CSO</SortableHeader>
+</Table.HeadCell>
+              <Table.HeadCell className="whitespace-nowrap">
                 <SortableHeader field="mobile1">Phone Number</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
@@ -1430,7 +1434,9 @@ const OutletList = () => {
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.ownerName}
                       </Table.Cell>
-
+                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                        {outlet?.cso || "-"}
+                      </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.mobile1}
                       </Table.Cell>
