@@ -354,6 +354,7 @@ const OutletList = () => {
       panNumber: outlet?.panNumber || "",
       retailerClass: outlet?.retailerClass || "",
       empId: outlet?.employeeId?.empId || "",
+      cso: outlet?.cso || "",
       enrolledStatus: outlet?.enrolledStatus || "",
       shipToAddress: outlet?.shipToAddress || "",
       shipToPincode: outlet?.shipToPincode || "",
@@ -2022,6 +2023,20 @@ const OutletList = () => {
                       }))
                     }
                     placeholder="Enter Employee Code"
+                  />
+                </div>
+                <div>
+                  <Label value="CSO" className="mb-2 block" />
+                  <TextInput
+                    name="cso"
+                    value={editOutletData?.cso || ""}
+                    onChange={(e) =>
+                      setEditOutletData((prev) => ({
+                        ...prev,
+                        cso: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter CSO"
                   />
                 </div>
               </div>
