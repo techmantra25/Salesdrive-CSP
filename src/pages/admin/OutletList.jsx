@@ -1303,8 +1303,8 @@ const OutletList = () => {
                 <SortableHeader field="ownerName">Owner Name</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
-  <SortableHeader field="cso">CSO</SortableHeader>
-</Table.HeadCell>
+                <SortableHeader field="cso">CSO</SortableHeader>
+              </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
                 <SortableHeader field="mobile1">Phone Number</SortableHeader>
               </Table.HeadCell>
