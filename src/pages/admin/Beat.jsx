@@ -133,9 +133,6 @@ const Beat = () => {
     }
   };
 
-  const distributorListByRegion = activeDistributors.filter(
-    (distributor) => distributor?.regionId?._id === regionId
-  );
 
   let fetchOutletsPaginated = useDebounce(
     fetchOutletsPaginatedWithOutDebounce,
@@ -969,13 +966,12 @@ const Beat = () => {
                 </div>
                 <div>
                   {/* <Label htmlFor="region">Region *</Label> */}
-                   <Label htmlFor="region">State *</Label>
+                  <Label htmlFor="region">State *</Label>
                   <Select
                     id="region"
                     value={regionId}
                     onChange={(e) => {
                       setRegionId(e.target.value);
-                      setDistributorId([]); // Clear selected distributors when state changes
                     }}
                   >
                     <option value="">Select State</option>
@@ -994,7 +990,7 @@ const Beat = () => {
                     </div>
                     <SearchableSelect
                       id="distributorId"
-                      options={distributorListByRegion}
+                      options={activeDistributors}
                       value={distributorId}
                       onChange={(e) => setDistributorId(e.target.value)}
                       placeholder="Select Distributor"
