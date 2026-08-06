@@ -37,6 +37,7 @@ import { createSingleOutlet } from "../../api/api";
 import { TextInput } from "flowbite-react";
 import SearchableSelect from "../../components/SearchableSelect";
 import validatePhone from "../../utils/validatePhone";
+import {SearchEmployeeById} from "../../api/api";
 
 
 const OutletRequestList = () => {
@@ -57,6 +58,7 @@ const OutletRequestList = () => {
     endDate: null,
   });
   const { openConfirmationModel } = useContext(ConfirmationModelContext);
+  const [employeeSearchLoading, setEmployeeSearchLoading] = useState(false);
   const [errorLog, setErrorLog] = useState([]);
   const [selectedOutletIds, setSelectedOutletIds] = useState([]);
 
@@ -101,7 +103,41 @@ const OutletRequestList = () => {
     aadhaarImage: "",
     bankImage: "",
   });
+const fetchEmployeeByCodeWithoutDebounce = async (code) => {
+  if (!code?.trim()) {
+    setSingleOutletForm((prev) => ({ ...prev, employeeName: "" }));
+    return;
+  }
+  try {
+    setEmployeeSearchLoading(true);
+    const response = await SearchEmployeeById(code.trim());
+    const match =
+      response?.data?.data?.find(
+        (emp) => emp.empId?.toLowerCase() === code.trim().toLowerCase()
+      ) || response?.data?.data?.[0];
 
+    setSingleOutletForm((prev) => ({
+      ...prev,
+      employeeName: match?.name || "",
+    }));
+
+    if (!match) {
+      toast.error("No employee found for this code");
+    }
+  } catch (error) {
+    setSingleOutletForm((prev) => ({ ...prev, employeeName: "" }));
+    toast.error(
+      error?.message || "Failed to fetch employee details"
+    );
+  } finally {
+    setEmployeeSearchLoading(false);
+  }
+};
+
+const fetchEmployeeByCode = useDebounce(
+  fetchEmployeeByCodeWithoutDebounce,
+  500
+);
   useEffect(() => {
     if (!permissionState?.data?.data) return;
     const permission = getPagePermission(permissionState, "outlet-lead");
@@ -441,19 +477,24 @@ const OutletRequestList = () => {
   };
 
 
-  const handleSingleOutletChange = (e) => {
-    const { name, value } = e.target;
-    if (["mobile1", "mobile2", "whatsappNumber"].includes(name)) {
-      const cleaned = value.replace(/\D/g, "");
-      if (cleaned.length > 10) return;
-      setSingleOutletForm((prev) => ({ ...prev, [name]: cleaned }));
-      return;
-    }
-    setSingleOutletForm({
-      ...singleOutletForm,
-      [name]: value,
-    });
-  };
+const handleSingleOutletChange = (e) => {
+  const { name, value } = e.target;
+  if (["mobile1", "mobile2", "whatsappNumber"].includes(name)) {
+    const cleaned = value.replace(/\D/g, "");
+    if (cleaned.length > 10) return;
+    setSingleOutletForm((prev) => ({ ...prev, [name]: cleaned }));
+    return;
+  }
+
+  setSingleOutletForm({
+    ...singleOutletForm,
+    [name]: value,
+  });
+
+  if (name === "employeeCode") {
+    fetchEmployeeByCode(value);
+  }
+};
 
   const handleCreateSingleOutlet = async () => {
     try {
@@ -1433,11 +1474,13 @@ const OutletRequestList = () => {
                         className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
-                      <TextInput
-                        value={singleOutletForm.employeeName}
-                        readOnly
-                        className={commonInputClass}
-                      />
+                     <TextInput
+  value={
+    employeeSearchLoading ? "Searching..." : singleOutletForm.employeeName
+  }
+  readOnly
+  className={commonInputClass}
+/>
                     </div>
 
                     {/* CSO */}

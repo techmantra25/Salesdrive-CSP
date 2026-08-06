@@ -55,6 +55,7 @@ import { BulkRebuildRetailerTransaction } from "../../api/rbp/transaction";
 import { IoClose } from "react-icons/io5";
 import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import { downloadFile } from "../../utils/downloadFile";
+import { SearchEmployeeById } from "../../api/api";
 
 // Keep this in sync with the backend SORTABLE_FIELDS whitelist
 // (controllers/outletApproved/paginatedOutletApproved.js). Only fields that
@@ -109,6 +110,8 @@ const OutletList = () => {
   const [selectedDistributor, setSelectedDistributor] = useState("default");
   const [selectedBeat, setSelectedBeat] = useState("default");
   const [statusFilter, setStatusFilter] = useState("active");
+  const [editEmployeeName, setEditEmployeeName] = useState("");
+  const [editEmployeeSearchLoading, setEditEmployeeSearchLoading] = useState(false);
   const [dateRange, setDateRange] = useState({
     startDate: null,
     endDate: null,
@@ -362,6 +365,7 @@ const OutletList = () => {
       competitorBrands: outlet?.competitorBrands || [],
       preferredLanguage: outlet?.preferredLanguage || "",
       teleCallDay: outlet?.teleCallDay || "",
+
       marketCenter: outlet?.marketCenter || "",
       gpsLocation: outlet?.gpsLocation || "",
       beatId: Array.isArray(outlet?.beatId)
@@ -375,9 +379,39 @@ const OutletList = () => {
       googleMapLink: outlet?.googleMapLink || "",
     });
     setSelectedOutletDetails(outlet);
+    setEditEmployeeName(outlet?.employeeId?.name || "");
     setOpenEditModal(true);
   };
+  const fetchEditEmployeeByCodeWithoutDebounce = async (code) => {
+    if (!code?.trim()) {
+      setEditEmployeeName("");
+      return;
+    }
+    try {
+      setEditEmployeeSearchLoading(true);
+      const response = await SearchEmployeeById(code.trim());
+      const match =
+        response?.data?.data?.find(
+          (emp) => emp.empId?.toLowerCase() === code.trim().toLowerCase()
+        ) || response?.data?.data?.[0];
 
+      setEditEmployeeName(match?.name || "");
+
+      if (!match) {
+        toast.error("No employee found for this code");
+      }
+    } catch (error) {
+      setEditEmployeeName("");
+      toast.error(error?.message || "Failed to fetch employee details");
+    } finally {
+      setEditEmployeeSearchLoading(false);
+    }
+  };
+
+  const fetchEditEmployeeByCode = useDebounce(
+    fetchEditEmployeeByCodeWithoutDebounce,
+    500
+  );
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     console.log("🚀 Source IDs sent to backend:", editOutletData.massistRefIds);
@@ -406,8 +440,8 @@ const OutletList = () => {
     setOpenEditModal(false);
     setEditOutletData(null);
     setSelectedOutletDetails(null);
+    setEditEmployeeName("");
   };
-
   const onCloseModal = () => {
     fetchOutletsPaginated();
     setOpenModal(false);
@@ -2022,13 +2056,26 @@ const OutletList = () => {
                     id="empId"
                     type="text"
                     value={editOutletData?.empId || ""}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const value = e.target.value;
                       setEditOutletData((prev) => ({
                         ...prev,
-                        empId: e.target.value,
-                      }))
-                    }
+                        empId: value,
+                      }));
+                      fetchEditEmployeeByCode(value);
+                    }}
                     placeholder="Enter Employee Code"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="empName" value="Employee Name" />
+                  <TextInput
+                    id="empName"
+                    type="text"
+                    value={editEmployeeSearchLoading ? "Searching..." : editEmployeeName}
+                    readOnly
+                    placeholder="Auto-filled from Employee Code"
                   />
                 </div>
                 <div>

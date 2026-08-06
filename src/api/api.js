@@ -987,6 +987,24 @@ export const updateEmployee = async (payload, id) => {
     );
   }
 };
+export const SearchEmployeeById = async (query) => {
+  try {
+    const response = await axios.get(
+      `${BACKEND_URL}/api/v1/employee/search-by-id`,
+      {
+        headers: setAuthHeader(),
+        params: { query },
+      },
+    );
+    return response;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to search employee, try again",
+    );
+  }
+};
 
 export const getBeats = async () => {
   try {
