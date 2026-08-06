@@ -76,6 +76,7 @@ const OutletRequestList = () => {
 
     employeeCode: "",
     employeeName: "",
+    cso: "",
 
     beatCode: "",
     subDivisionCode: "",
@@ -517,7 +518,7 @@ const OutletRequestList = () => {
 
         employeeCode:
           singleOutletForm.employeeCode?.trim(),
-
+        cso: singleOutletForm.cso?.trim(),
         beatCode:
           singleOutletForm.beatCode?.trim(),
 
@@ -1402,15 +1403,25 @@ const OutletRequestList = () => {
                     </div>
 
                     {/* Employee Code */}
+                    {/* Employee Code */}
                     <div>
                       <Label
-                        value="Employee Code"
+                        value={
+                          <>
+                            Employee Code <span className="text-red-500">*</span>
+                          </>
+                        }
                         className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
                       />
 
                       <TextInput
+                        sizing="md"
+                        shadow
+                        required
+                        name="employeeCode"
+                        placeholder="Enter employee code"
                         value={singleOutletForm.employeeCode}
-                        readOnly
+                        onChange={handleSingleOutletChange}
                         className={commonInputClass}
                       />
                     </div>
@@ -1429,6 +1440,23 @@ const OutletRequestList = () => {
                       />
                     </div>
 
+                    {/* CSO */}
+                    <div>
+                      <Label
+                        value="CSO"
+                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                      />
+
+                      <TextInput
+                        sizing="md"
+                        shadow
+                        name="cso"
+                        placeholder="Enter CSO"
+                        value={singleOutletForm.cso}
+                        onChange={handleSingleOutletChange}
+                        className={commonInputClass}
+                      />
+                    </div>
                     {/* State Code */}
                     <div>
                       <Label

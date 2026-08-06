@@ -67,6 +67,7 @@ const SORTABLE_COLUMNS = new Set([
   "ownerName",
   "outletCode",
   // "outletUID",
+  "cso",
   "mobile1",
   "mobile2",
   "email",
@@ -353,6 +354,8 @@ const OutletList = () => {
       aadharNumber: outlet?.aadharNumber || "",
       panNumber: outlet?.panNumber || "",
       retailerClass: outlet?.retailerClass || "",
+      empId: outlet?.employeeId?.empId || "",
+      cso: outlet?.cso || "",
       enrolledStatus: outlet?.enrolledStatus || "",
       shipToAddress: outlet?.shipToAddress || "",
       shipToPincode: outlet?.shipToPincode || "",
@@ -1300,6 +1303,9 @@ const OutletList = () => {
                 <SortableHeader field="ownerName">Owner Name</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
+                <SortableHeader field="cso">CSO</SortableHeader>
+              </Table.HeadCell>
+              <Table.HeadCell className="whitespace-nowrap">
                 <SortableHeader field="mobile1">Phone Number</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
@@ -1428,7 +1434,9 @@ const OutletList = () => {
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.ownerName}
                       </Table.Cell>
-
+                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                        {outlet?.cso || "-"}
+                      </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.mobile1}
                       </Table.Cell>
@@ -2006,6 +2014,35 @@ const OutletList = () => {
                       })
                     }
                     required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="empId" value="Employee Code" />
+                  <TextInput
+                    id="empId"
+                    type="text"
+                    value={editOutletData?.empId || ""}
+                    onChange={(e) =>
+                      setEditOutletData((prev) => ({
+                        ...prev,
+                        empId: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter Employee Code"
+                  />
+                </div>
+                <div>
+                  <Label value="CSO" className="mb-2 block" />
+                  <TextInput
+                    name="cso"
+                    value={editOutletData?.cso || ""}
+                    onChange={(e) =>
+                      setEditOutletData((prev) => ({
+                        ...prev,
+                        cso: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter CSO"
                   />
                 </div>
               </div>
