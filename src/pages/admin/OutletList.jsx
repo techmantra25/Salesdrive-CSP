@@ -790,6 +790,7 @@ const OutletList = () => {
       "Outlet Code",
       "Source ID",
       "Outlet Name",
+      "Sudo Name",
       "Owner Name",
       "Employee Code",
       "Beat Code",
@@ -808,6 +809,7 @@ const OutletList = () => {
       "PAN Number",
       "GSTIN",
       "Retailer Class",
+      "CSO",
       "Brand Code",
     ];
 
@@ -815,6 +817,7 @@ const OutletList = () => {
 
       "REQUIRED",
       '"(OPTIONAL) :[Example: 5985455, 588744]"',
+      "(OPTIONAL)",
       "(OPTIONAL)",
       "(OPTIONAL)",
       "(OPTIONAL)",
