@@ -300,7 +300,7 @@ export const adminSidebarConfig = [
     icon: AiOutlineMenuUnfold,
     children: [
       {
-        label: "Outlet Lead",
+        label: "Add Outlet",
         path: "/admin/outlet-requests",
         icon: FaCodePullRequest,
       },
@@ -836,7 +836,7 @@ export const usersidebarconfig = [
     icon: AiOutlineMenuUnfold,
     children: [
       {
-        label: "Outlet Lead",
+        label: "Add Outlet",
         path: "/user/outlet-requests",
         icon: FaCodePullRequest,
         slug: "outlet-lead",
@@ -1388,7 +1388,7 @@ export const subadminssidebarconfig = [
     icon: AiOutlineMenuUnfold,
     children: [
       {
-        label: "Outlet Lead",
+        label: "Add Outlet",
         path: "/sub-admins/outlet-requests",
         icon: FaCodePullRequest,
         slug: "outlet-lead",
@@ -1940,7 +1940,7 @@ export const aaadminsesidebarconfig = [
     icon: AiOutlineMenuUnfold,
     children: [
       {
-        label: "Outlet Lead",
+        label: "Add Outlet",
         path: "/admine/outlet-requests",
         icon: FaCodePullRequest,
         slug: "outlet-lead",
@@ -2493,7 +2493,7 @@ export const salessidebarconfig = [
     icon: AiOutlineMenuUnfold,
     children: [
       {
-        label: "Outlet Lead",
+        label: "Add Outlet",
         path: "/sales/outlet-requests",
         icon: FaCodePullRequest,
         slug: "outlet-lead",
