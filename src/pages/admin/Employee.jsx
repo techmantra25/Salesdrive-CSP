@@ -330,15 +330,15 @@ export const Employee = () => {
         console.log(selectedEmployee._id, "selectedEmployee._id");
         console.log("formData", formData);
 
-console.log(
-  "Selected Region Object",
-  regions.find((r) => r._id === formData.regionId[0])
-);
+        console.log(
+          "Selected Region Object",
+          regions.find((r) => r._id === formData.regionId[0])
+        );
 
-console.log(
-  "Selected State Object",
-  states.find((s) => s._id === formData.stateId)
-);
+        console.log(
+          "Selected State Object",
+          states.find((s) => s._id === formData.stateId)
+        );
         await updateEmployee(cleanedFormData, selectedEmployee._id);
         toast.success("Employee updated successfully");
       }
@@ -539,46 +539,46 @@ console.log(
     setRegionToRemove(null);
   };
 
- const fetchReportingMangers = async (desgId) => {
-  try {
-    setManLoading(true);
+  const fetchReportingMangers = async (desgId) => {
+    try {
+      setManLoading(true);
 
-    const selectedDesignation = designations.find(
-      (desg) => desg._id === desgId
-    );
+      const selectedDesignation = designations.find(
+        (desg) => desg._id === desgId
+      );
 
-    const designationName = selectedDesignation?.name;
+      const designationName = selectedDesignation?.name;
 
-    let managerDesignationNames = [];
+      let managerDesignationNames = [];
 
-    if (designationName === "MO/SO") {
-      managerDesignationNames = ["ASM", "RSM"];
-    } else if (designationName === "ASM") {
-      managerDesignationNames = ["RSM"];
-    } else {
-      managerDesignationNames = [];
+      if (designationName === "MO/SO") {
+        managerDesignationNames = ["ASM", "RSM"];
+      } else if (designationName === "ASM") {
+        managerDesignationNames = ["RSM"];
+      } else {
+        managerDesignationNames = [];
+      }
+
+      const managerDesignationIds = designations
+        .filter((desg) => managerDesignationNames.includes(desg.name))
+        .map((desg) => desg._id);
+
+      const responses = await Promise.all(
+        managerDesignationIds.map((id) => getEmployeeByDesignation(id))
+      );
+
+      const managers = responses.flatMap(
+        (response) => response?.data?.data || []
+      );
+
+      setReportingMangers(managers);
+    } catch (error) {
+      console.log(error);
+      setReportingMangers([]);
+    } finally {
+      setManLoading(false);
     }
-
-    const managerDesignationIds = designations
-      .filter((desg) => managerDesignationNames.includes(desg.name))
-      .map((desg) => desg._id);
-
-    const responses = await Promise.all(
-      managerDesignationIds.map((id) => getEmployeeByDesignation(id))
-    );
-
-    const managers = responses.flatMap(
-      (response) => response?.data?.data || []
-    );
-
-    setReportingMangers(managers);
-  } catch (error) {
-    console.log(error);
-    setReportingMangers([]);
-  } finally {
-    setManLoading(false);
-  }
-};
+  };
 
   const getParentDesignation = (desgId) => {
     let parentDesg = designations.find((desg) => desg._id === desgId)
@@ -631,13 +631,13 @@ console.log(
   // }, [formData?.desgId]);
 
   useEffect(() => {
-  if (formData?.desgId?.trim() !== "") {
-    fetchReportingMangers(formData.desgId);
-  } else {
-    setReportingMangers([]);
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [formData?.desgId]);
+    if (formData?.desgId?.trim() !== "") {
+      fetchReportingMangers(formData.desgId);
+    } else {
+      setReportingMangers([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData?.desgId]);
 
   useEffect(() => {
     fetchEmployeesPaginated();
@@ -1491,31 +1491,31 @@ console.log(
                     />
                   </div>
                   <div className="w-full">
-  <div className="mb-2 block text-gray-700 dark:text-gray-100">
-    <Label value="Designation *" />
-  </div>
-<Select
-  name="desgId"
-  value={formData.desgId}
-  onChange={handleChange}
-  required
->
-  <option value="">Select Designation</option>
+                    <div className="mb-2 block text-gray-700 dark:text-gray-100">
+                      <Label value="Designation *" />
+                    </div>
+                    <Select
+                      name="desgId"
+                      value={formData.desgId}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select Designation</option>
 
-  {designations
-    ?.filter((d) => ["MO/SO", "ASM", "RSM"].includes(d.name))
-    .sort(
-      (a, b) =>
-        ["MO/SO", "ASM", "RSM"].indexOf(a.name) -
-        ["MO/SO", "ASM", "RSM"].indexOf(b.name)
-    )
-    .map((designation) => (
-      <option key={designation._id} value={designation._id}>
-        {designation.name}
-      </option>
-    ))}
-</Select>
-</div>
+                      {designations
+                        ?.filter((d) => ["MO/SO", "ASM", "RSM"].includes(d.name))
+                        .sort(
+                          (a, b) =>
+                            ["MO/SO", "ASM", "RSM"].indexOf(a.name) -
+                            ["MO/SO", "ASM", "RSM"].indexOf(b.name)
+                        )
+                        .map((designation) => (
+                          <option key={designation._id} value={designation._id}>
+                            {designation.name}
+                          </option>
+                        ))}
+                    </Select>
+                  </div>
                   <div className="w-full space-y-4">
                     {/* Selected States & Distributors Display - Collapsible */}
                     {formData.regionId.length > 0 && (
@@ -1592,13 +1592,13 @@ console.log(
                                         >
                                           No, Cancel
                                         </Button>
-                                       <Button
+                                        <Button
                                           size="xs"
                                           color="failure"
                                           onClick={(e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                         setFormData((prev) => {
+                                            setFormData((prev) => {
                                               const remainingRegionIds = prev.regionId.filter(
                                                 (id) => id !== regId
                                               );
@@ -1690,7 +1690,7 @@ console.log(
                             setFormData((prev) => ({
                               ...prev,
                               regionId: [...prev.regionId, selectedRegionId],
-                             stateId: autoStateId,
+                              stateId: autoStateId,
                               zoneId: autoZoneId,
                             }));
                           }
@@ -1970,7 +1970,8 @@ console.log(
                     />
                   </div>
                   {formData?.desgId?.trim() !== "" &&
-                    getParentDesignation(formData?.desgId) && (
+                    designations.find((d) => d._id === formData.desgId)?.name !== "RSM" &&
+                    getParentDesignation(formData.desgId) && (
                       <div className="w-full">
                         <div className="mb-2 block text-gray-700 dark:text-gray-100">
                           <Label>
