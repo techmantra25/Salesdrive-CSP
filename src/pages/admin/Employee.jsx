@@ -539,17 +539,46 @@ console.log(
     setRegionToRemove(null);
   };
 
-  const fetchReportingMangers = async (desgId) => {
-    try {
-      setManLoading(true);
-      const response = await getEmployeeByDesignation(desgId);
-      setReportingMangers(response?.data?.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setManLoading(false);
+ const fetchReportingMangers = async (desgId) => {
+  try {
+    setManLoading(true);
+
+    const selectedDesignation = designations.find(
+      (desg) => desg._id === desgId
+    );
+
+    const designationName = selectedDesignation?.name;
+
+    let managerDesignationNames = [];
+
+    if (designationName === "MO/SO") {
+      managerDesignationNames = ["ASM", "RSM"];
+    } else if (designationName === "ASM") {
+      managerDesignationNames = ["RSM"];
+    } else {
+      managerDesignationNames = [];
     }
-  };
+
+    const managerDesignationIds = designations
+      .filter((desg) => managerDesignationNames.includes(desg.name))
+      .map((desg) => desg._id);
+
+    const responses = await Promise.all(
+      managerDesignationIds.map((id) => getEmployeeByDesignation(id))
+    );
+
+    const managers = responses.flatMap(
+      (response) => response?.data?.data || []
+    );
+
+    setReportingMangers(managers);
+  } catch (error) {
+    console.log(error);
+    setReportingMangers([]);
+  } finally {
+    setManLoading(false);
+  }
+};
 
   const getParentDesignation = (desgId) => {
     let parentDesg = designations.find((desg) => desg._id === desgId)
@@ -590,16 +619,25 @@ console.log(
     dispatch(fetchStates());
   }, [dispatch]);
 
+  // useEffect(() => {
+  //   if (
+  //     formData?.desgId?.trim() !== "" &&
+  //     getParentDesignation(formData?.desgId)
+  //   ) {
+  //     const parentDesg = getParentDesignation(formData?.desgId);
+  //     fetchReportingMangers(parentDesg);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [formData?.desgId]);
+
   useEffect(() => {
-    if (
-      formData?.desgId?.trim() !== "" &&
-      getParentDesignation(formData?.desgId)
-    ) {
-      const parentDesg = getParentDesignation(formData?.desgId);
-      fetchReportingMangers(parentDesg);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData?.desgId]);
+  if (formData?.desgId?.trim() !== "") {
+    fetchReportingMangers(formData.desgId);
+  } else {
+    setReportingMangers([]);
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [formData?.desgId]);
 
   useEffect(() => {
     fetchEmployeesPaginated();
@@ -1453,24 +1491,31 @@ console.log(
                     />
                   </div>
                   <div className="w-full">
-                    <div className="mb-2 block text-gray-700 dark:text-gray-100">
-                      <Label value="Designation *" />
-                    </div>
-                    <Select
-                      name="desgId"
-                      value={formData.desgId}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Select Designation</option>
-                      {designations?.length > 0 &&
-                        designations?.map((designation) => (
-                          <option key={designation?._id} value={designation?._id}>
-                            {designation?.name}
-                          </option>
-                        ))}
-                    </Select>
-                  </div>
+  <div className="mb-2 block text-gray-700 dark:text-gray-100">
+    <Label value="Designation *" />
+  </div>
+<Select
+  name="desgId"
+  value={formData.desgId}
+  onChange={handleChange}
+  required
+>
+  <option value="">Select Designation</option>
+
+  {designations
+    ?.filter((d) => ["MO/SO", "ASM", "RSM"].includes(d.name))
+    .sort(
+      (a, b) =>
+        ["MO/SO", "ASM", "RSM"].indexOf(a.name) -
+        ["MO/SO", "ASM", "RSM"].indexOf(b.name)
+    )
+    .map((designation) => (
+      <option key={designation._id} value={designation._id}>
+        {designation.name}
+      </option>
+    ))}
+</Select>
+</div>
                   <div className="w-full space-y-4">
                     {/* Selected States & Distributors Display - Collapsible */}
                     {formData.regionId.length > 0 && (
