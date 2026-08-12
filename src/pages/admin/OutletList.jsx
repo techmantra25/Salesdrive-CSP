@@ -66,6 +66,7 @@ const SORTABLE_COLUMNS = new Set([
   "outletName",
   "sudoName",
   "ownerName",
+  "createdBy",
   "outletCode",
   // "outletUID",
   "cso",
@@ -342,6 +343,7 @@ const OutletList = () => {
       outletName: outlet?.outletName || "",
       sudoName: outlet?.sudoName || "",
       ownerName: outlet?.ownerName || "",
+      createdBy: outlet?.createdBy || "",
       mobile1: outlet?.mobile1 || "",
       mobile2: outlet?.mobile2 || "",
       whatsappNumber: outlet?.whatsappNumber || "",
@@ -792,6 +794,7 @@ const OutletList = () => {
       "Outlet Name",
       "Sudo Name",
       "Owner Name",
+      "Created By",
       "Employee Code",
       "Beat Code",
       "State",
@@ -817,6 +820,7 @@ const OutletList = () => {
 
       "REQUIRED",
       '"(OPTIONAL) :[Example: 5985455, 588744]"',
+      "(OPTIONAL)",
       "(OPTIONAL)",
       "(OPTIONAL)",
       "(OPTIONAL)",
@@ -1340,6 +1344,9 @@ const OutletList = () => {
                 <SortableHeader field="ownerName">Owner Name</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
+                <SortableHeader field="createdBy">Created By</SortableHeader>
+              </Table.HeadCell>
+              <Table.HeadCell className="whitespace-nowrap">
                 <SortableHeader field="cso">CSO</SortableHeader>
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
@@ -1472,6 +1479,9 @@ const OutletList = () => {
                         {outlet?.ownerName}
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                        {outlet?.createdBy || "-"}
+                      </Table.Cell>
+                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.cso || "-"}
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
@@ -1576,6 +1586,7 @@ const OutletList = () => {
                   ["Outlet Name", selectedOutletDetails?.outletName],
                   ["Sudo Name", selectedOutletDetails?.sudoName],
                   ["Owner Name", selectedOutletDetails?.ownerName],
+                  ["Created By", selectedOutletDetails?.createdBy],
 
                   ["Mobile 1", selectedOutletDetails?.mobile1],
                   ["Mobile 2", selectedOutletDetails?.mobile2],
@@ -2053,6 +2064,24 @@ const OutletList = () => {
                     required
                   />
                 </div>
+
+                {/* Created By */}
+                <div>
+                  <Label htmlFor="createdBy" value="Created By" />
+                  <TextInput
+                    id="createdBy"
+                    type="text"
+                    value={editOutletData?.createdBy || ""}
+                    onChange={(e) =>
+                      setEditOutletData({
+                        ...editOutletData,
+                        createdBy: e.target.value,
+                      })
+                    }
+                    placeholder="Enter created by"
+                  />
+                </div>
+
                 <div>
                   <Label htmlFor="empId" value="Employee Code" />
                   <TextInput
