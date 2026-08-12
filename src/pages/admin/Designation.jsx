@@ -402,15 +402,15 @@ const Designation = () => {
                   >
                     <option value="">Select Parent Designation</option>
                     {filteredDesignations
-  .filter(
-    (element) =>
-      element.name === "ASM" || element.name === "RSM"
-  )
-  .map((element) => (
-    <option key={element._id} value={element._id}>
-      {element.name}
-    </option>
-  ))}
+                      .filter(
+                        (element) =>
+                          element.name === "ASM" || element.name === "RSM"
+                      )
+                      .map((element) => (
+                        <option key={element._id} value={element._id}>
+                          {element.name}
+                        </option>
+                      ))}
                   </Select>
                 </div>
 
