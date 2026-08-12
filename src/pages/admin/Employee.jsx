@@ -330,15 +330,15 @@ export const Employee = () => {
         console.log(selectedEmployee._id, "selectedEmployee._id");
         console.log("formData", formData);
 
-console.log(
-  "Selected Region Object",
-  regions.find((r) => r._id === formData.regionId[0])
-);
+        console.log(
+          "Selected Region Object",
+          regions.find((r) => r._id === formData.regionId[0])
+        );
 
-console.log(
-  "Selected State Object",
-  states.find((s) => s._id === formData.stateId)
-);
+        console.log(
+          "Selected State Object",
+          states.find((s) => s._id === formData.stateId)
+        );
         await updateEmployee(cleanedFormData, selectedEmployee._id);
         toast.success("Employee updated successfully");
       }
@@ -542,10 +542,39 @@ console.log(
   const fetchReportingMangers = async (desgId) => {
     try {
       setManLoading(true);
-      const response = await getEmployeeByDesignation(desgId);
-      setReportingMangers(response?.data?.data);
+
+      const selectedDesignation = designations.find(
+        (desg) => desg._id === desgId
+      );
+
+      const designationName = selectedDesignation?.name;
+
+      let managerDesignationNames = [];
+
+      if (designationName === "MO/SO") {
+        managerDesignationNames = ["ASM", "RSM"];
+      } else if (designationName === "ASM") {
+        managerDesignationNames = ["RSM"];
+      } else {
+        managerDesignationNames = [];
+      }
+
+      const managerDesignationIds = designations
+        .filter((desg) => managerDesignationNames.includes(desg.name))
+        .map((desg) => desg._id);
+
+      const responses = await Promise.all(
+        managerDesignationIds.map((id) => getEmployeeByDesignation(id))
+      );
+
+      const managers = responses.flatMap(
+        (response) => response?.data?.data || []
+      );
+
+      setReportingMangers(managers);
     } catch (error) {
       console.log(error);
+      setReportingMangers([]);
     } finally {
       setManLoading(false);
     }
@@ -590,13 +619,22 @@ console.log(
     dispatch(fetchStates());
   }, [dispatch]);
 
+  // useEffect(() => {
+  //   if (
+  //     formData?.desgId?.trim() !== "" &&
+  //     getParentDesignation(formData?.desgId)
+  //   ) {
+  //     const parentDesg = getParentDesignation(formData?.desgId);
+  //     fetchReportingMangers(parentDesg);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [formData?.desgId]);
+
   useEffect(() => {
-    if (
-      formData?.desgId?.trim() !== "" &&
-      getParentDesignation(formData?.desgId)
-    ) {
-      const parentDesg = getParentDesignation(formData?.desgId);
-      fetchReportingMangers(parentDesg);
+    if (formData?.desgId?.trim() !== "") {
+      fetchReportingMangers(formData.desgId);
+    } else {
+      setReportingMangers([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData?.desgId]);
@@ -1463,10 +1501,17 @@ console.log(
                       required
                     >
                       <option value="">Select Designation</option>
-                      {designations?.length > 0 &&
-                        designations?.map((designation) => (
-                          <option key={designation?._id} value={designation?._id}>
-                            {designation?.name}
+
+                      {designations
+                        ?.filter((d) => ["MO/SO", "ASM", "RSM"].includes(d.name))
+                        .sort(
+                          (a, b) =>
+                            ["MO/SO", "ASM", "RSM"].indexOf(a.name) -
+                            ["MO/SO", "ASM", "RSM"].indexOf(b.name)
+                        )
+                        .map((designation) => (
+                          <option key={designation._id} value={designation._id}>
+                            {designation.name}
                           </option>
                         ))}
                     </Select>
@@ -1547,13 +1592,13 @@ console.log(
                                         >
                                           No, Cancel
                                         </Button>
-                                       <Button
+                                        <Button
                                           size="xs"
                                           color="failure"
                                           onClick={(e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                         setFormData((prev) => {
+                                            setFormData((prev) => {
                                               const remainingRegionIds = prev.regionId.filter(
                                                 (id) => id !== regId
                                               );
@@ -1645,7 +1690,7 @@ console.log(
                             setFormData((prev) => ({
                               ...prev,
                               regionId: [...prev.regionId, selectedRegionId],
-                             stateId: autoStateId,
+                              stateId: autoStateId,
                               zoneId: autoZoneId,
                             }));
                           }
@@ -1925,7 +1970,8 @@ console.log(
                     />
                   </div>
                   {formData?.desgId?.trim() !== "" &&
-                    getParentDesignation(formData?.desgId) && (
+                    designations.find((d) => d._id === formData.desgId)?.name !== "RSM" &&
+                    getParentDesignation(formData.desgId) && (
                       <div className="w-full">
                         <div className="mb-2 block text-gray-700 dark:text-gray-100">
                           <Label>
