@@ -77,6 +77,11 @@ const OutletRequestList = () => {
     ownerName: "",
     createdBy: "",
 
+    potentialSelection: "",
+    birthday: "",
+    categoryOfOutlet: [],
+    paymentCategory: "",
+
     employeeCode: "",
     employeeName: "",
     cso: "",
@@ -416,6 +421,10 @@ const OutletRequestList = () => {
       "CSO",
       "Owner Name",
       "Created By",
+      "Potential",
+      "Birthday",
+      "Category of Outlet", 
+      "Payment Category",
       "Employee Code",
       "Beat Code",
       "State Code",
@@ -445,6 +454,10 @@ const OutletRequestList = () => {
       "(Optional)",
       "(Required)",
       "(Optional)",
+      '(Optional)[Example: "Below 1 Lac"]',
+      "(Optional)[Example: YYYY-MM-DD]",
+      '(Optional)[Example: Retail,Wholesale][Example: "Retail"]',
+      '(Optional)[Example: "Good"]',
       "(Optional)",
       "(Required) [Example: BEAT-492,BEAT-183]",
       "(Required)[Example: WB]",
@@ -564,6 +577,11 @@ const OutletRequestList = () => {
 
         createdBy: singleOutletForm.createdBy?.trim(),
 
+        potentialSelection: singleOutletForm.potentialSelection?.trim(),
+        birthday: singleOutletForm.birthday || null,
+        categoryOfOutlet: singleOutletForm.categoryOfOutlet.join(","),
+        paymentCategory: singleOutletForm.paymentCategory?.trim(),
+
         employeeCode:
           singleOutletForm.employeeCode?.trim(),
         cso: singleOutletForm.cso?.trim(),
@@ -624,6 +642,11 @@ const OutletRequestList = () => {
         sudoName: "",
         ownerName: "",
         createdBy: "",
+
+        potentialSelection: "",
+        birthday: "",
+        categoryOfOutlet: [],
+        paymentCategory: "",
 
         employeeCode: "",
         employeeName: "",
@@ -687,6 +710,30 @@ const OutletRequestList = () => {
     }
   };
 
+  const potentialOptions = [
+    "Below 1 Lac",
+    "Upto 3 Lac",
+    "Upto 5 Lac",
+    "Upto 10 Lac",
+    "10 Lac & Above",
+  ];
+
+  const categoryOfOutletOptions = ["Retail", "Wholesale", "Project Consumer", "Others"];
+
+  const paymentCategoryOptions = ["Good", "Normal", "Follow up", "Continuous Red"];
+
+  const toggleCategoryOfOutlet = (value) => {
+    setSingleOutletForm((prev) => {
+      const exists = prev.categoryOfOutlet.includes(value);
+      return {
+        ...prev,
+        categoryOfOutlet: exists
+          ? prev.categoryOfOutlet.filter((v) => v !== value)
+          : [...prev.categoryOfOutlet, value],
+      };
+    });
+  };
+
   const commonInputClass =
     "[&_input]:!h-[44px] " +
     "[&_input]:!rounded-xl " +
@@ -705,6 +752,15 @@ const OutletRequestList = () => {
     "[&_input]:focus:!ring-2 " +
     "[&_input]:focus:!ring-indigo-500/40 " +
     "[&_input]:focus:!bg-slate-700";
+
+  // Shared section-header style so every group in the Add Outlet modal
+  // reads the same way (mirrors the h3 + border-b pattern used in the
+  // Edit Outlet modal's sections).
+  const sectionHeaderClass =
+    "text-sm font-semibold uppercase tracking-wide text-indigo-300 mb-4";
+  const sectionWrapperClass =
+    "border-b border-slate-700 pb-6 mb-6 last:border-b-0 last:pb-0 last:mb-0";
+
   return (
     <>
       {pagePermission?.view ? (
@@ -1255,15 +1311,6 @@ const OutletRequestList = () => {
             </Modal.Body>
           </Modal>
 
-
-
-
-
-
-
-
-
-
           {/* Add Outlet Modal */}
           <Modal
             show={openAddOutletModal}
@@ -1298,406 +1345,416 @@ const OutletRequestList = () => {
                 {/* Body */}
                 <div className="max-h-[72vh] overflow-y-auto bg-[#0f172a] px-6 py-5">
 
-                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                  {/* ===================== Basic Information ===================== */}
+                  <div className={sectionWrapperClass}>
+                    <h3 className={sectionHeaderClass}>Basic Information</h3>
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
 
-                    {/* Outlet Code */}
-                    <div>
-                      <Label
-                        value={
-                          <>
-                            Outlet Code <span className="text-red-500">*</span>
-                          </>
-                        }
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
+                      {/* Outlet Code */}
+                      <div>
+                        <Label
+                          value={
+                            <>
+                              Outlet Code <span className="text-red-500">*</span>
+                            </>
+                          }
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
 
-                      <TextInput
-                        sizing="md"
-                        shadow
-                        required
-                        name="outletCode"
-                        placeholder="Enter outlet code"
-                        value={singleOutletForm.outletCode}
-                        onChange={handleSingleOutletChange}
-                        className={commonInputClass}
-                      />
+                        <TextInput
+                          sizing="md"
+                          shadow
+                          required
+                          name="outletCode"
+                          placeholder="Enter outlet code"
+                          value={singleOutletForm.outletCode}
+                          onChange={handleSingleOutletChange}
+                          className={commonInputClass}
+                        />
+                      </div>
+
+                      {/* Outlet Name */}
+                      <div>
+                        <Label
+                          value={
+                            <>
+                              Outlet Name <span className="text-red-500">*</span>
+                            </>
+                          }
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
+
+                        <TextInput
+                          sizing="md"
+                          shadow
+                          required
+                          name="outletName"
+                          placeholder="Enter outlet name"
+                          value={singleOutletForm.outletName}
+                          onChange={handleSingleOutletChange}
+                          className={commonInputClass}
+                        />
+                      </div>
+
+                      {/* Sudo Name */}
+                      <div>
+                        <Label
+                          value="Sudo Name"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
+
+                        <TextInput
+                          sizing="md"
+                          shadow
+                          name="sudoName"
+                          placeholder="Enter sudo name"
+                          value={singleOutletForm.sudoName}
+                          onChange={handleSingleOutletChange}
+                          className={commonInputClass}
+                        />
+                      </div>
+
+                      {/* Owner Name */}
+                      <div>
+                        <Label
+                          value={
+                            <>
+                              Owner Name <span className="text-red-500">*</span>
+                            </>
+                          }
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
+
+                        <TextInput
+                          sizing="md"
+                          shadow
+                          required
+                          name="ownerName"
+                          placeholder="Enter owner name"
+                          value={singleOutletForm.ownerName}
+                          onChange={handleSingleOutletChange}
+                          className={commonInputClass}
+                        />
+                      </div>
+
+                      {/* Created By */}
+                      <div>
+                        <Label
+                          value="Created By"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
+                        <TextInput
+                          sizing="md"
+                          shadow
+                          name="createdBy"
+                          placeholder="Enter created by"
+                          value={singleOutletForm.createdBy}
+                          onChange={handleSingleOutletChange}
+                          className={commonInputClass}
+                        />
+                      </div>
                     </div>
+                  </div>
 
-                    {/* Outlet Name */}
-                    <div>
-                      <Label
-                        value={
-                          <>
-                            Outlet Name <span className="text-red-500">*</span>
-                          </>
-                        }
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
+                  {/* ===================== Assignment / Beat Information ===================== */}
+                  <div className={sectionWrapperClass}>
+                    <h3 className={sectionHeaderClass}>Assignment &amp; Beat Information</h3>
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
 
-                      <TextInput
-                        sizing="md"
-                        shadow
-                        required
-                        name="outletName"
-                        placeholder="Enter outlet name"
-                        value={singleOutletForm.outletName}
-                        onChange={handleSingleOutletChange}
-                        className={commonInputClass}
-                      />
+                      {/* Beat Select */}
+                      <div>
+                        <Label
+                          value={
+                            <>
+                              Select Beat <span className="text-red-500">*</span>
+                            </>
+                          }
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
+
+                        <SearchableSelect
+                          options={beats}
+                          value={singleOutletForm.beatCode}
+                          onChange={(e) => {
+                            const selectedBeat = beats.find(
+                              (beat) => beat.code === e.target.value
+                            );
+                            console.log("selectedBeat:", selectedBeat);
+                            console.log("subDivisionId:", selectedBeat?.subDivisionId);
+
+                            setSingleOutletForm({
+                              ...singleOutletForm,
+
+                              beatCode: selectedBeat?.code || "",
+
+                              subDivisionCode:
+                                selectedBeat?.subDivisionId?.code || "",
+
+                              stateCode:
+                                selectedBeat?.regionId?.stateId?.slug || "",
+
+                              city:
+                                selectedBeat?.distributorId?.[0]?.city || "",
+
+                              pin:
+                                selectedBeat?.distributorId?.[0]?.pincode || "",
+
+                              employeeCode:
+                                selectedBeat?.employeeId?.[0]?.empId || "",
+
+                              employeeName:
+                                selectedBeat?.employeeId?.[0]?.name || "",
+
+                              region:
+                                selectedBeat?.regionId?.name || "",
+
+                              distributor:
+                                selectedBeat?.distributorId?.[0]?.name || "",
+
+                              beatType:
+                                selectedBeat?.beat_type || "",
+                            });
+                          }}
+                          placeholder="Select Beat"
+                          disabled={beatsLoading}
+                          displayKey="name"
+                          valueKey="code"
+                          descKey="code"
+                          id="beat-select"
+                          className="w-full"
+                        />
+                      </div>
+
+                      {/* Employee Code */}
+                      <div>
+                        <Label
+                          value={
+                            <>
+                              Employee Code <span className="text-red-500">*</span>
+                            </>
+                          }
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
+
+                        <TextInput
+                          sizing="md"
+                          shadow
+                          required
+                          name="employeeCode"
+                          placeholder="Enter employee code"
+                          value={singleOutletForm.employeeCode}
+                          onChange={handleSingleOutletChange}
+                          className={commonInputClass}
+                        />
+                      </div>
+
+                      {/* Employee Name */}
+                      <div>
+                        <Label
+                          value="Employee Name"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
+
+                        <TextInput
+                          value={
+                            employeeSearchLoading ? "Searching..." : singleOutletForm.employeeName
+                          }
+                          readOnly
+                          className={commonInputClass}
+                        />
+                      </div>
+
+                      {/* CSO */}
+                      <div>
+                        <Label
+                          value="CSO"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
+
+                        <TextInput
+                          sizing="md"
+                          shadow
+                          name="cso"
+                          placeholder="Enter CSO"
+                          value={singleOutletForm.cso}
+                          onChange={handleSingleOutletChange}
+                          className={commonInputClass}
+                        />
+                      </div>
+
+                      {/* State Code */}
+                      <div>
+                        <Label
+                          value="State Code"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
+
+                        <TextInput
+                          value={singleOutletForm.stateCode}
+                          readOnly
+                          className={commonInputClass}
+                        />
+                      </div>
+
+                      {/* Beat Type */}
+                      <div>
+                        <Label
+                          value="Beat Type"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
+
+                        <TextInput
+                          value={singleOutletForm.beatType}
+                          readOnly
+                          className={commonInputClass}
+                        />
+                      </div>
+
+                      {/* Zone Code */}
+                      <div>
+                        <Label
+                          value="Zone Code"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
+
+                        <TextInput
+                          value={singleOutletForm.subDivisionCode}
+                          readOnly
+                          className={commonInputClass}
+                        />
+                      </div>
                     </div>
+                  </div>
 
-                    {/* Sudo Name */}
-                    <div>
-                      <Label
-                        value="Sudo Name"
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
+                  {/* ===================== Contact Information ===================== */}
+                  <div className={sectionWrapperClass}>
+                    <h3 className={sectionHeaderClass}>Contact Information</h3>
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
 
-                      <TextInput
-                        sizing="md"
-                        shadow
-                        name="sudoName"
-                        placeholder="Enter sudo name"
-                        value={singleOutletForm.sudoName}
-                        onChange={handleSingleOutletChange}
-                        className={commonInputClass}
-                      />
+                      {/* Mobile Number */}
+                      <div>
+                        <Label
+                          value="Mobile Number"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
+
+                        <TextInput
+                          sizing="md"
+                          shadow
+                          name="mobile1"
+                          placeholder="Mobile number"
+                          value={singleOutletForm.mobile1}
+                          onChange={handleSingleOutletChange}
+                          className={commonInputClass}
+                        />
+                      </div>
+
+                      {/* Alternate Number */}
+                      <div>
+                        <Label
+                          value="Alternate Number"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
+
+                        <TextInput
+                          sizing="md"
+                          shadow
+                          name="mobile2"
+                          placeholder="Alternate number"
+                          value={singleOutletForm.mobile2}
+                          onChange={handleSingleOutletChange}
+                          className={commonInputClass}
+                        />
+                      </div>
+
+                      {/* WhatsApp Number */}
+                      <div>
+                        <Label
+                          value="WhatsApp Number"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
+
+                        <TextInput
+                          sizing="md"
+                          shadow
+                          name="whatsappNumber"
+                          placeholder="WhatsApp number"
+                          value={singleOutletForm.whatsappNumber}
+                          onChange={handleSingleOutletChange}
+                          className={commonInputClass}
+                        />
+                      </div>
+
+                      {/* Email */}
+                      <div>
+                        <Label
+                          value="Email"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
+
+                        <TextInput
+                          sizing="md"
+                          shadow
+                          type="email"
+                          name="email"
+                          placeholder="Enter email"
+                          value={singleOutletForm.email}
+                          onChange={handleSingleOutletChange}
+                          className={commonInputClass}
+                        />
+                      </div>
                     </div>
+                  </div>
 
-                    {/* Owner Name */}
-                    <div>
-                      <Label
-                        value={
-                          <>
-                            Owner Name <span className="text-red-500">*</span>
-                          </>
-                        }
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
+                  {/* ===================== Address Information ===================== */}
+                  <div className={sectionWrapperClass}>
+                    <h3 className={sectionHeaderClass}>Address Information</h3>
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
 
-                      <TextInput
-                        sizing="md"
-                        shadow
-                        required
-                        name="ownerName"
-                        placeholder="Enter owner name"
-                        value={singleOutletForm.ownerName}
-                        onChange={handleSingleOutletChange}
-                        className={commonInputClass}
-                      />
-                    </div>
+                      {/* City */}
+                      <div>
+                        <Label
+                          value="City"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
 
-                    {/* Created By */}
-                    <div>
-                      <Label
-                        value="Created By"
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
-                      <TextInput
-                        sizing="md"
-                        shadow
-                        name="createdBy"
-                        placeholder="Enter created by"
-                        value={singleOutletForm.createdBy}
-                        onChange={handleSingleOutletChange}
-                        className={commonInputClass}
-                      />
-                    </div>
+                        <TextInput
+                          name="city"
+                          value={singleOutletForm.city}
+                          onChange={handleSingleOutletChange}
+                          className={commonInputClass}
+                        />
+                      </div>
 
-                    {/* Beat Select */}
-                    <div>
-                      <Label
-                        value={
-                          <>
-                            Select Beat <span className="text-red-500">*</span>
-                          </>
-                        }
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
+                      {/* PIN */}
+                      <div>
+                        <Label
+                          value="PIN Code"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
 
-                      <SearchableSelect
-                        options={beats}
-                        value={singleOutletForm.beatCode}
-                        onChange={(e) => {
-                          const selectedBeat = beats.find(
-                            (beat) => beat.code === e.target.value
-                          );
-                          console.log("selectedBeat:", selectedBeat);
-                          console.log("subDivisionId:", selectedBeat?.subDivisionId);
+                        <TextInput
+                          name="pin"
+                          value={singleOutletForm.pin}
+                          onChange={handleSingleOutletChange}
+                          className={commonInputClass}
+                        />
+                      </div>
 
-                          setSingleOutletForm({
-                            ...singleOutletForm,
+                      {/* Address */}
+                      <div className="md:col-span-2">
+                        <Label
+                          value="Address"
+                          className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
+                        />
 
-                            beatCode: selectedBeat?.code || "",
-
-                            subDivisionCode:
-                              selectedBeat?.subDivisionId?.code || "",
-
-                            stateCode:
-                              selectedBeat?.regionId?.stateId?.slug || "",
-
-                            city:
-                              selectedBeat?.distributorId?.[0]?.city || "",
-
-                            pin:
-                              selectedBeat?.distributorId?.[0]?.pincode || "",
-
-                            employeeCode:
-                              selectedBeat?.employeeId?.[0]?.empId || "",
-
-                            employeeName:
-                              selectedBeat?.employeeId?.[0]?.name || "",
-
-                            region:
-                              selectedBeat?.regionId?.name || "",
-
-                            distributor:
-                              selectedBeat?.distributorId?.[0]?.name || "",
-
-                            beatType:
-                              selectedBeat?.beat_type || "",
-                          });
-                        }}
-                        placeholder="Select Beat"
-                        disabled={beatsLoading}
-                        displayKey="name"
-                        valueKey="code"
-                        descKey="code"
-                        id="beat-select"
-                        className="w-full"
-                      />
-                    </div>
-
-                    {/* Employee Code */}
-                    {/* Employee Code */}
-                    <div>
-                      <Label
-                        value={
-                          <>
-                            Employee Code <span className="text-red-500">*</span>
-                          </>
-                        }
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
-
-                      <TextInput
-                        sizing="md"
-                        shadow
-                        required
-                        name="employeeCode"
-                        placeholder="Enter employee code"
-                        value={singleOutletForm.employeeCode}
-                        onChange={handleSingleOutletChange}
-                        className={commonInputClass}
-                      />
-                    </div>
-
-                    {/* Employee Name */}
-                    <div>
-                      <Label
-                        value="Employee Name"
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
-
-                      <TextInput
-                        value={
-                          employeeSearchLoading ? "Searching..." : singleOutletForm.employeeName
-                        }
-                        readOnly
-                        className={commonInputClass}
-                      />
-                    </div>
-
-                    {/* CSO */}
-                    <div>
-                      <Label
-                        value="CSO"
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
-
-                      <TextInput
-                        sizing="md"
-                        shadow
-                        name="cso"
-                        placeholder="Enter CSO"
-                        value={singleOutletForm.cso}
-                        onChange={handleSingleOutletChange}
-                        className={commonInputClass}
-                      />
-                    </div>
-                    {/* State Code */}
-                    <div>
-                      <Label
-                        value="State Code"
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
-
-                      <TextInput
-                        value={singleOutletForm.stateCode}
-                        readOnly
-                        className={commonInputClass}
-                      />
-                    </div>
-
-                    {/* Region */}
-                    {/* <div>
-                      <Label
-                        value="Region"
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
-
-                      <TextInput
-                        value={singleOutletForm.region}
-                        readOnly
-                        className={commonInputClass}
-                      />
-                    </div> */}
-
-                    {/* Beat Type */}
-                    <div>
-                      <Label
-                        value="Beat Type"
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
-
-                      <TextInput
-                        value={singleOutletForm.beatType}
-                        readOnly
-                        className={commonInputClass}
-                      />
-                    </div>
-
-                    {/* Zone Code */}
-                    <div>
-                      <Label
-                        value="Zone Code"
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
-
-                      <TextInput
-                        value={singleOutletForm.subDivisionCode}
-                        readOnly
-                        className={commonInputClass}
-                      />
-                    </div>
-
-                    {/* Mobile Number */}
-                    <div>
-                      <Label
-                        value="Mobile Number"
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
-
-                      <TextInput
-                        sizing="md"
-                        shadow
-                        name="mobile1"
-                        placeholder="Mobile number"
-                        value={singleOutletForm.mobile1}
-                        onChange={handleSingleOutletChange}
-                        className={commonInputClass}
-                      />
-                    </div>
-
-                    {/* Alternate Number */}
-                    <div>
-                      <Label
-                        value="Alternate Number"
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
-
-                      <TextInput
-                        sizing="md"
-                        shadow
-                        name="mobile2"
-                        placeholder="Alternate number"
-                        value={singleOutletForm.mobile2}
-                        onChange={handleSingleOutletChange}
-                        className={commonInputClass}
-                      />
-                    </div>
-
-                    {/* WhatsApp Number */}
-                    <div>
-                      <Label
-                        value="WhatsApp Number"
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
-
-                      <TextInput
-                        sizing="md"
-                        shadow
-                        name="whatsappNumber"
-                        placeholder="WhatsApp number"
-                        value={singleOutletForm.whatsappNumber}
-                        onChange={handleSingleOutletChange}
-                        className={commonInputClass}
-                      />
-                    </div>
-
-                    {/* Email */}
-                    <div>
-                      <Label
-                        value="Email"
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
-
-                      <TextInput
-                        sizing="md"
-                        shadow
-                        type="email"
-                        name="email"
-                        placeholder="Enter email"
-                        value={singleOutletForm.email}
-                        onChange={handleSingleOutletChange}
-                        className={commonInputClass}
-                      />
-                    </div>
-
-                    {/* City */}
-                    <div>
-                      <Label
-                        value="City"
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
-
-                      <TextInput
-                        name="city"
-                        value={singleOutletForm.city}
-                        onChange={handleSingleOutletChange}
-                        className={commonInputClass}
-                      />
-                    </div>
-
-                    {/* PIN */}
-                    <div>
-                      <Label
-                        value="PIN Code"
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
-
-                      <TextInput
-                        name="pin"
-                        value={singleOutletForm.pin}
-                        onChange={handleSingleOutletChange}
-                        className={commonInputClass}
-                      />
-                    </div>
-
-                    {/* Address */}
-                    <div className="md:col-span-2">
-                      <Label
-                        value="Address"
-                        className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300"
-                      />
-
-                      <textarea
-                        rows={4}
-                        name="address1"
-                        placeholder="Enter complete address"
-                        value={singleOutletForm.address1}
-                        onChange={handleSingleOutletChange}
-                        className="
+                        <textarea
+                          rows={4}
+                          name="address1"
+                          placeholder="Enter complete address"
+                          value={singleOutletForm.address1}
+                          onChange={handleSingleOutletChange}
+                          className="
                 w-full
                 rounded-xl
                 border
@@ -1717,193 +1774,253 @@ const OutletRequestList = () => {
                 focus:ring-indigo-500/40
                 focus:outline-none
               "
-                      />
-                    </div>
-                    {/* GST Upload */}
-
-
-
-
-
-
-                    <div className="md:col-span-2 mt-2">
-                      <Label
-                        value="Documents"
-                        className="mb-4 block text-sm font-semibold text-slate-200"
-                      />
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                        {/* GST */}
-                        <div className="rounded-xl border border-slate-600 bg-slate-800 p-4">
-                          <p className="mb-3 text-sm font-medium text-white">
-                            GST Certificate
-                          </p>
-
-                          <FileUpload
-                            type="single-image"
-                            page="modal-form"
-                            onSetFileUrl={(url) =>
-                              setSingleOutletForm((prev) => ({
-                                ...prev,
-                                gstImage: url,
-                              }))
-                            }
-                          />
-
-                          {singleOutletForm.gstImage && (
-                            <div className="relative mt-3">
-                              <img
-                                src={singleOutletForm.gstImage}
-                                alt="GST"
-                                className="h-24 w-full rounded-lg object-cover border border-slate-600"
-                              />
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setSingleOutletForm((prev) => ({
-                                    ...prev,
-                                    gstImage: "",
-                                  }))
-                                }
-                                className="absolute top-2 right-2 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
-                              >
-                                <FaTimesCircle size={18} />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* PAN */}
-                        <div className="rounded-xl border border-slate-600 bg-slate-800 p-4">
-                          <p className="mb-3 text-sm font-medium text-white">
-                            PAN Card
-                          </p>
-
-                          <FileUpload
-                            type="single-image"
-                            page="modal-form"
-                            onSetFileUrl={(url) =>
-                              setSingleOutletForm((prev) => ({
-                                ...prev,
-                                panImage: url,
-                              }))
-                            }
-                          />
-
-                          {singleOutletForm.panImage && (
-                            <div className="relative mt-3">
-                              <img
-                                src={singleOutletForm.panImage}
-                                alt="PAN"
-                                className="h-24 w-full rounded-lg object-cover border border-slate-600"
-                              />
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setSingleOutletForm((prev) => ({
-                                    ...prev,
-                                    panImage: "",
-                                  }))
-                                }
-                                className="absolute top-2 right-2 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
-                              >
-                                <FaTimesCircle size={18} />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Aadhaar */}
-                        <div className="rounded-xl border border-slate-600 bg-slate-800 p-4">
-                          <p className="mb-3 text-sm font-medium text-white">
-                            Aadhaar Card
-                          </p>
-
-                          <FileUpload
-                            type="single-image"
-                            page="modal-form"
-                            onSetFileUrl={(url) =>
-                              setSingleOutletForm((prev) => ({
-                                ...prev,
-                                aadhaarImage: url,
-                              }))
-                            }
-                          />
-
-                          {singleOutletForm.aadhaarImage && (
-                            <div className="relative mt-3">
-                              <img
-                                src={singleOutletForm.aadhaarImage}
-                                alt="Aadhaar"
-                                className="h-24 w-full rounded-lg object-cover border border-slate-600"
-                              />
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setSingleOutletForm((prev) => ({
-                                    ...prev,
-                                    aadhaarImage: "",
-                                  }))
-                                }
-                                className="absolute top-2 right-2 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
-                              >
-                                <FaTimesCircle size={18} />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Bank */}
-                        <div className="rounded-xl border border-slate-600 bg-slate-800 p-4">
-                          <p className="mb-3 text-sm font-medium text-white">
-                            Bank Details
-                          </p>
-
-                          <FileUpload
-                            type="single-image"
-                            page="modal-form"
-                            onSetFileUrl={(url) =>
-                              setSingleOutletForm((prev) => ({
-                                ...prev,
-                                bankImage: url,
-                              }))
-                            }
-                          />
-
-                          {singleOutletForm.bankImage && (
-                            <div className="relative mt-3">
-                              <img
-                                src={singleOutletForm.bankImage}
-                                alt="Bank"
-                                className="h-24 w-full rounded-lg object-cover border border-slate-600"
-                              />
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setSingleOutletForm((prev) => ({
-                                    ...prev,
-                                    bankImage: "",
-                                  }))
-                                }
-                                className="absolute top-2 right-2 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
-                              >
-                                <FaTimesCircle size={18} />
-                              </button>
-                            </div>
-                          )}
-                        </div>
-
+                        />
                       </div>
                     </div>
+                  </div>
 
+                  {/* ===================== Business Information ===================== */}
+                  <div className={sectionWrapperClass}>
+                    <h3 className={sectionHeaderClass}>Business Information</h3>
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
 
+                      {/* Potential Selection */}
+                      <div>
+                        <Label value="Potential" className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300" />
+                        <select
+                          name="potentialSelection"
+                          value={singleOutletForm.potentialSelection}
+                          onChange={handleSingleOutletChange}
+                          className="w-full rounded-xl border border-slate-600 bg-slate-700/80 px-4 h-[44px] text-sm font-medium text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/40 focus:outline-none"
+                        >
+                          <option value="">Select Potential</option>
+                          {potentialOptions.map((opt) => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      </div>
 
+                      {/* Payment Category */}
+                      <div>
+                        <Label value="Payment Category" className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300" />
+                        <select
+                          name="paymentCategory"
+                          value={singleOutletForm.paymentCategory}
+                          onChange={handleSingleOutletChange}
+                          className="w-full rounded-xl border border-slate-600 bg-slate-700/80 px-4 h-[44px] text-sm font-medium text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/40 focus:outline-none"
+                        >
+                          <option value="">Select Payment Category</option>
+                          {paymentCategoryOptions.map((opt) => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      </div>
 
+                      {/* Birthday */}
+                      <div>
+                        <Label value="Birthday" className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300" />
+                        <TextInput
+                          sizing="md"
+                          shadow
+                          type="date"
+                          name="birthday"
+                          value={singleOutletForm.birthday}
+                          onChange={handleSingleOutletChange}
+                          className={commonInputClass}
+                        />
+                      </div>
+
+                      {/* Category of Outlet (multiselect) */}
+                      <div className="md:col-span-2">
+                        <Label value="Category of Outlet" className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300" />
+                        <div className="flex flex-wrap gap-3 rounded-xl border border-slate-600 bg-slate-700/50 p-3">
+                          {categoryOfOutletOptions.map((opt) => (
+                            <label key={opt} className="flex items-center gap-2 text-sm text-white cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={singleOutletForm.categoryOfOutlet.includes(opt)}
+                                onChange={() => toggleCategoryOfOutlet(opt)}
+                                className="rounded border-slate-500 bg-slate-800 text-indigo-500 focus:ring-indigo-500"
+                              />
+                              {opt}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ===================== Documents ===================== */}
+                  <div className={sectionWrapperClass}>
+                    <h3 className={sectionHeaderClass}>Documents</h3>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                      {/* GST */}
+                      <div className="rounded-xl border border-slate-600 bg-slate-800 p-4">
+                        <p className="mb-3 text-sm font-medium text-white">
+                          GST Certificate
+                        </p>
+
+                        <FileUpload
+                          type="single-image"
+                          page="modal-form"
+                          onSetFileUrl={(url) =>
+                            setSingleOutletForm((prev) => ({
+                              ...prev,
+                              gstImage: url,
+                            }))
+                          }
+                        />
+
+                        {singleOutletForm.gstImage && (
+                          <div className="relative mt-3">
+                            <img
+                              src={singleOutletForm.gstImage}
+                              alt="GST"
+                              className="h-24 w-full rounded-lg object-cover border border-slate-600"
+                            />
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setSingleOutletForm((prev) => ({
+                                  ...prev,
+                                  gstImage: "",
+                                }))
+                              }
+                              className="absolute top-2 right-2 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
+                            >
+                              <FaTimesCircle size={18} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* PAN */}
+                      <div className="rounded-xl border border-slate-600 bg-slate-800 p-4">
+                        <p className="mb-3 text-sm font-medium text-white">
+                          PAN Card
+                        </p>
+
+                        <FileUpload
+                          type="single-image"
+                          page="modal-form"
+                          onSetFileUrl={(url) =>
+                            setSingleOutletForm((prev) => ({
+                              ...prev,
+                              panImage: url,
+                            }))
+                          }
+                        />
+
+                        {singleOutletForm.panImage && (
+                          <div className="relative mt-3">
+                            <img
+                              src={singleOutletForm.panImage}
+                              alt="PAN"
+                              className="h-24 w-full rounded-lg object-cover border border-slate-600"
+                            />
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setSingleOutletForm((prev) => ({
+                                  ...prev,
+                                  panImage: "",
+                                }))
+                              }
+                              className="absolute top-2 right-2 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
+                            >
+                              <FaTimesCircle size={18} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Aadhaar */}
+                      <div className="rounded-xl border border-slate-600 bg-slate-800 p-4">
+                        <p className="mb-3 text-sm font-medium text-white">
+                          Aadhaar Card
+                        </p>
+
+                        <FileUpload
+                          type="single-image"
+                          page="modal-form"
+                          onSetFileUrl={(url) =>
+                            setSingleOutletForm((prev) => ({
+                              ...prev,
+                              aadhaarImage: url,
+                            }))
+                          }
+                        />
+
+                        {singleOutletForm.aadhaarImage && (
+                          <div className="relative mt-3">
+                            <img
+                              src={singleOutletForm.aadhaarImage}
+                              alt="Aadhaar"
+                              className="h-24 w-full rounded-lg object-cover border border-slate-600"
+                            />
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setSingleOutletForm((prev) => ({
+                                  ...prev,
+                                  aadhaarImage: "",
+                                }))
+                              }
+                              className="absolute top-2 right-2 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
+                            >
+                              <FaTimesCircle size={18} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Bank */}
+                      <div className="rounded-xl border border-slate-600 bg-slate-800 p-4">
+                        <p className="mb-3 text-sm font-medium text-white">
+                          Bank Details
+                        </p>
+
+                        <FileUpload
+                          type="single-image"
+                          page="modal-form"
+                          onSetFileUrl={(url) =>
+                            setSingleOutletForm((prev) => ({
+                              ...prev,
+                              bankImage: url,
+                            }))
+                          }
+                        />
+
+                        {singleOutletForm.bankImage && (
+                          <div className="relative mt-3">
+                            <img
+                              src={singleOutletForm.bankImage}
+                              alt="Bank"
+                              className="h-24 w-full rounded-lg object-cover border border-slate-600"
+                            />
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setSingleOutletForm((prev) => ({
+                                  ...prev,
+                                  bankImage: "",
+                                }))
+                              }
+                              className="absolute top-2 right-2 rounded-full bg-red-600 p-1 text-white hover:bg-red-700"
+                            >
+                              <FaTimesCircle size={18} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                    </div>
                   </div>
 
                 </div>

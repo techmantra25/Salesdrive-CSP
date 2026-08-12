@@ -89,6 +89,31 @@ const SORTABLE_COLUMNS = new Set([
   "beat",
 ]);
 
+// Matches the OutletApproved schema enum for categoryOfOutlet (an array field).
+const CATEGORY_OF_OUTLET_OPTIONS = [
+  "Retail",
+  "Wholesale",
+  "Project Consumer",
+  "Others",
+];
+
+// Matches the OutletApproved schema enum for potentialSelection.
+const POTENTIAL_SELECTION_OPTIONS = [
+  "Below 1 Lac",
+  "Upto 3 Lac",
+  "Upto 5 Lac",
+  "Upto 10 Lac",
+  "10 Lac & Above",
+];
+
+// Matches the OutletApproved schema enum for paymentCategory.
+const PAYMENT_CATEGORY_OPTIONS = [
+  "Good",
+  "Normal",
+  "Follow up",
+  "Continuous Red",
+];
+
 const OutletList = () => {
   // State
   const [openModal, setOpenModal] = useState(false);
@@ -352,7 +377,16 @@ const OutletList = () => {
       city: outlet?.city || "",
       pin: outlet?.pin || "",
       location: outlet.location || "",
-      categoryOfOutlet: outlet?.categoryOfOutlet || "",
+      categoryOfOutlet: (Array.isArray(outlet?.categoryOfOutlet)
+        ? outlet.categoryOfOutlet
+        : outlet?.categoryOfOutlet
+          ? [outlet.categoryOfOutlet]
+          : []
+      ).filter((cat) =>
+        CATEGORY_OF_OUTLET_OPTIONS.some(
+          (opt) => opt.toLowerCase() === cat?.toLowerCase()
+        )
+      ),
       contactPerson: outlet?.contactPerson || "",
       email: outlet?.email || "",
       gstin: outlet?.gstin || "",
@@ -367,6 +401,13 @@ const OutletList = () => {
       competitorBrands: outlet?.competitorBrands || [],
       preferredLanguage: outlet?.preferredLanguage || "",
       teleCallDay: outlet?.teleCallDay || "",
+
+      // NEW: potential business value bracket, birthday, payment behaviour category
+      potentialSelection: outlet?.potentialSelection || "",
+      birthday: outlet?.birthday
+        ? moment(outlet.birthday).format("YYYY-MM-DD")
+        : "",
+      paymentCategory: outlet?.paymentCategory || "",
 
       marketCenter: outlet?.marketCenter || "",
       gpsLocation: outlet?.gpsLocation || "",
@@ -414,6 +455,22 @@ const OutletList = () => {
     fetchEditEmployeeByCodeWithoutDebounce,
     500
   );
+
+  // Toggles a single category value inside the categoryOfOutlet array,
+  // keeping editOutletData.categoryOfOutlet as an array (matches schema).
+  const handleCategoryOfOutletToggle = (category) => {
+    setEditOutletData((prev) => {
+      const current = Array.isArray(prev?.categoryOfOutlet)
+        ? prev.categoryOfOutlet
+        : [];
+      const exists = current.includes(category);
+      const next = exists
+        ? current.filter((c) => c !== category)
+        : [...current, category];
+      return { ...prev, categoryOfOutlet: next };
+    });
+  };
+
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     console.log("🚀 Source IDs sent to backend:", editOutletData.massistRefIds);
@@ -795,6 +852,10 @@ const OutletList = () => {
       "Sudo Name",
       "Owner Name",
       "Created By",
+      "Potential",
+      "Birthday",
+      "Category of Outlet",
+      "Payment Category",
       "Employee Code",
       "Beat Code",
       "State",
@@ -820,6 +881,10 @@ const OutletList = () => {
 
       "REQUIRED",
       '"(OPTIONAL) :[Example: 5985455, 588744]"',
+      "(OPTIONAL)",
+      "(OPTIONAL)",
+      "(OPTIONAL)",
+      "(OPTIONAL)",
       "(OPTIONAL)",
       "(OPTIONAL)",
       "(OPTIONAL)",
@@ -1577,107 +1642,311 @@ const OutletList = () => {
         <Modal.Header>Outlet Details</Modal.Header>
 
         <Modal.Body>
-          <div className="overflow-x-auto">
-            <div className="bg-white dark:bg-gray-900 rounded-lg shadow p-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+          <div className="space-y-6">
+            {/* Basic Information */}
+            <div className="border-b pb-4 dark:border-gray-700">
+              <h3 className="text-lg font-semibold mb-4 dark:text-white">
+                Basic Information
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
                   ["Outlet Code", selectedOutletDetails?.outletCode],
-                  // ["Outlet UID", selectedOutletDetails?.outletUID],
                   ["Outlet Name", selectedOutletDetails?.outletName],
                   ["Sudo Name", selectedOutletDetails?.sudoName],
                   ["Owner Name", selectedOutletDetails?.ownerName],
                   ["Created By", selectedOutletDetails?.createdBy],
+                  ["Employee Code", selectedOutletDetails?.employeeId?.empId],
+                  ["Employee Name", selectedOutletDetails?.employeeId?.name],
+                  ["CSO", selectedOutletDetails?.cso],
+                ].map(([label, value]) => (
+                  <div key={label}>
+                    <Label value={label} className="mb-1 block" />
+                    <div className="min-h-[38px] flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                      {value || "—"}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-                  ["Mobile 1", selectedOutletDetails?.mobile1],
-                  ["Mobile 2", selectedOutletDetails?.mobile2],
+            {/* Contact Information */}
+            <div className="border-b pb-4 dark:border-gray-700">
+              <h3 className="text-lg font-semibold mb-4 dark:text-white">
+                Contact Information
+              </h3>
 
-                  ["WhatsApp", selectedOutletDetails?.whatsappNumber],
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  ["Mobile Number", selectedOutletDetails?.mobile1],
+                  ["Alternate Number", selectedOutletDetails?.mobile2],
+                  ["WhatsApp Number", selectedOutletDetails?.whatsappNumber],
                   ["Email", selectedOutletDetails?.email],
+                  ["Contact Person", selectedOutletDetails?.contactPerson],
+                ].map(([label, value]) => (
+                  <div key={label}>
+                    <Label value={label} className="mb-1 block" />
+                    <div className="min-h-[38px] flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                      {value || "—"}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
+            {/* Address Information */}
+            <div className="border-b pb-4 dark:border-gray-700">
+              <h3 className="text-lg font-semibold mb-4 dark:text-white">
+                Address Information
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <Label value="Beat" className="mb-1 block" />
+                  <div className="min-h-[38px] rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    {Array.isArray(selectedOutletDetails?.beatId)
+                      ? selectedOutletDetails.beatId.length > 0
+                        ? selectedOutletDetails.beatId.map((beat, index) => (
+                          <div key={beat?._id || index}>
+                            {beat?.name || "—"}
+                            {beat?.code ? ` (${beat.code})` : ""}
+                          </div>
+                        ))
+                        : "—"
+                      : selectedOutletDetails?.beatId?.name
+                        ? `${selectedOutletDetails.beatId.name}${selectedOutletDetails.beatId.code
+                          ? ` (${selectedOutletDetails.beatId.code})`
+                          : ""
+                        }`
+                        : "—"}
+                  </div>
+                </div>
+
+                <div>
+                  <Label value="State" className="mb-1 block" />
+                  <div className="min-h-[38px] flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    {selectedOutletDetails?.stateId?.name || "—"}
+                  </div>
+                </div>
+
+                <div>
+                  <Label value="District" className="mb-1 block" />
+                  <div className="min-h-[38px] flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    {selectedOutletDetails?.district?.name || "—"}
+                  </div>
+                </div>
+
+                <div>
+                  <Label value="Sub Division" className="mb-1 block" />
+                  <div className="min-h-[38px] flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    {Array.isArray(selectedOutletDetails?.beatId)
+                      ? selectedOutletDetails?.beatId?.[0]?.subDivisionId?.name || "—"
+                      : selectedOutletDetails?.beatId?.subDivisionId?.name || "—"}
+                  </div>
+                </div>
+
+                <div>
+                  <Label value="City" className="mb-1 block" />
+                  <div className="min-h-[38px] flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    {selectedOutletDetails?.city || "—"}
+                  </div>
+                </div>
+
+                <div>
+                  <Label value="PIN Code" className="mb-1 block" />
+                  <div className="min-h-[38px] flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    {selectedOutletDetails?.pin || "—"}
+                  </div>
+                </div>
+
+                <div className="lg:col-span-3">
+                  <Label value="Address" className="mb-1 block" />
+                  <div className="min-h-[38px] rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    {selectedOutletDetails?.address1 || "—"}
+                  </div>
+                </div>
+
+                <div className="lg:col-span-3">
+                  <Label value="Ship To Address" className="mb-1 block" />
+                  <div className="min-h-[38px] rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    {selectedOutletDetails?.shipToAddress || "—"}
+                  </div>
+                </div>
+
+                <div>
+                  <Label value="Ship To PIN Code" className="mb-1 block" />
+                  <div className="min-h-[38px] flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    {selectedOutletDetails?.shipToPincode || "—"}
+                  </div>
+                </div>
+
+                <div>
+                  <Label value="Location" className="mb-1 block" />
+                  <div className="min-h-[38px] flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    {selectedOutletDetails?.location || "—"}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Business Information */}
+            <div className="border-b pb-4 dark:border-gray-700">
+              <h3 className="text-lg font-semibold mb-4 dark:text-white">
+                Business Information
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
                   [
-                    "GST IN",
-                    <div className="flex items-center gap-2">
-                      <span>{selectedOutletDetails?.gstin || "—"}</span>
-
-                      {selectedOutletDetails?.gstImage && (
-                        <Button
-                          size="xs"
-                          color="blue"
-                          pill
-                          onClick={() => {
-                            setDocumentTitle("GST Certificate");
-                            setSelectedDocument(
-                              selectedOutletDetails.gstImage
-                            );
-                            setOpenDocumentModal(true);
-                          }}
-                        >
-                          <FiEye size={14} />
-                        </Button>
-                      )}
-                    </div>,
+                    "Category of Outlet",
+                    Array.isArray(selectedOutletDetails?.categoryOfOutlet)
+                      ? selectedOutletDetails.categoryOfOutlet.join(", ")
+                      : selectedOutletDetails?.categoryOfOutlet,
                   ],
-
+                  ["Retailer Class", selectedOutletDetails?.retailerClass],
+                  ["Potential Selection", selectedOutletDetails?.potentialSelection],
+                  ["Payment Category", selectedOutletDetails?.paymentCategory],
                   [
-                    "PAN No",
-                    <div className="flex items-center gap-2">
-                      <span>{selectedOutletDetails?.panNumber || "—"}</span>
-
-                      {selectedOutletDetails?.panImage && (
-                        <Button
-                          size="xs"
-                          color="blue"
-                          pill
-                          onClick={() => {
-                            setDocumentTitle("PAN Card");
-                            setSelectedDocument(
-                              selectedOutletDetails.panImage
-                            );
-                            setOpenDocumentModal(true);
-                          }}
-                        >
-                          <FiEye size={14} />
-                        </Button>
-                      )}
-                    </div>,
+                    "Birthday",
+                    selectedOutletDetails?.birthday
+                      ? moment(selectedOutletDetails.birthday).format("DD-MM-YYYY")
+                      : null,
                   ],
+                  // [
+                  //   "Existing Retailer",
+                  //   selectedOutletDetails?.existingRetailer ? "Yes" : "No",
+                  // ],
+                  // [
+                  //   "Enrolled Status",
+                  //   selectedOutletDetails?.enrolledStatus,
+                  // ],
+                  // [
+                  //   "Preferred Language",
+                  //   selectedOutletDetails?.preferredLanguage,
+                  // ],
+                  // [
+                  //   "Tele Call Day",
+                  //   selectedOutletDetails?.teleCallDay,
+                  // ],
+                  // [
+                  //   "Tele Calling Slots",
+                  //   selectedOutletDetails?.teleCallingSlot?.length
+                  //     ? selectedOutletDetails.teleCallingSlot.join(", ")
+                  //     : null,
+                  // ],
+                  // [
+                  //   "Selling Brands",
+                  //   selectedOutletDetails?.sellingBrands?.length
+                  //     ? selectedOutletDetails.sellingBrands
+                  //       .map((brand) => brand.name)
+                  //       .join(", ")
+                  //     : null,
+                  // ],
+                  // [
+                  //   "Competitor Brands",
+                  //   selectedOutletDetails?.competitorBrands?.length
+                  //     ? selectedOutletDetails.competitorBrands.join(", ")
+                  //     : null,
+                  // ],
+                ].map(([label, value]) => (
+                  <div key={label}>
+                    <Label value={label} className="mb-1 block" />
+                    <div className="min-h-[38px] flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                      {value || "—"}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-                  [
-                    "Aadhaar No",
-                    <div className="flex items-center gap-2">
-                      <span>{selectedOutletDetails?.aadharNumber || "—"}</span>
+            {/* Legal Information */}
+            <div className="border-b pb-4 dark:border-gray-700">
+              <h3 className="text-lg font-semibold mb-4 dark:text-white">
+                Legal Information
+              </h3>
 
-                      {selectedOutletDetails?.aadharImage && (
-                        <Button
-                          size="xs"
-                          color="blue"
-                          pill
-                          onClick={() => {
-                            setDocumentTitle("Aadhaar Card");
-                            setSelectedDocument(
-                              selectedOutletDetails.aadharImage
-                            );
-                            setOpenDocumentModal(true);
-                          }}
-                        >
-                          <FiEye size={14} />
-                        </Button>
-                      )}
-                    </div>,
-                  ],
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* GST */}
+                <div>
+                  <Label value="GST IN" className="mb-1 block" />
+                  <div className="min-h-[38px] flex items-center justify-between gap-2 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    <span>{selectedOutletDetails?.gstin || "—"}</span>
 
-                  [
-                    "Bank Document",
-                    selectedOutletDetails?.bankImage ? (
+                    {selectedOutletDetails?.gstImage && (
+                      <Button
+                        size="xs"
+                        color="blue"
+                        pill
+                        onClick={() => {
+                          setDocumentTitle("GST Certificate");
+                          setSelectedDocument(selectedOutletDetails.gstImage);
+                          setOpenDocumentModal(true);
+                        }}
+                      >
+                        <FiEye size={14} />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Aadhaar */}
+                <div>
+                  <Label value="Aadhar Number" className="mb-1 block" />
+                  <div className="min-h-[38px] flex items-center justify-between gap-2 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    <span>{selectedOutletDetails?.aadharNumber || "—"}</span>
+
+                    {selectedOutletDetails?.aadharImage && (
+                      <Button
+                        size="xs"
+                        color="blue"
+                        pill
+                        onClick={() => {
+                          setDocumentTitle("Aadhaar Card");
+                          setSelectedDocument(selectedOutletDetails.aadharImage);
+                          setOpenDocumentModal(true);
+                        }}
+                      >
+                        <FiEye size={14} />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {/* PAN */}
+                <div>
+                  <Label value="PAN Number" className="mb-1 block" />
+                  <div className="min-h-[38px] flex items-center justify-between gap-2 rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    <span>{selectedOutletDetails?.panNumber || "—"}</span>
+
+                    {selectedOutletDetails?.panImage && (
+                      <Button
+                        size="xs"
+                        color="blue"
+                        pill
+                        onClick={() => {
+                          setDocumentTitle("PAN Card");
+                          setSelectedDocument(selectedOutletDetails.panImage);
+                          setOpenDocumentModal(true);
+                        }}
+                      >
+                        <FiEye size={14} />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bank */}
+                <div>
+                  <Label value="Bank Document" className="mb-1 block" />
+                  <div className="min-h-[38px] flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    {selectedOutletDetails?.bankImage ? (
                       <Button
                         size="xs"
                         color="blue"
                         pill
                         onClick={() => {
                           setDocumentTitle("Bank Document");
-                          setSelectedDocument(
-                            selectedOutletDetails.bankImage
-                          );
+                          setSelectedDocument(selectedOutletDetails.bankImage);
                           setOpenDocumentModal(true);
                         }}
                       >
@@ -1685,117 +1954,67 @@ const OutletList = () => {
                       </Button>
                     ) : (
                       "—"
-                    ),
-                  ],
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
 
-                  [
-                    "Category Of Outlet",
-                    selectedOutletDetails?.categoryOfOutlet,
-                  ],
+            {/* Outlet Status / Source */}
+            <div className="border-b pb-4 dark:border-gray-700">
+              <h3 className="text-lg font-semibold mb-4 dark:text-white">
+                Outlet Status & Source
+              </h3>
 
-                  ["Address", selectedOutletDetails?.address1],
-
-                  ["Pincode", selectedOutletDetails?.pin],
-
-                  ["City", selectedOutletDetails?.city],
-
-                  ["Location", selectedOutletDetails?.location],
-
-                  ["State", selectedOutletDetails?.stateId?.name],
-
-                  ["District", selectedOutletDetails?.district?.name],
-
-                  [
-                    "Beat",
-                    Array.isArray(selectedOutletDetails?.beatId)
-                      ? selectedOutletDetails.beatId
-                        .map((beat) => beat.name)
-                        .join(", ")
-                      : selectedOutletDetails?.beatId?.name,
-                  ],
-
-                  [
-                    "Employee Name",
-                    selectedOutletDetails?.employeeId?.name,
-                  ],
-
-                  [
-                    "Existing Retailer",
-                    selectedOutletDetails?.existingRetailer
-                      ? "Yes"
-                      : "No",
-                  ],
-
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
                   [
                     "Outlet Status",
-                    selectedOutletDetails?.status
-                      ? "Active"
-                      : "Inactive",
+                    selectedOutletDetails?.status ? "Active" : "Inactive",
                   ],
-
-                  [
-                    "Outlet Source",
-                    selectedOutletDetails?.outletSource,
-                  ],
-
-                  [
-                    "Tele Calling Slots",
-                    selectedOutletDetails?.teleCallingSlot?.join(
-                      ", "
-                    ),
-                  ],
-
-                  [
-                    "Selling Brands",
-                    selectedOutletDetails?.sellingBrands?.length
-                      ? selectedOutletDetails.sellingBrands
-                        .map((brand) => brand.name)
-                        .join(", ")
-                      : "—",
-                  ],
-
-                  [
-                    "Competitor Brands",
-                    selectedOutletDetails?.competitorBrands?.length
-                      ? selectedOutletDetails.competitorBrands.join(
-                        ", "
-                      )
-                      : "N/A",
-                  ],
-
-                  [
-                    "Created At",
-                    selectedOutletDetails?.createdAt
-                      ? new Date(
-                        selectedOutletDetails.createdAt
-                      ).toLocaleString()
-                      : "—",
-                  ],
-
-                  [
-                    "Updated At",
-                    selectedOutletDetails?.updatedAt
-                      ? new Date(
-                        selectedOutletDetails.updatedAt
-                      ).toLocaleString()
-                      : "—",
-                  ],
+                  ["Outlet Source", selectedOutletDetails?.outletSource],
+                  ["Market Center", selectedOutletDetails?.marketCenter],
+                  ["GPS Location", selectedOutletDetails?.gpsLocation],
+                  ["Google Map Link", selectedOutletDetails?.googleMapLink],
                 ].map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="flex border-b border-gray-200 dark:border-gray-700 py-3"
-                  >
-                    <div className="w-44 font-semibold text-gray-700 dark:text-gray-300">
-                      {label}
-                    </div>
-
-                    <div className="flex-1 text-gray-900 dark:text-gray-100">
-                      {value || (
-                        <span className="text-gray-400">—</span>
-                      )}
+                  <div key={label}>
+                    <Label value={label} className="mb-1 block" />
+                    <div className="min-h-[38px] flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white break-all">
+                      {value || "—"}
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* System Information */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4 dark:text-white">
+                System Information
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label value="Created At" className="mb-1 block" />
+                  <div className="min-h-[38px] flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    {selectedOutletDetails?.createdAt
+                      ? moment(selectedOutletDetails.createdAt)
+                        .tz("Asia/Kolkata")
+                        .format("DD-MM-YYYY hh:mm:ss A")
+                      : "—"}
+                  </div>
+                </div>
+
+                <div>
+                  <Label value="Updated At" className="mb-1 block" />
+                  <div className="min-h-[38px] flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                    {selectedOutletDetails?.updatedAt
+                      ? moment(selectedOutletDetails.updatedAt)
+                        .tz("Asia/Kolkata")
+                        .format("DD-MM-YYYY hh:mm:ss A")
+                      : "—"}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -2281,23 +2500,28 @@ const OutletList = () => {
             <div className="border-b pb-4 dark:text-white">
               <h3 className="text-lg font-semibold mb-4">Business Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="categoryOfOutlet" value="Category of Outlet (required)" />
-                  <Select
-                    id="categoryOfOutlet"
-                    value={editOutletData?.categoryOfOutlet || ""}
-                    onChange={(e) =>
-                      setEditOutletData({
-                        ...editOutletData,
-                        categoryOfOutlet: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="">Select Category</option>
-                    <option value="Economy">Economy</option>
-                    <option value="Premium">Premium</option>
-                    <option value="RETAILER">Retailer</option>
-                  </Select>
+                <div className="lg:col-span-3">
+                  <Label value="Category of Outlet" className="mb-2 block" />
+                  <div className="flex flex-wrap gap-4">
+                    {CATEGORY_OF_OUTLET_OPTIONS.map((category) => (
+                      <label
+                        key={category}
+                        className="flex items-center gap-2 text-sm dark:text-white cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={(editOutletData?.categoryOfOutlet || []).includes(
+                            category
+                          )}
+                          onChange={() =>
+                            handleCategoryOfOutletToggle(category)
+                          }
+                          className="rounded border-gray-300"
+                        />
+                        {category}
+                      </label>
+                    ))}
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="retailerClass" value="Retailer Class (Required)" />
@@ -2317,6 +2541,60 @@ const OutletList = () => {
                     <option value="C">Class C</option>
                     <option value="D">Class D</option>
                   </Select>
+                </div>
+                <div>
+                  <Label htmlFor="potentialSelection" value="Potential Selection" />
+                  <Select
+                    id="potentialSelection"
+                    value={editOutletData?.potentialSelection || ""}
+                    onChange={(e) =>
+                      setEditOutletData({
+                        ...editOutletData,
+                        potentialSelection: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">Select Potential</option>
+                    {POTENTIAL_SELECTION_OPTIONS.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="paymentCategory" value="Payment Category" />
+                  <Select
+                    id="paymentCategory"
+                    value={editOutletData?.paymentCategory || ""}
+                    onChange={(e) =>
+                      setEditOutletData({
+                        ...editOutletData,
+                        paymentCategory: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">Select Payment Category</option>
+                    {PAYMENT_CATEGORY_OPTIONS.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="birthday" value="Birthday" />
+                  <TextInput
+                    id="birthday"
+                    type="date"
+                    value={editOutletData?.birthday || ""}
+                    onChange={(e) =>
+                      setEditOutletData({
+                        ...editOutletData,
+                        birthday: e.target.value,
+                      })
+                    }
+                  />
                 </div>
               </div>
             </div>
