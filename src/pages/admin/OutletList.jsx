@@ -1408,9 +1408,9 @@ const OutletList = () => {
               <Table.HeadCell className="whitespace-nowrap">
                 <SortableHeader field="ownerName">Owner Name</SortableHeader>
               </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap">
+              {/* <Table.HeadCell className="whitespace-nowrap">
                 <SortableHeader field="createdBy">Created By</SortableHeader>
-              </Table.HeadCell>
+              </Table.HeadCell> */}
               <Table.HeadCell className="whitespace-nowrap">
                 <SortableHeader field="cso">CSO</SortableHeader>
               </Table.HeadCell>
@@ -1543,9 +1543,9 @@ const OutletList = () => {
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.ownerName}
                       </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                      {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.createdBy || "-"}
-                      </Table.Cell>
+                      </Table.Cell> */}
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {outlet?.cso || "-"}
                       </Table.Cell>
