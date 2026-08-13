@@ -401,6 +401,7 @@ return (
                   <option value="Purchase-Order-Cancellation">
                     Purchase-Order-Cancellation
                   </option>
+                  <option value="Enquiry-Cancellation">Enquiry Cancellation</option>
                   <option value="Order-To-Bill">Order-To-Bill</option>
                   <option value="Order-Cancellation">Order-Cancellation</option>
                   <option value="Bill-Cancellation">Bill Cancellation</option>
