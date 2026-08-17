@@ -367,18 +367,18 @@ export const adminSidebarConfig = [
       },
     ],
   },
-  // {
-  //   type: "collapse",
-  //   label: "Godown Master",
-  //   icon: AiOutlineMenuUnfold,
-  //   children: [
-  //     {
-  //       label: "Add Godown",
-  //       path: "/admin/godown-add",
-  //       icon: FaWarehouse,
-  //     },
-  //   ],
-  // },
+  {
+    type: "collapse",
+    label: "Godown Master",
+    icon: AiOutlineMenuUnfold,
+    children: [
+      {
+        label: "Add Godown",
+        path: "/admin/godown-add",
+        icon: FaWarehouse,
+      },
+    ],
+  },
 
   // {
   //   type: "collapse",
