@@ -367,18 +367,18 @@ export const adminSidebarConfig = [
       },
     ],
   },
-  {
-    type: "collapse",
-    label: "Godown Master",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      {
-        label: "Add Godown",
-        path: "/admin/godown-add",
-        icon: FaWarehouse,
-      },
-    ],
-  },
+  // {
+  //   type: "collapse",
+  //   label: "Godown Master",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     {
+  //       label: "Add Godown",
+  //       path: "/admin/godown-add",
+  //       icon: FaWarehouse,
+  //     },
+  //   ],
+  // },
 
   // {
   //   type: "collapse",
@@ -924,18 +924,18 @@ export const usersidebarconfig = [
       },
     ],
   },
-  {
-    type: "collapse",
-    label: "Godown Master",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      {
-        label: "Add Godown",
-        path: "/user/godown-add",
-        icon: FaWarehouse,
-      },
-    ],
-  },
+  // {
+  //   type: "collapse",
+  //   label: "Godown Master",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     {
+  //       label: "Add Godown",
+  //       path: "/user/godown-add",
+  //       icon: FaWarehouse,
+  //     },
+  //   ],
+  // },
 
   // {
   //   type: "collapse",
@@ -1488,18 +1488,18 @@ export const subadminssidebarconfig = [
       },
     ],
   },
-  {
-    type: "collapse",
-    label: "Godown Master",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      {
-        label: "Add Godown",
-        path: "/sub-admins/godown-add",
-        icon: FaWarehouse,
-      },
-    ],
-  },
+  // {
+  //   type: "collapse",
+  //   label: "Godown Master",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     {
+  //       label: "Add Godown",
+  //       path: "/sub-admins/godown-add",
+  //       icon: FaWarehouse,
+  //     },
+  //   ],
+  // },
 
   // {
   //   type: "collapse",
@@ -2052,18 +2052,18 @@ export const aaadminsesidebarconfig = [
       },
     ],
   },
-  {
-    type: "collapse",
-    label: "Godown Master",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      {
-        label: "Add Godown",
-        path: "/admine/godown-add",
-        icon: FaWarehouse,
-      },
-    ],
-  },
+  // {
+  //   type: "collapse",
+  //   label: "Godown Master",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     {
+  //       label: "Add Godown",
+  //       path: "/admine/godown-add",
+  //       icon: FaWarehouse,
+  //     },
+  //   ],
+  // },
 
   // {
   //   type: "collapse",
@@ -2617,18 +2617,18 @@ export const salessidebarconfig = [
       },
     ],
   },
-  {
-    type: "collapse",
-    label: "Godown Master",
-    icon: AiOutlineMenuUnfold,
-    children: [
-      {
-        label: "Add Godown",
-        path: "/sales/godown-add",
-        icon: FaWarehouse,
-      },
-    ],
-  },
+  // {
+  //   type: "collapse",
+  //   label: "Godown Master",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     {
+  //       label: "Add Godown",
+  //       path: "/sales/godown-add",
+  //       icon: FaWarehouse,
+  //     },
+  //   ],
+  // },
   // {
   //   type: "collapse",
   //   label: "RBP App",
