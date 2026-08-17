@@ -12,6 +12,7 @@ import {
   FaRoute,
   FaSignOutAlt,
   FaUsers,
+  FaWarehouse,
 } from "react-icons/fa";
 import { FaCodePullRequest, FaPerson, FaUsersGear } from "react-icons/fa6";
 import { IoIosAdd, IoIosImages } from "react-icons/io";
@@ -366,6 +367,18 @@ export const adminSidebarConfig = [
       },
     ],
   },
+  // {
+  //   type: "collapse",
+  //   label: "Godown Master",
+  //   icon: AiOutlineMenuUnfold,
+  //   children: [
+  //     {
+  //       label: "Add Godown",
+  //       path: "/admin/godown-add",
+  //       icon: FaWarehouse,
+  //     },
+  //   ],
+  // },
 
   // {
   //   type: "collapse",
