@@ -924,6 +924,18 @@ export const usersidebarconfig = [
       },
     ],
   },
+  {
+    type: "collapse",
+    label: "Godown Master",
+    icon: AiOutlineMenuUnfold,
+    children: [
+      {
+        label: "Add Godown",
+        path: "/user/godown-add",
+        icon: FaWarehouse,
+      },
+    ],
+  },
 
   // {
   //   type: "collapse",
@@ -1473,6 +1485,18 @@ export const subadminssidebarconfig = [
         path: "/sub-admins/all-db-orders-list",
         icon: FaListAlt,
         slug: "db-orders-list",
+      },
+    ],
+  },
+  {
+    type: "collapse",
+    label: "Godown Master",
+    icon: AiOutlineMenuUnfold,
+    children: [
+      {
+        label: "Add Godown",
+        path: "/sub-admins/godown-add",
+        icon: FaWarehouse,
       },
     ],
   },
@@ -2028,6 +2052,18 @@ export const aaadminsesidebarconfig = [
       },
     ],
   },
+  {
+    type: "collapse",
+    label: "Godown Master",
+    icon: AiOutlineMenuUnfold,
+    children: [
+      {
+        label: "Add Godown",
+        path: "/admine/godown-add",
+        icon: FaWarehouse,
+      },
+    ],
+  },
 
   // {
   //   type: "collapse",
@@ -2578,6 +2614,18 @@ export const salessidebarconfig = [
         path: "/Sales/all-db-orders-list",
         icon: FaListAlt,
         slug: "db-orders-list",
+      },
+    ],
+  },
+  {
+    type: "collapse",
+    label: "Godown Master",
+    icon: AiOutlineMenuUnfold,
+    children: [
+      {
+        label: "Add Godown",
+        path: "/sales/godown-add",
+        icon: FaWarehouse,
       },
     ],
   },

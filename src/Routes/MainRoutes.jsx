@@ -33,6 +33,7 @@ import SubBrand from "../pages/admin/SubBrand";
 import { SupplierMaster } from "../pages/admin/SupplierMaster";
 import Zone from "../pages/admin/Zone";
 import SalesOrderLog from "../pages/admin/SalesOrderLog";
+import AddGodown from "../pages/admin/AddGodown";
 import PuchaseInvoiceLog from "../pages/admin/PuchaseInvoiceLog";
 
 // Admin Purchase Order Pages
@@ -222,6 +223,7 @@ export const MainRoutes = () => {
                 path: "all-db-orders-list",
                 element: <AllDistributorOrderList />,
               },
+              { path: "godown-add", element: <AddGodown /> },
               { path: "plant", element: <PlantMaster /> },
               { path: "settings", element: <Settings /> },
               { path: "cron-settings", element: <CronSettings /> },
@@ -443,6 +445,7 @@ export const MainRoutes = () => {
                 path: "all-db-orders-list",
                 element: <AllDistributorOrderList />,
               },
+              { path: "godown-add", element: <AddGodown /> },
               { path: "plant", element: <PlantMaster /> },
               { path: "settings", element: <Settings /> },
               { path: "cron-settings", element: <CronSettings /> },
@@ -652,6 +655,7 @@ export const MainRoutes = () => {
                 path: "all-db-orders-list",
                 element: <AllDistributorOrderList />,
               },
+              { path: "godown-add", element: <AddGodown /> },
               { path: "plant", element: <PlantMaster /> },
               { path: "settings", element: <Settings /> },
               { path: "cron-settings", element: <CronSettings /> },
@@ -868,6 +872,7 @@ export const MainRoutes = () => {
                 path: "all-db-orders-list",
                 element: <AllDistributorOrderList />,
               },
+              { path: "godown-add", element: <AddGodown /> },
               { path: "plant", element: <PlantMaster /> },
               { path: "settings", element: <Settings /> },
               { path: "cron-settings", element: <CronSettings /> },
@@ -1077,6 +1082,7 @@ export const MainRoutes = () => {
                 path: "all-db-orders-list",
                 element: <AllDistributorOrderList />,
               },
+              { path: "godown-add", element: <AddGodown /> },
               { path: "plant", element: <PlantMaster /> },
               { path: "settings", element: <Settings /> },
               { path: "cron-settings", element: <CronSettings /> },
