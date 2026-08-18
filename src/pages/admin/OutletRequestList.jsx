@@ -81,6 +81,7 @@ const OutletRequestList = () => {
     birthday: "",
     categoryOfOutlet: [],
     paymentCategory: "",
+    retailerClass: "",
 
     employeeCode: "",
     employeeName: "",
@@ -456,11 +457,12 @@ const OutletRequestList = () => {
       "(Optional)",
       '(Optional)[Example: "Below 1 Lac"]',
       "(Optional)[Example: YYYY-MM-DD]",
-      '(Optional)[Example: Retail,Wholesale][Example: "Retail"]',
-      '(Optional)[Example: "Good"]',
+      '(Optional)[Example: Retail,Wholesale][Valid: "Retail", "Wholesale", "Project", "Consumer", "Survey"]',
+      '(Optional)[Example: "Good"][Valid: "Good", "Normal", "Follow Up", "RED", "Survey"]',
       "(Optional)",
       "(Required) [Example: BEAT-492,BEAT-183]",
       "(Required)[Example: WB]",
+      "(Optional)",
       "(Optional)",
       "(Optional)",
       "(Optional)",
@@ -581,6 +583,7 @@ const OutletRequestList = () => {
         birthday: singleOutletForm.birthday || null,
         categoryOfOutlet: singleOutletForm.categoryOfOutlet.join(","),
         paymentCategory: singleOutletForm.paymentCategory?.trim(),
+        retailerClass: singleOutletForm.retailerClass?.trim(),
 
         employeeCode:
           singleOutletForm.employeeCode?.trim(),
@@ -647,6 +650,7 @@ const OutletRequestList = () => {
         birthday: "",
         categoryOfOutlet: [],
         paymentCategory: "",
+        retailerClass: "",
 
         employeeCode: "",
         employeeName: "",
@@ -710,17 +714,22 @@ const OutletRequestList = () => {
     }
   };
 
+  // Options below are aligned with the Outlet model enums
+  // (models/outlet.model.js: potentialSelection, categoryOfOutlet, paymentCategory)
   const potentialOptions = [
     "Below 1 Lac",
     "Upto 3 Lac",
     "Upto 5 Lac",
     "Upto 10 Lac",
     "10 Lac & Above",
+    "Survey",
   ];
 
-  const categoryOfOutletOptions = ["Retail", "Wholesale", "Project Consumer", "Others"];
+  const categoryOfOutletOptions = ["Retail", "Wholesale", "Project", "Consumer", "Survey"];
 
-  const paymentCategoryOptions = ["Good", "Normal", "Follow up", "Continuous Red"];
+  const paymentCategoryOptions = ["Good", "Normal", "Follow Up", "RED", "Survey"];
+
+  const retailerClassOptions = ["A", "B", "C", "D", "Survey"];
 
   const toggleCategoryOfOutlet = (value) => {
     setSingleOutletForm((prev) => {
@@ -1828,6 +1837,22 @@ const OutletRequestList = () => {
                           onChange={handleSingleOutletChange}
                           className={commonInputClass}
                         />
+                      </div>
+
+                      {/* Retailer Class */}
+                      <div>
+                        <Label value="Retailer Class" className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-300" />
+                        <select
+                          name="retailerClass"
+                          value={singleOutletForm.retailerClass}
+                          onChange={handleSingleOutletChange}
+                          className="w-full rounded-xl border border-slate-600 bg-slate-700/80 px-4 h-[44px] text-sm font-medium text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/40 focus:outline-none"
+                        >
+                          <option value="">Select Retailer Class</option>
+                          {retailerClassOptions.map((opt) => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
                       </div>
 
                       {/* Category of Outlet (multiselect) */}
