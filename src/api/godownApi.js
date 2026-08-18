@@ -67,26 +67,21 @@ export const viewGodownList = async (queryParams) => {
 //   }
 // };
 
-// Update Godown
-// export const updateGodown = async (godownId, data) => {
-//   try {
-//     const response = await axios.put(
-//       BACKEND_URL + `/api/v1/inventory/update-godown/${godownId}`,
-//       data,
-//       {
-//         headers: setAuthHeader(),
-//       }
-//     );
-//     return response;
-//   } catch (error) {
-//     return (
-//       error.response?.data || {
-//         error: true,
-//         message: "Error updating godown",
-//       }
-//     );
-//   }
-// };
+// Edit Godown
+export const editGodown = async (godownId, payload) => {
+  try {
+    const response = await axios.put(
+      BACKEND_URL + `/api/v1/inventory/edit-godown/${godownId}`,
+      payload,
+      { headers: setAuthHeader() },
+    );
+    return response;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message || error?.message || "Failed to edit godown, try again",
+    );
+  }
+};
 
 // Delete Godown
 // export const deleteGodown = async (godownId) => {

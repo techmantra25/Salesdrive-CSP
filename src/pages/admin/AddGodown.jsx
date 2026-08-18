@@ -13,12 +13,24 @@ import {
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { RiRefreshFill } from "react-icons/ri";
-import { addGodown, viewGodownList } from "../../api/godownApi";
+import { HiPencil } from "react-icons/hi";
+import { addGodown, editGodown, viewGodownList } from "../../api/godownApi";
 import { AllDistributorList } from "../../api/api";
 import { useDebounce } from "../../hooks/useDebounce";
 
 const initialGodownForm = {
   distributorId: "",
+  godownCode: "",
+  godownName: "",
+  godownType: "MAIN",
+  location: "",
+  contactPerson: "",
+  isActive: true,
+  remarks: "",
+};
+
+const initialEditGodownForm = {
+  godownId: "",
   godownCode: "",
   godownName: "",
   godownType: "MAIN",
@@ -43,6 +55,10 @@ const AddGodown = () => {
   const [openAddGodownModal, setOpenAddGodownModal] = useState(false);
   const [godownForm, setGodownForm] = useState(initialGodownForm);
   const [addGodownLoading, setAddGodownLoading] = useState(false);
+
+  const [openEditGodownModal, setOpenEditGodownModal] = useState(false);
+  const [editGodownForm, setEditGodownForm] = useState(initialEditGodownForm);
+  const [editGodownLoading, setEditGodownLoading] = useState(false);
 
   const [distributors, setDistributors] = useState([]);
   const [distributorsLoading, setDistributorsLoading] = useState(false);
@@ -131,6 +147,11 @@ const AddGodown = () => {
     setGodownForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleEditGodownFormChange = (e) => {
+    const { name, value } = e.target;
+    setEditGodownForm((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleCreateGodown = async () => {
     try {
       if (!godownForm.distributorId) {
@@ -178,6 +199,63 @@ const AddGodown = () => {
       );
     } finally {
       setAddGodownLoading(false);
+    }
+  };
+
+  const handleOpenEditGodown = (godown) => {
+    setEditGodownForm({
+      godownId: godown?._id || "",
+      godownCode: godown?.godownCode || "",
+      godownName: godown?.godownName || "",
+      godownType: godown?.godownType || "MAIN",
+      location: godown?.location || "",
+      contactPerson: godown?.contactPerson || "",
+      isActive: !!godown?.isActive,
+      remarks: godown?.remarks || "",
+    });
+    setOpenEditGodownModal(true);
+  };
+
+  const handleUpdateGodown = async () => {
+    try {
+      if (!editGodownForm.godownId) {
+        toast.error("Invalid godown");
+        return;
+      }
+
+      if (!editGodownForm.godownName?.trim()) {
+        toast.error("Godown name is required");
+        return;
+      }
+
+      setEditGodownLoading(true);
+
+      const payload = {
+        godownCode: editGodownForm.godownCode,
+        godownName: editGodownForm.godownName.trim(),
+        godownType: editGodownForm.godownType,
+        location: editGodownForm.location.trim(),
+        contactPerson: editGodownForm.contactPerson.trim(),
+        isActive: editGodownForm.isActive,
+        remarks: editGodownForm.remarks.trim(),
+      };
+
+      const response = await editGodown(editGodownForm.godownId, payload);
+
+      toast.success(response?.data?.message || "Godown updated successfully");
+
+      setOpenEditGodownModal(false);
+      setEditGodownForm(initialEditGodownForm);
+      fetchGodownsWithoutDebounce();
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to update godown"
+      );
+    } finally {
+      setEditGodownLoading(false);
     }
   };
 
@@ -298,6 +376,9 @@ const AddGodown = () => {
               <Table.HeadCell className="whitespace-nowrap">
                 Remarks
               </Table.HeadCell>
+              <Table.HeadCell className="whitespace-nowrap">
+                Action
+              </Table.HeadCell>
             </Table.Head>
 
             <Table.Body>
@@ -344,6 +425,16 @@ const AddGodown = () => {
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {godown?.remarks || "—"}
+                      </Table.Cell>
+                      <Table.Cell className="whitespace-nowrap font-medium">
+                        <Button
+                          size="xs"
+                          color="light"
+                          onClick={() => handleOpenEditGodown(godown)}
+                        >
+                          <HiPencil className="mr-1" size={14} />
+                          Edit
+                        </Button>
                       </Table.Cell>
                     </Table.Row>
                   ))}
@@ -540,6 +631,156 @@ const AddGodown = () => {
               </div>
             ) : (
               "Create Godown"
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Edit Godown Modal */}
+      <Modal
+        show={openEditGodownModal}
+        onClose={() => setOpenEditGodownModal(false)}
+        size="2xl"
+        popup
+      >
+        <Modal.Header className="px-6 pt-4">
+          <span className="text-lg font-semibold">Edit Godown</span>
+        </Modal.Header>
+
+        <Modal.Body>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 pt-2">
+            <div>
+              <Label
+                value="Godown Code"
+                className="mb-2 block text-xs font-semibold uppercase tracking-wide"
+              />
+              <TextInput
+                disabled
+                readOnly
+                name="godownCode"
+                value={editGodownForm.godownCode}
+                className={commonInputClass}
+              />
+            </div>
+
+            <div>
+              <Label
+                value={
+                  <>
+                    Godown Name <span className="text-red-500">*</span>
+                  </>
+                }
+                className="mb-2 block text-xs font-semibold uppercase tracking-wide"
+              />
+              <TextInput
+                required
+                name="godownName"
+                placeholder="Enter godown name"
+                value={editGodownForm.godownName}
+                onChange={handleEditGodownFormChange}
+                className={commonInputClass}
+              />
+            </div>
+
+            <div>
+              <Label
+                value="Godown Type"
+                className="mb-2 block text-xs font-semibold uppercase tracking-wide"
+              />
+              <Select
+                name="godownType"
+                value={editGodownForm.godownType}
+                onChange={handleEditGodownFormChange}
+              >
+                {godownTypeOptions.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </Select>
+            </div>
+
+            <div>
+              <Label
+                value="Status"
+                className="mb-2 block text-xs font-semibold uppercase tracking-wide"
+              />
+              <Select
+                name="isActive"
+                value={editGodownForm.isActive ? "true" : "false"}
+                onChange={(e) =>
+                  setEditGodownForm((prev) => ({
+                    ...prev,
+                    isActive: e.target.value === "true",
+                  }))
+                }
+              >
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </Select>
+            </div>
+
+            <div>
+              <Label
+                value="Contact Person"
+                className="mb-2 block text-xs font-semibold uppercase tracking-wide"
+              />
+              <TextInput
+                name="contactPerson"
+                placeholder="Enter contact person"
+                value={editGodownForm.contactPerson}
+                onChange={handleEditGodownFormChange}
+                className={commonInputClass}
+              />
+            </div>
+
+            <div>
+              <Label
+                value="Location"
+                className="mb-2 block text-xs font-semibold uppercase tracking-wide"
+              />
+              <TextInput
+                name="location"
+                placeholder="Enter location"
+                value={editGodownForm.location}
+                onChange={handleEditGodownFormChange}
+                className={commonInputClass}
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <Label
+                value="Remarks"
+                className="mb-2 block text-xs font-semibold uppercase tracking-wide"
+              />
+              <textarea
+                rows={3}
+                name="remarks"
+                placeholder="Enter remarks"
+                value={editGodownForm.remarks}
+                onChange={handleEditGodownFormChange}
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 focus:outline-none"
+              />
+            </div>
+          </div>
+        </Modal.Body>
+
+        <Modal.Footer className="flex justify-end gap-3">
+          <Button
+            color="gray"
+            onClick={() => setOpenEditGodownModal(false)}
+          >
+            Cancel
+          </Button>
+
+          <Button onClick={handleUpdateGodown} disabled={editGodownLoading}>
+            {editGodownLoading ? (
+              <div className="flex items-center gap-2">
+                <Spinner size="sm" />
+                Updating...
+              </div>
+            ) : (
+              "Update Godown"
             )}
           </Button>
         </Modal.Footer>
