@@ -395,6 +395,8 @@ export const Employee = () => {
       empId: employee?.empId,
       employeeLabel: employee?.employeeLabel,
       phone: employee?.phone || "",
+      whatsapp: employee?.whatsapp || "",
+      alternateMobile: employee?.alternateMobile || "",
       email: employee?.email || "",
       dob: employee?.dob
         ? new Date(employee.dob).toISOString().split("T")[0]
