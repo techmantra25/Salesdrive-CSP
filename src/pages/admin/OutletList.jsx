@@ -93,8 +93,9 @@ const SORTABLE_COLUMNS = new Set([
 const CATEGORY_OF_OUTLET_OPTIONS = [
   "Retail",
   "Wholesale",
-  "Project Consumer",
-  "Others",
+  "Project",
+  "Consumer",
+  "Survey",
 ];
 
 // Matches the OutletApproved schema enum for potentialSelection.
@@ -104,14 +105,16 @@ const POTENTIAL_SELECTION_OPTIONS = [
   "Upto 5 Lac",
   "Upto 10 Lac",
   "10 Lac & Above",
+  "Survey",
 ];
 
 // Matches the OutletApproved schema enum for paymentCategory.
 const PAYMENT_CATEGORY_OPTIONS = [
   "Good",
   "Normal",
-  "Follow up",
-  "Continuous Red",
+  "Follow Up",
+  "RED",
+  "Survey",
 ];
 
 const OutletList = () => {
@@ -2540,6 +2543,7 @@ const OutletList = () => {
                     <option value="B">Class B</option>
                     <option value="C">Class C</option>
                     <option value="D">Class D</option>
+                    <option value="Survey">Survey</option>
                   </Select>
                 </div>
                 <div>

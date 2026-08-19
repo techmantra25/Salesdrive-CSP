@@ -56,6 +56,11 @@ import { IoInformationCircleSharp } from "react-icons/io5";
 import { getPagePermission } from "../../utils/permissionHelper";
 
 
+const HARDCODED_DESIGNATIONS = ["MO/SO", "ASM", "RSM"];
+
+const normalizeDesgName = (str) =>
+  (str || "").replace(/\s+/g, "").toUpperCase();
+
 export const Employee = () => {
   const { config } = useSelector((state) => state.config);
   const { functionalSettings } = config || {};
@@ -395,6 +400,8 @@ export const Employee = () => {
       empId: employee?.empId,
       employeeLabel: employee?.employeeLabel,
       phone: employee?.phone || "",
+      whatsapp: employee?.whatsapp || "",
+      alternateMobile: employee?.alternateMobile || "",
       email: employee?.email || "",
       dob: employee?.dob
         ? new Date(employee.dob).toISOString().split("T")[0]
@@ -1502,18 +1509,17 @@ export const Employee = () => {
                     >
                       <option value="">Select Designation</option>
 
-                      {designations
-                        ?.filter((d) => ["MO/SO", "ASM", "RSM"].includes(d.name))
-                        .sort(
-                          (a, b) =>
-                            ["MO/SO", "ASM", "RSM"].indexOf(a.name) -
-                            ["MO/SO", "ASM", "RSM"].indexOf(b.name)
-                        )
-                        .map((designation) => (
-                          <option key={designation._id} value={designation._id}>
-                            {designation.name}
+                      {HARDCODED_DESIGNATIONS.map((desgName) => {
+                        const matched = designations?.find(
+                          (d) => normalizeDesgName(d.name) === normalizeDesgName(desgName)
+                        );
+                        if (!matched) return null;
+                        return (
+                          <option key={matched._id} value={matched._id}>
+                            {desgName}
                           </option>
-                        ))}
+                        );
+                      })}
                     </Select>
                   </div>
                   <div className="w-full space-y-4">
