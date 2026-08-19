@@ -2543,6 +2543,7 @@ const OutletList = () => {
                     <option value="B">Class B</option>
                     <option value="C">Class C</option>
                     <option value="D">Class D</option>
+                    <option value="Survey">Survey</option>
                   </Select>
                 </div>
                 <div>
