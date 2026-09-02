@@ -2353,3 +2353,42 @@ export const bulkUpdateRlp = async (payload) => {
   }
 };
 
+// Add these two functions into api.js (near AllPricingList / addPricing)
+
+export const getProductDateWiseMatrix = async (params) => {
+  try {
+    const response = await axios.get(
+      `${BACKEND_URL}/api/v1/price/product-date-wise-paginated`,
+      {
+        headers: setAuthHeader(),
+        params,
+      },
+    );
+    return response;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to fetch product date wise pricing",
+    );
+  }
+};
+
+export const getCategoryDateWiseMatrix = async (params) => {
+  try {
+    const response = await axios.get(
+      `${BACKEND_URL}/api/v1/price/category-date-wise-matrix`,
+      {
+        headers: setAuthHeader(),
+        params,
+      },
+    );
+    return response;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to fetch category date wise pricing",
+    );
+  }
+};
