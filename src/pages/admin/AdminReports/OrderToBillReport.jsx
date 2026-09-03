@@ -17,6 +17,7 @@ import SearchableSelect from "../../../components/SearchableSelect";
 import { fetchDistributors } from "../../../redux/distributorListSlice";
 import { paginatedOrderToBillReport } from "../../../api/orderApi";
 import { getPagePermission } from "../../../utils/permissionHelper";
+import { viewGodownList } from "../../../api/api"; // NEW
 
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -41,6 +42,10 @@ const OrderToBillReport = () => {
   const permissionState = useSelector((state) => state.permission);
   const [pagePermission, setPagePermission] = useState(null);
 
+  // NEW: godown filter state
+  const [godownList, setGodownList] = useState([]);
+  const [godownLoading, setGodownLoading] = useState(false);
+  const [selectedGodowns, setSelectedGodowns] = useState([]);
 
   const dispatch = useDispatch();
   const { distributors } = useSelector((s) => s.distributors);
@@ -54,6 +59,23 @@ const OrderToBillReport = () => {
   useEffect(() => {
     dispatch(fetchDistributors());
   }, [dispatch]);
+
+  // NEW: fetch godown list
+  useEffect(() => {
+    const fetchGodowns = async () => {
+      setGodownLoading(true);
+      try {
+        const res = await viewGodownList({ page: 1, limit: 100 });
+        setGodownList(res?.data?.data || []);
+      } catch (error) {
+        console.error("Failed to fetch godown list", error);
+        toast.error("Failed to fetch Godown List");
+      } finally {
+        setGodownLoading(false);
+      }
+    };
+    fetchGodowns();
+  }, []);
 
   const fetchAllData = async () => {
     let currentPage = 1;
@@ -71,6 +93,11 @@ const OrderToBillReport = () => {
     if (orderStatus !== "all") query.status = orderStatus;
     if (selectedDistributors.length && !selectedDistributors.includes("all")) {
       query.distributorIds = selectedDistributors.join(",");
+    }
+
+    // NEW: godown filter
+    if (selectedGodowns.length && !selectedGodowns.includes("all")) {
+      query.godownIds = selectedGodowns.join(",");
     }
 
     try {
@@ -141,6 +168,11 @@ const OrderToBillReport = () => {
   const handleDistributorChange = (e) => {
     setSelectedDistributors(e.target.value);
   };
+
+  const handleGodownChange = (e) => {  // NEW
+    setSelectedGodowns(e.target.value);
+  };
+
   return (
     <>
       {pagePermission?.view ? (
@@ -179,6 +211,23 @@ const OrderToBillReport = () => {
                     disabled={downloadLoading}
                   />
                 </div>
+
+                {/* NEW: Godown filter */}
+                <div className="w-56">
+                  <Label value="Godown" />
+                  <SearchableSelect
+                    id="godown-select"
+                    className="w-full"
+                    options={godownList}
+                    value={selectedGodowns}
+                    placeholder="Select Godown(s)"
+                    onChange={handleGodownChange}
+                    displayKey="godownName"
+                    valueKey="_id"
+                    multiple
+                    disabled={downloadLoading || godownLoading}
+                  />
+                </div>
               </div>
 
               <div className="flex justify-center mt-4 gap-4">
@@ -189,6 +238,7 @@ const OrderToBillReport = () => {
                       setOrderSource("all");
                       setOrderStatus("all");
                       setSelectedDistributors([]);
+                      setSelectedGodowns([]); // NEW
                       setDateRange({ startDate: null, endDate: null });
                     }}
                     size="sm"
