@@ -11,6 +11,7 @@ import moment from "moment";
 import toast from "react-hot-toast";
 import { setAuthHeader } from "../../../api/api";
 import { getPagePermission } from "../../../utils/permissionHelper";
+import { viewGodownList } from "../../../api/api";
 
 
 const SalesReturnReports = () => {
@@ -27,34 +28,37 @@ const SalesReturnReports = () => {
 
   const { distributors } = useSelector((state) => state.distributors);
 
+  // NEW: Godown filter state
+  const [godownList, setGodownList] = useState([]);
+  const [godownLoading, setGodownLoading] = useState(false);
+  const [selectedGodowns, setSelectedGodowns] = useState([]);
+
   useEffect(() => {
     if (!permissionState?.data?.data) return;
     const permission = getPagePermission(permissionState, "sales-return-report");
     setPagePermission(permission);
   }, [permissionState]);
 
+  // NEW: fetch godown list
+  useEffect(() => {
+    const fetchGodowns = async () => {
+      setGodownLoading(true);
+      try {
+        const res = await viewGodownList({ page: 1, limit: 100 });
+        setGodownList(res?.data?.data || []);
+      } catch (error) {
+        console.error("Failed to fetch godown list", error);
+        toast.error("Failed to fetch Godown List");
+      } finally {
+        setGodownLoading(false);
+      }
+    };
+    fetchGodowns();
+  }, []);
+
   const handleDateRangeChange = (range) => {
     setDateRange(range);
   };
-
-  // let downloadReport = async () => {
-  //   const query = {};
-
-  //   if (dateRange.startDate && dateRange.endDate) {
-  //     query.startDate = dateRange.startDate;
-  //     query.endDate = dateRange.endDate;
-  //   }
-
-  //   if (selectedDistributors.length > 0) {
-  //     if (!selectedDistributors.includes("all")) {
-  //       query.distributorIds = selectedDistributors.join(",");
-  //     }
-  //   }
-  //   const params = new URLSearchParams(query).toString();
-  //   const url = `${BACKEND_URL}/api/v1/sales-return/all-sales-return-report?${params}`;
-
-  //   window.open(url, "_blank");
-  // };
 
   let downloadReport = async () => {
     try {
@@ -71,6 +75,13 @@ const SalesReturnReports = () => {
       if (selectedDistributors.length > 0) {
         if (!selectedDistributors.includes("all")) {
           query.distributorIds = selectedDistributors.join(",");
+        }
+      }
+
+      // NEW: godown filter
+      if (selectedGodowns.length > 0) {
+        if (!selectedGodowns.includes("all")) {
+          query.godownIds = selectedGodowns.join(",");
         }
       }
 
@@ -118,6 +129,10 @@ const SalesReturnReports = () => {
     setSelectedDistributors(e.target.value);
   };
 
+  const handleGodownChange = (e) => {  // NEW
+    setSelectedGodowns(e.target.value);
+  };
+
   useEffect(() => {
     dispatch(fetchDistributors());
   }, [dispatch]);
@@ -128,6 +143,7 @@ const SalesReturnReports = () => {
       endDate: null,
     });
     setSelectedDistributors([]);
+    setSelectedGodowns([]); // NEW
   };
 
   return (
@@ -157,6 +173,23 @@ const SalesReturnReports = () => {
                     valueKey="_id"
                     multiple
                     disabled={isDownloading}
+                  />
+                </div>
+
+                {/* NEW: Godown filter */}
+                <div className="w-56">
+                  <Label value="Select Godown(s)" />
+                  <SearchableSelect
+                    id="godown-select"
+                    className="w-full"
+                    options={godownList}
+                    value={selectedGodowns}
+                    onChange={handleGodownChange}
+                    placeholder="Select Godown(s)"
+                    displayKey="godownName"
+                    valueKey="_id"
+                    multiple
+                    disabled={isDownloading || godownLoading}
                   />
                 </div>
 
