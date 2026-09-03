@@ -9,9 +9,8 @@ import { BACKEND_URL } from "../../../constants";
 import { fetchDistributors } from "../../../redux/distributorListSlice";
 import moment from "moment";
 import toast from "react-hot-toast";
-import { setAuthHeader } from "../../../api/api";
+import { setAuthHeader, viewGodownList } from "../../../api/api";
 import { getPagePermission } from "../../../utils/permissionHelper";
-
 
 const PurchaseOrderReport = () => {
   const [dateRange, setDateRange] = useState({
@@ -19,10 +18,12 @@ const PurchaseOrderReport = () => {
     endDate: null,
   });
   const [selectedDistributors, setSelectedDistributors] = useState([]);
+  const [selectedGodowns, setSelectedGodowns] = useState([]); // NEW
+  const [godownList, setGodownList] = useState([]);           // NEW
+  const [godownLoading, setGodownLoading] = useState(false);  // NEW
   const [isDownloading, setIsDownloading] = useState(false);
   const permissionState = useSelector((state) => state.permission);
-const [pagePermission, setPagePermission] = useState(null);
-
+  const [pagePermission, setPagePermission] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -31,37 +32,41 @@ const [pagePermission, setPagePermission] = useState(null);
   const handleDateRangeChange = (range) => {
     setDateRange(range);
   };
-  useEffect(() => {
-  if (!permissionState?.data?.data) return;
-  const permission = getPagePermission(permissionState, "purchase-order-report");
-  setPagePermission(permission);
-}, [permissionState]);
 
+  useEffect(() => {
+    if (!permissionState?.data?.data) return;
+    const permission = getPagePermission(permissionState, "purchase-order-report");
+    setPagePermission(permission);
+  }, [permissionState]);
 
   const handleDistributorChange = (e) => {
     setSelectedDistributors(e.target.value);
+  };
+
+  const handleGodownChange = (e) => {   // NEW
+    setSelectedGodowns(e.target.value);
   };
 
   useEffect(() => {
     dispatch(fetchDistributors());
   }, [dispatch]);
 
-  // const downloadReport = async () => {
-  //   let query = {};
-  //   if (dateRange.startDate && dateRange.endDate) {
-  //     query.startDate = dateRange.startDate;
-  //     query.endDate = dateRange.endDate;
-  //   }
-  //   if (selectedDistributors.length > 0) {
-  //     if (!selectedDistributors.includes("all")) {
-  //       query.distributorIds = selectedDistributors.join(",");
-  //     }
-  //   }
-  //   const params = new URLSearchParams(query).toString();
-  //   const url = `${BACKEND_URL}/api/v1/purchase-order/po-report?${params}`;
-
-  //   window.open(url, "_blank");
-  // };
+  // NEW: fetch godown list
+  useEffect(() => {
+    const fetchGodowns = async () => {
+      setGodownLoading(true);
+      try {
+        const res = await viewGodownList({ page: 1, limit: 100 });
+        setGodownList(res?.data?.data || []);
+      } catch (error) {
+        console.error("Failed to fetch godown list", error);
+        toast.error("Failed to fetch Godown List");
+      } finally {
+        setGodownLoading(false);
+      }
+    };
+    fetchGodowns();
+  }, []);
 
   const downloadReport = async () => {
     try {
@@ -76,6 +81,13 @@ const [pagePermission, setPagePermission] = useState(null);
       if (selectedDistributors.length > 0) {
         if (!selectedDistributors.includes("all")) {
           query.distributorIds = selectedDistributors.join(",");
+        }
+      }
+
+      // NEW: godown filter
+      if (selectedGodowns.length > 0) {
+        if (!selectedGodowns.includes("all")) {
+          query.godownIds = selectedGodowns.join(",");
         }
       }
 
@@ -126,96 +138,115 @@ const [pagePermission, setPagePermission] = useState(null);
       endDate: null,
     });
     setSelectedDistributors([]);
+    setSelectedGodowns([]); // NEW
   };
 
-return (
-  <>
-    {pagePermission?.view ? (
-      <div className="flex justify-start items-center flex-col w-full">
-
-      <div className="flex justify-between w-full items-center border-b-2 py-4">
-        <div className="flex justify-center items-center">
-          <h1 className="text-2xl font-bold">Purchase Order Report</h1>
-        </div>
-      </div>
-      <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
-        <Card className="flex justify-center items-center flex-col">
-          <div className="flex justify-center w-full items-end gap-2 flex-wrap">
-            <div className="w-56">
-              <Label value="Select Distributor(s)" />
-              <SearchableSelect
-                id="distributor-select"
-                className="w-full"
-                options={distributors}
-                value={selectedDistributors}
-                onChange={handleDistributorChange}
-                placeholder="Select Distributor(s)"
-                displayKey="name"
-                descKey="dbCode"
-                valueKey="_id"
-                multiple
-                disabled={isDownloading}
-              />
+  return (
+    <>
+      {pagePermission?.view ? (
+        <div className="flex justify-start items-center flex-col w-full">
+          <div className="flex justify-between w-full items-center border-b-2 py-4">
+            <div className="flex justify-center items-center">
+              <h1 className="text-2xl font-bold">Purchase Order Report</h1>
             </div>
-            <div className="w-64">
-              <div className="block">
-                <Label htmlFor="dateRangeSelect" value="PO Date Range" />
+          </div>
+          <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
+            <Card className="flex justify-center items-center flex-col">
+              <div className="flex justify-center w-full items-end gap-2 flex-wrap">
+                <div className="w-56">
+                  <Label value="Select Distributor(s)" />
+                  <SearchableSelect
+                    id="distributor-select"
+                    className="w-full"
+                    options={distributors}
+                    value={selectedDistributors}
+                    onChange={handleDistributorChange}
+                    placeholder="Select Distributor(s)"
+                    displayKey="name"
+                    descKey="dbCode"
+                    valueKey="_id"
+                    multiple
+                    disabled={isDownloading}
+                  />
+                </div>
+
+                {/* NEW: Godown filter */}
+                <div className="w-56">
+                  <Label value="Select Godown(s)" />
+                  <SearchableSelect
+                    id="godown-select"
+                    className="w-full"
+                    options={godownList}
+                    value={selectedGodowns}
+                    onChange={handleGodownChange}
+                    placeholder="Select Godown(s)"
+                    displayKey="godownName"
+                    valueKey="_id"
+                    multiple
+                    disabled={isDownloading || godownLoading}
+                  />
+                </div>
+
+                <div className="w-64">
+                  <div className="block">
+                    <Label htmlFor="dateRangeSelect" value="PO Date Range" />
+                  </div>
+                  <Datepicker
+                    inputClassName={
+                      "relative py-2.5 pl-4 pr-14 w-full border border-gray-300  rounded-lg dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white/80 rounded-xs tracking-wide text-sm placeholder-gray-400 focus:ring-1 focus:border-cyan-500 focus:outline-none dark:placeholder-gray-400 dark:focus:border-cyan-500 disabled:cursor-not-allowed disabled:opacity-50 focus:ring-cyan-500"
+                    }
+                    showShortcuts={true}
+                    value={dateRange}
+                    onChange={handleDateRangeChange}
+                    disabled={isDownloading}
+                  />
+                </div>
               </div>
-              <Datepicker
-                inputClassName={
-                  "relative py-2.5 pl-4 pr-14 w-full border border-gray-300  rounded-lg dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white/80 rounded-xs tracking-wide text-sm placeholder-gray-400 focus:ring-1 focus:border-cyan-500 focus:outline-none dark:placeholder-gray-400 dark:focus:border-cyan-500 disabled:cursor-not-allowed disabled:opacity-50 focus:ring-cyan-500"
-                }
-                showShortcuts={true}
-                value={dateRange}
-                onChange={handleDateRangeChange}
-                disabled={isDownloading}
-              />
-            </div>
-          </div>
-          <div className="flex justify-center items-center gap-2 w-full mt-4">
-          {pagePermission?.view && (
-            <Button
-              className="text-xs"
-              size="sm"
-              color="success"
-              onClick={handleResetFilter}
-              disabled={isDownloading}
-            >
-              <span className="flex justify-center items-center gap-2">
-                <RiRefreshFill size={20} />
-                Reset & Refresh
-              </span>
-            </Button>)}
-            {pagePermission?.view && (
-            <Button
-              className="text-xs"
-              color="blue"
-              size="sm"
-              onClick={downloadReport}
-              disabled={isDownloading}
-            >
-              <FaDownload size={15} className="mx-2" />
-              Download Report
-            </Button>)}
-          </div>
-        </Card>
-      </div>
-          </div>
-    ) : (
-      <div className="flex justify-center items-center h-[70vh] w-full">
-        <div className="text-center">
-          <div className="text-red-600 text-4xl font-bold mb-2">
-            NO Access
-          </div>
-          <div className="text-gray-500 text-lg">
-            You do not have permission to view this page.
+              <div className="flex justify-center items-center gap-2 w-full mt-4">
+                {pagePermission?.view && (
+                  <Button
+                    className="text-xs"
+                    size="sm"
+                    color="success"
+                    onClick={handleResetFilter}
+                    disabled={isDownloading}
+                  >
+                    <span className="flex justify-center items-center gap-2">
+                      <RiRefreshFill size={20} />
+                      Reset & Refresh
+                    </span>
+                  </Button>
+                )}
+                {pagePermission?.view && (
+                  <Button
+                    className="text-xs"
+                    color="blue"
+                    size="sm"
+                    onClick={downloadReport}
+                    disabled={isDownloading}
+                  >
+                    <FaDownload size={15} className="mx-2" />
+                    Download Report
+                  </Button>
+                )}
+              </div>
+            </Card>
           </div>
         </div>
-      </div>
-    )}
-  </>
-);
-
+      ) : (
+        <div className="flex justify-center items-center h-[70vh] w-full">
+          <div className="text-center">
+            <div className="text-red-600 text-4xl font-bold mb-2">
+              NO Access
+            </div>
+            <div className="text-gray-500 text-lg">
+              You do not have permission to view this page.
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 };
 
 export default PurchaseOrderReport;

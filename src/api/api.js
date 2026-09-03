@@ -2436,3 +2436,23 @@ export const exportCategoryDateWiseMatrix = async (params) => {
     );
   }
 };
+
+
+export const viewGodownList = async (queryParams) => {
+  try {
+    const response = await axios.get(
+      BACKEND_URL + "/api/v1/inventory/view-godown",
+      {
+        headers: setAuthHeader(),
+        params: queryParams, // e.g. { page, limit, godownName }
+      },
+    );
+    return response;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message ||
+      error?.message ||
+      "Failed to fetch godown list, try again",
+    );
+  }
+};

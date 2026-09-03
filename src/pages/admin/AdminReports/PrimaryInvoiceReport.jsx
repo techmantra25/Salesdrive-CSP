@@ -9,7 +9,7 @@ import { fetchDistributors } from "../../../redux/distributorListSlice";
 import { BACKEND_URL } from "../../../constants";
 import toast from "react-hot-toast";
 import moment from "moment";
-import { setAuthHeader } from "../../../api/api";
+import { setAuthHeader, viewGodownList } from "../../../api/api"; // UPDATED: added viewGodownList
 import { getPagePermission } from "../../../utils/permissionHelper";
 import { AllBrandList } from "../../../api/api";
 
@@ -31,6 +31,10 @@ const PrimaryInvoiceReport = () => {
   const [brands, setBrands] = useState([]);
   const [selectedBrands, setSelectedBrands] = useState([]);
 
+  // NEW: godown filter state
+  const [godownList, setGodownList] = useState([]);
+  const [godownLoading, setGodownLoading] = useState(false);
+  const [selectedGodowns, setSelectedGodowns] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -51,57 +55,44 @@ const PrimaryInvoiceReport = () => {
     setGrnDateRange(range);
   };
 
-  // let downloadReport = async () => {
-  //   const query = {};
-  //   if (selectedStatus !== "all") query.status = selectedStatus;
-  //   if (dateRange.startDate && dateRange.endDate) {
-  //     query.startDate = dateRange.startDate;
-  //     query.endDate = dateRange.endDate;
-  //   }
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const res = await AllBrandList();
 
-  //   if (
-  //     (grnDateRange.startDate || grnDateRange.endDate) &&
-  //     selectedStatus !== "Confirmed"
-  //   ) {
-  //     toast.error(
-  //       "GRN date filter can only be applied when status is 'Confirmed'. Please Select the Status 'Confirmed'"
-  //     );
-  //     return;
-  //   }
-  //   if (grnDateRange.startDate && grnDateRange.endDate) {
-  //     query.grnStartDate = grnDateRange.startDate;
-  //     query.grnEndDate = grnDateRange.endDate;
-  //   }
-  //   if (selectedDistributors.length > 0) {
-  //     if (!selectedDistributors.includes("all")) {
-  //       query.distributorIds = selectedDistributors.join(",");
-  //     }
-  //   }
-  //   const params = new URLSearchParams(query).toString();
-  //   const url = `${BACKEND_URL}/api/v1/invoice/paginated-invoice-report?${params}`;
+        const formattedBrands = (res?.data?.data || [])
+          .filter((brand) => brand.status === true)
+          .map((brand) => ({
+            ...brand,
+            displayLabel: `${brand.code || ""} - ${brand.desc || ""}`,
+          }));
 
-  //   window.open(url, "_blank");
-  // };
-useEffect(() => {
-  const fetchBrands = async () => {
-    try {
-      const res = await AllBrandList();
+        setBrands(formattedBrands);
+      } catch (error) {
+        toast.error("Failed to fetch brands");
+      }
+    };
 
-      const formattedBrands = (res?.data?.data || [])
-        .filter((brand) => brand.status === true)
-        .map((brand) => ({
-          ...brand,
-          displayLabel: `${brand.code || ""} - ${brand.desc || ""}`,
-        }));
+    fetchBrands();
+  }, []);
 
-      setBrands(formattedBrands);
-    } catch (error) {
-      toast.error("Failed to fetch brands");
-    }
-  };
+  // NEW: fetch godown list
+  useEffect(() => {
+    const fetchGodowns = async () => {
+      setGodownLoading(true);
+      try {
+        const res = await viewGodownList({ page: 1, limit: 100 });
+        setGodownList(res?.data?.data || []);
+      } catch (error) {
+        console.error("Failed to fetch godown list", error);
+        toast.error("Failed to fetch Godown List");
+      } finally {
+        setGodownLoading(false);
+      }
+    };
+    fetchGodowns();
+  }, []);
 
-  fetchBrands();
-}, []);
   let downloadReport = async () => {
     const query = {};
     if (selectedStatus !== "all") query.status = selectedStatus;
@@ -112,6 +103,12 @@ useEffect(() => {
     if (selectedBrands.length > 0 && !selectedBrands.includes("all")) {
       query.brandIds = selectedBrands.join(",");
     }
+
+    // NEW: godown filter
+    if (selectedGodowns.length > 0 && !selectedGodowns.includes("all")) {
+      query.godownIds = selectedGodowns.join(",");
+    }
+
     if (
       (grnDateRange.startDate || grnDateRange.endDate) &&
       selectedStatus !== "Confirmed"
@@ -150,10 +147,8 @@ useEffect(() => {
         throw new Error("Failed to download report");
       }
 
-      // Get the blob from response
       const blob = await response.blob();
 
-      // Create download link
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = downloadUrl;
@@ -182,6 +177,10 @@ useEffect(() => {
     setSelectedDistributors(e.target.value);
   };
 
+  const handleGodownChange = (e) => {  // NEW
+    setSelectedGodowns(e.target.value);
+  };
+
   useEffect(() => {
     dispatch(fetchDistributors());
   }, [dispatch]);
@@ -189,6 +188,7 @@ useEffect(() => {
   const handleResetFilter = () => {
     setSelectedStatus("all");
     setSelectedBrands([]);
+    setSelectedGodowns([]); // NEW
     setDateRange({
       startDate: null,
       endDate: null,
@@ -245,6 +245,24 @@ useEffect(() => {
                     disabled={isDownloading}
                   />
                 </div>
+
+                {/* NEW: Godown filter */}
+                <div className="w-56">
+                  <Label value="Select Godown(s)" />
+                  <SearchableSelect
+                    id="godown-select"
+                    className="w-full"
+                    options={godownList}
+                    value={selectedGodowns}
+                    onChange={handleGodownChange}
+                    placeholder="Select Godown(s)"
+                    displayKey="godownName"
+                    valueKey="_id"
+                    multiple
+                    disabled={isDownloading || godownLoading}
+                  />
+                </div>
+
                 <div className="w-40">
                   <div className="block">
                     <Label value="Select Status" />
