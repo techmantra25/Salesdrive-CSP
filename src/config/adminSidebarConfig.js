@@ -194,6 +194,11 @@ export const adminSidebarConfig = [
         path: "/admin/pricing",
         icon: IoPricetags,
       },
+      {
+        label: "Pricing Category",
+        path: "/admin/pricing-category",
+        icon: IoPricetags,
+      }
       // {
       //   label: "Price Update",
       //   path: "/admin/price-update",
@@ -734,6 +739,14 @@ export const usersidebarconfig = [
         icon: IoPricetags,
         slug: "pricing",
       },
+      {
+        
+        label: "Pricing Category",
+        path: "/user/pricing-category",
+        icon: IoPricetags,
+        slug: "pricing-category",
+      }
+      
       // {
       //   label: "Price Update",
       //   path: "/user/price-update",
@@ -1298,6 +1311,13 @@ export const subadminssidebarconfig = [
         icon: IoPricetags,
         slug: "pricing",
       },
+      {
+        
+        label: "Pricing Category",
+        path: "/sub-admins/pricing-category",
+        icon: IoPricetags,
+        slug: "pricing-category",
+      }
       // {
       //   label: "Price Update",
       //   path: "/sub-admins/price-update",
@@ -1862,6 +1882,13 @@ export const aaadminsesidebarconfig = [
         icon: IoPricetags,
         slug: "pricing",
       },
+      {
+        
+        label: "Pricing Category",
+        path: "/admine/pricing-category",
+        icon: IoPricetags,
+        slug: "pricing-category",
+      }
       // {
       //   label: "Price Update",
       //   path: "/admine/price-update",
@@ -2427,6 +2454,13 @@ export const salessidebarconfig = [
         icon: IoPricetags,
         slug: "pricing",
       },
+      {
+        
+        label: "Pricing Category",
+        path: "/sales/pricing-category",
+        icon: IoPricetags,
+        slug: "pricing-category",
+      }
       // {
       //   label: "Price Update",
       //   path: "/sales/price-update",
@@ -2943,6 +2977,8 @@ export const salessidebarconfig = [
 //         path: "/sub-admin/pricing",
 //         icon: IoPricetags,
 //       },
+
+
 //       {
 //         label: "Price Update",
 //         path: "/sub-admin/price-update",

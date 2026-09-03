@@ -132,8 +132,8 @@ export const Settings = () => {
               {role === "admin" && (
                 <>
                   {" "}
-                  <ShadowMultiplierButton />
-                  <CompareRetailerMultiplierButton />
+                  {/* <ShadowMultiplierButton />
+                  <CompareRetailerMultiplierButton /> */}
                 </>
               )}
               <Button

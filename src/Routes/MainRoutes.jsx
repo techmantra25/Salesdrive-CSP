@@ -19,6 +19,7 @@ import { Employee } from "../pages/admin/Employee";
 import OutletList from "../pages/admin/OutletList";
 import DuplicateOutletReport from "../pages/admin/DuplicateOutletReport";
 import Pricing from "../pages/admin/Pricing";
+import PricingCatagory from "../pages/admin/PricingCatagory";
 import Products from "../pages/admin/Products";
 import ReasonMaster from "../pages/admin/ReasonMaster";
 import Region from "../pages/admin/Region";
@@ -166,6 +167,7 @@ export const MainRoutes = () => {
               { path: "products", element: <Products /> },
               { path: "distributer", element: <Distributor /> },
               { path: "pricing", element: <Pricing /> },
+              { path: "pricing-category", element: <PricingCatagory /> },
               { path: "price-update", element: <PriceUpdate /> },
               { path: "country", element: <Zone /> },
               { path: "sub-division", element: <SubDivision /> },
@@ -388,6 +390,7 @@ export const MainRoutes = () => {
               { path: "products", element: <Products /> },
               { path: "distributer", element: <Distributor /> },
               { path: "pricing", element: <Pricing /> },
+              { path: "pricing-category", element: <PricingCatagory /> },
               { path: "price-update", element: <PriceUpdate /> },
               { path: "zone", element: <Zone /> },
               { path: "sub-division", element: <SubDivision /> },
@@ -599,6 +602,7 @@ export const MainRoutes = () => {
               { path: "products", element: <Products /> },
               { path: "distributer", element: <Distributor /> },
               { path: "pricing", element: <Pricing /> },
+              { path: "pricing-category", element: <PricingCatagory /> },
               { path: "price-update", element: <PriceUpdate /> },
               { path: "zone", element: <Zone /> },
               { path: "region", element: <Region /> },
@@ -816,6 +820,7 @@ export const MainRoutes = () => {
               { path: "products", element: <Products /> },
               { path: "distributer", element: <Distributor /> },
               { path: "pricing", element: <Pricing /> },
+              { path: "pricing-category", element: <PricingCatagory /> },
               { path: "price-update", element: <PriceUpdate /> },
               { path: "zone", element: <Zone /> },
               { path: "region", element: <Region /> },
@@ -1026,6 +1031,7 @@ export const MainRoutes = () => {
               { path: "products", element: <Products /> },
               { path: "distributer", element: <Distributor /> },
               { path: "pricing", element: <Pricing /> },
+              { path: "pricing-category", element: <PricingCatagory /> },
               { path: "price-update", element: <PriceUpdate /> },
               { path: "zone", element: <Zone /> },
               { path: "region", element: <Region /> },
@@ -1244,6 +1250,7 @@ export const MainRoutes = () => {
     //           { path: "distributer", element: <DistributorView /> },
     //           // price routes
     //           { path: "pricing", element: <PricingView /> },
+    //           { path: "pricing-category", element: <PricingCatagory /> },
     //           { path: "price-update", element: <PriceUpdate /> },
     //           // Geo -Hieararchy
     //           { path: "zone", element: <ZoneView /> },
@@ -1348,6 +1355,7 @@ export const MainRoutes = () => {
     //           { path: "distributer", element: <DistributorView /> },
     //           // price routes
     //           { path: "pricing", element: <PricingView /> },
+    //           { path: "pricing-category", element: <PricingCatagory /> },
     //           { path: "price-update", element: <PriceUpdate /> },
     //           // Geo -Hieararchy
     //           { path: "zone", element: <ZoneView /> },
