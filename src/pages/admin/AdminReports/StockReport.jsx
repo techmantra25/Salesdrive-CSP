@@ -7,16 +7,17 @@ import Datepicker from "react-tailwindcss-datepicker";
 import SearchableSelect from "../../../components/SearchableSelect";
 import { fetchDistributors } from "../../../redux/distributorListSlice";
 import { BACKEND_URL } from "../../../constants";
-import { setAuthHeader } from "../../../api/api";
+import { setAuthHeader, viewGodownList } from "../../../api/api";
 import { toast } from "react-hot-toast";
 import moment from "moment";
 import { getPagePermission } from "../../../utils/permissionHelper";
 
-
 const StockReport = () => {
-  // const [stockType, setStockType] = useState("all");
   const [showZeroStock, setShowZeroStock] = useState(false);
   const [selectedDistributors, setSelectedDistributors] = useState([]);
+  const [selectedGodowns, setSelectedGodowns] = useState([]); // NEW
+  const [godownList, setGodownList] = useState([]);           // NEW
+  const [godownLoading, setGodownLoading] = useState(false);  // NEW
   const [isDownloading, setIsDownloading] = useState(false);
 
   const dispatch = useDispatch();
@@ -31,25 +32,22 @@ const StockReport = () => {
     setPagePermission(permission);
   }, [permissionState]);
 
-  // let downloadReport = async () => {
-  //   const query = {};
-  //   // if (stockType !== "all") {
-  //   //   query.stockType = stockType;
-  //   // }
-
-  //   if (showZeroStock) {
-  //     query.showZeroStock = true;
-  //   }
-  //   if (selectedDistributors.length > 0) {
-  //     if (!selectedDistributors.includes("all")) {
-  //       query.distributorIds = selectedDistributors.join(",");
-  //     }
-  //   }
-  //   const params = new URLSearchParams(query).toString();
-  //   const url = `${BACKEND_URL}/api/v1/inventory/all-inventories-paginatedList-report?${params}`;
-
-  //   window.open(url, "_blank");
-  // };
+  // NEW: fetch godown list
+  useEffect(() => {
+    const fetchGodowns = async () => {
+      setGodownLoading(true);
+      try {
+        const res = await viewGodownList({ page: 1, limit: 100 });
+        setGodownList(res?.data?.data || []);
+      } catch (error) {
+        console.error("Failed to fetch godown list", error);
+        toast.error("Failed to fetch Godown List");
+      } finally {
+        setGodownLoading(false);
+      }
+    };
+    fetchGodowns();
+  }, []);
 
   let downloadReport = async () => {
     try {
@@ -68,11 +66,17 @@ const StockReport = () => {
         }
       }
 
+      // NEW: godown filter
+      if (selectedGodowns.length > 0) {
+        if (!selectedGodowns.includes("all")) {
+          query.godownIds = selectedGodowns.join(",");
+        }
+      }
+
       const params = new URLSearchParams(query).toString();
       const url = `${BACKEND_URL}/api/v1/inventory/all-inventories-paginatedList-report?${params}`;
 
       const response = await fetch(url, {
-        
         method: "GET",
         credentials: "include",
         headers: {
@@ -85,7 +89,6 @@ const StockReport = () => {
       }
 
       const blob = await response.blob();
-
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = downloadUrl;
@@ -114,21 +117,24 @@ const StockReport = () => {
     setSelectedDistributors(e.target.value);
   };
 
+  const handleGodownChange = (e) => {   // NEW
+    setSelectedGodowns(e.target.value);
+  };
+
   useEffect(() => {
     dispatch(fetchDistributors());
   }, [dispatch]);
 
   const handleResetFilter = () => {
-    // setStockType("all");
     setShowZeroStock(false);
     setSelectedDistributors([]);
+    setSelectedGodowns([]); // NEW
   };
 
   return (
     <>
       {pagePermission?.view ? (
         <div className="flex justify-start items-center flex-col w-full">
-
           <div className="flex justify-between w-full items-center border-b-2 py-4">
             <div className="flex justify-center items-center">
               <h1 className="text-2xl font-bold">Stock Report</h1>
@@ -153,21 +159,24 @@ const StockReport = () => {
                     disabled={isDownloading}
                   />
                 </div>
-                {/* <div className="w-40">
-              <div className="block">
-                <Label value="Select Stock Type" />
-              </div>
-              <Select
-                value={stockType}
-                onChange={(e) => setStockType(e.target.value)}
-                required
-              >
-                <option value="all">All</option>
-                <option value="salable">Salable</option>
-                <option value="unsalable">Unsalable</option>
-                <option value="offer">Offer</option>
-              </Select>
-            </div> */}
+
+                {/* NEW: Godown filter */}
+                <div className="w-56">
+                  <Label value="Select Godown(s)" />
+                  <SearchableSelect
+                    id="godown-select"
+                    className="w-full"
+                    options={godownList}
+                    value={selectedGodowns}
+                    onChange={handleGodownChange}
+                    placeholder="Select Godown(s)"
+                    displayKey="godownName"
+                    valueKey="_id"
+                    multiple
+                    disabled={isDownloading || godownLoading}
+                  />
+                </div>
+
                 <div className="w-40">
                   <div className="block">
                     <Label value="Show Zero Stock" />
@@ -205,16 +214,8 @@ const StockReport = () => {
                   >
                     <FaDownload size={15} className="mx-2" />
                     {isDownloading ? "Downloading..." : "Download Report"}
-                  </Button>)}
-                {/* <Button
-              className="text-xs"
-              color="blue"
-              size="sm"
-              onClick={downloadReport}
-            >
-              <FaDownload size={15} className="mx-2" />
-              Download Report
-            </Button> */}
+                  </Button>
+                )}
               </div>
             </Card>
           </div>
@@ -222,9 +223,7 @@ const StockReport = () => {
       ) : (
         <div className="flex justify-center items-center h-[70vh] w-full">
           <div className="text-center">
-            <div className="text-red-600 text-4xl font-bold mb-2">
-              NO Access
-            </div>
+            <div className="text-red-600 text-4xl font-bold mb-2">NO Access</div>
             <div className="text-gray-500 text-lg">
               You do not have permission to view this page.
             </div>
@@ -233,7 +232,6 @@ const StockReport = () => {
       )}
     </>
   );
-
 };
 
 export default StockReport;
