@@ -19,7 +19,7 @@ import { fetchDistributors } from "../../../redux/distributorListSlice";
 import { escapeCSVValue } from "../../../utils/escapeCSVValue";
 import { getPagePermission } from "../../../utils/permissionHelper";
 import { BACKEND_URL } from "../../../constants";
-import { setAuthHeader } from "../../../api/api";
+import { setAuthHeader, viewGodownList } from "../../../api/api"; // UPDATED: added viewGodownList
 
 
 export const OrderReport = () => {
@@ -36,6 +36,10 @@ export const OrderReport = () => {
   const permissionState = useSelector((state) => state.permission);
   const [pagePermission, setPagePermission] = useState(null);
 
+  // NEW: godown filter state
+  const [godownList, setGodownList] = useState([]);
+  const [godownLoading, setGodownLoading] = useState(false);
+  const [selectedGodowns, setSelectedGodowns] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -51,6 +55,22 @@ export const OrderReport = () => {
     setPagePermission(permission);
   }, [permissionState]);
 
+  // NEW: fetch godown list
+  useEffect(() => {
+    const fetchGodowns = async () => {
+      setGodownLoading(true);
+      try {
+        const res = await viewGodownList({ page: 1, limit: 100 });
+        setGodownList(res?.data?.data || []);
+      } catch (error) {
+        console.error("Failed to fetch godown list", error);
+        toast.error("Failed to fetch Godown List");
+      } finally {
+        setGodownLoading(false);
+      }
+    };
+    fetchGodowns();
+  }, []);
 
   const fetchAllData = async () => {
     let currentPage = 1;
@@ -84,25 +104,29 @@ export const OrderReport = () => {
       }
     }
 
+    // NEW: godown filter
+    if (selectedGodowns.length > 0) {
+      if (!selectedGodowns.includes("all")) {
+        query.godownIds = selectedGodowns.join(",");
+      }
+    }
+
     setDownloadLoading(true);
 
     try {
       await toast.promise(
         (async () => {
-          // --- Step 1: Fetch and process the first page ---
           const firstResponse = await OrderEntryPaginatedReportList(query);
           totalPages = firstResponse?.data?.pagination?.totalPages || 1;
           const fetchedFirstPageData = firstResponse?.data?.data || [];
 
-          // Process the first page data
           const processedFirstPageData =
             processRawDataForCSV(fetchedFirstPageData);
           allProcessedData = [...processedFirstPageData];
 
-          // --- Step 2: Fetch and process subsequent pages ---
           while (currentPage < totalPages) {
             currentPage++;
-            query.page = currentPage; // Add the current page to the query
+            query.page = currentPage;
 
             const response = await OrderEntryPaginatedReportList(query);
             const fetchedPageData = response?.data?.data || [];
@@ -127,7 +151,7 @@ export const OrderReport = () => {
         },
       );
 
-      return allProcessedData; // Return the fully processed data
+      return allProcessedData;
     } catch (error) {
       console.error("Error fetching or processing data:", error);
       toast.error(
@@ -140,13 +164,11 @@ export const OrderReport = () => {
     }
   };
 
-  // Helper function to process raw data into CSV format
   const processRawDataForCSV = (rawData) => {
     if (!rawData || rawData.length === 0) {
       return [];
     }
 
-    // Flatten orders into line items (similar to OrderDumpReport)
     const withLineItems =
       rawData?.flatMap((order) =>
         order?.lineItems?.map((lineItem) => ({
@@ -160,6 +182,8 @@ export const OrderReport = () => {
     const reportData = withLineItems?.map((ele) => ({
       "Distributor ID": ele?.distributorId?.dbCode,
       "Distributor Name": escapeCSVValue(ele?.distributorId?.name),
+      "Godown Code": ele?.godownId?.godownCode, // NEW
+      "Godown Name": ele?.godownId?.godownName, // NEW
       "Order Number": ele?.orderNo,
       "Order Date": moment(ele?.updatedAt)
         .tz("Asia/Kolkata")
@@ -173,7 +197,6 @@ export const OrderReport = () => {
       "Retailer UID": ele?.retailerId?.outletUID,
       Retailer: ele?.retailerId?.outletName,
 
-      // Added fields from OrderDumpReport (Brand to Special Disc Amount)
       Brand: ele?.product?.brand?.name,
       Category: ele?.product?.cat_id?.name,
       Group: escapeCSVValue(ele?.product?.sku_group__name),
@@ -221,7 +244,7 @@ export const OrderReport = () => {
       const allData = await fetchAllData();
 
       if (!allData || allData.length === 0) {
-        toast.dismiss("downloadProgress"); // Ensure toast is dismissed if no data
+        toast.dismiss("downloadProgress");
         toast.error("No data to download", { position: "top-center" });
         return;
       }
@@ -287,6 +310,13 @@ export const OrderReport = () => {
         }
       }
 
+      // NEW: godown filter
+      if (selectedGodowns.length > 0) {
+        if (!selectedGodowns.includes("all")) {
+          query.godownIds = selectedGodowns.join(",");
+        }
+      }
+
       const params = new URLSearchParams(query).toString();
       const url = `${BACKEND_URL}/api/v1/order-entry/generate-report?${params}`;
 
@@ -331,6 +361,10 @@ export const OrderReport = () => {
     setSelectedDistributors(e.target.value);
   };
 
+  const handleGodownChange = (e) => {  // NEW
+    setSelectedGodowns(e.target.value);
+  };
+
   useEffect(() => {
     dispatch(fetchDistributors());
   }, [dispatch]);
@@ -343,6 +377,7 @@ export const OrderReport = () => {
       endDate: null,
     });
     setSelectedDistributors([]);
+    setSelectedGodowns([]); // NEW
     setSearchTerm("");
   };
 
@@ -377,6 +412,24 @@ export const OrderReport = () => {
                     disabled={downloadLoading}
                   />
                 </div>
+
+                {/* NEW: Godown filter */}
+                <div className="w-56">
+                  <Label value="Select Godown(s)" />
+                  <SearchableSelect
+                    id="godown-select"
+                    className="w-full"
+                    options={godownList}
+                    value={selectedGodowns}
+                    onChange={handleGodownChange}
+                    placeholder="Select Godown(s)"
+                    displayKey="godownName"
+                    valueKey="_id"
+                    multiple
+                    disabled={downloadLoading || backendDownloadLoading || godownLoading}
+                  />
+                </div>
+
                 <div className="w-44">
                   <Label value="Order Entry Date" />
 
@@ -455,21 +508,6 @@ export const OrderReport = () => {
                     <RiRefreshFill size={18} className="mx-2" />
                     Reset Filters
                   </Button>)}
-                {/* {pagePermission?.view && (
-                  <Button
-                    className="text-xs"
-                    color="blue"
-                    size="sm"
-                    disabled={downloadLoading}
-                    onClick={() => downloadCSV()}
-                  >
-                    {downloadLoading ? (
-                      <Spinner size="sm" className="mx-2" />
-                    ) : (
-                      <FaDownload size={15} className="mx-2" />
-                    )}
-                    {downloadLoading ? "Downloading..." : "Download Report"}
-                  </Button>)} */}
                 {pagePermission?.view && (
                   <Button
                     className="text-xs"
