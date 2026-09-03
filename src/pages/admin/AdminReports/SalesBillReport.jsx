@@ -18,7 +18,7 @@ import Datepicker from "react-tailwindcss-datepicker";
 import { RiRefreshFill } from "react-icons/ri";
 import { MdFileDownload } from "react-icons/md";
 import { getPagePermission } from "../../../utils/permissionHelper";
-import { ApprovedOutletPaginated, beatListPaginated } from "../../../api/api";
+import { ApprovedOutletPaginated, beatListPaginated, viewGodownList } from "../../../api/api";
 import PaginatedSearchableSelect from "../../../components/PaginatedSearchableSelect";
 import { fetchBrands } from "../../../redux/brandSlice";
 
@@ -33,7 +33,6 @@ const SalesBillReport = () => {
   });
   const [billStatus, setBillStatus] = useState("all");
 
-  // State for CSV and page loading (example usage)
   const [loading, setLoading] = useState(false);
   const [selectedDistributors, setSelectedDistributors] = useState([]);
   const permissionState = useSelector((state) => state.permission);
@@ -63,9 +62,13 @@ const SalesBillReport = () => {
 
   const { distributors } = useSelector((state) => state.distributors);
 
+  // NEW: Godown filter state
+  const [godownList, setGodownList] = useState([]);
+  const [godownLoading, setGodownLoading] = useState(false);
+  const [selectedGodowns, setSelectedGodowns] = useState([]);
+
   let delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  // Handler for resetting filters
   const handleResetFilter = () => {
     setDateRange({ startDate: null, endDate: null });
     setDeliveryDateRange({ startDate: null, endDate: null });
@@ -89,6 +92,7 @@ const SalesBillReport = () => {
     setOrderStatus("all");
 
     setSelectedDistributors([]);
+    setSelectedGodowns([]); // NEW
   };
 
   const fetchOutletsWithSearch = async (searchTerm = "", page = 1) => {
@@ -119,6 +123,23 @@ const SalesBillReport = () => {
     setPagePermission(permission);
   }, [permissionState]);
 
+  // NEW: fetch godown list
+  useEffect(() => {
+    const fetchGodowns = async () => {
+      setGodownLoading(true);
+      try {
+        const res = await viewGodownList({ page: 1, limit: 100 });
+        setGodownList(res?.data?.data || []);
+      } catch (error) {
+        console.error("Failed to fetch godown list", error);
+        toast.error("Failed to fetch Godown List");
+      } finally {
+        setGodownLoading(false);
+      }
+    };
+    fetchGodowns();
+  }, []);
+
   let downloadReport = async () => {
     try {
       setLoading(true);
@@ -126,7 +147,6 @@ const SalesBillReport = () => {
       let currentPage = 1;
       let toastId = toast.loading("Processing...");
 
-      // Check if at least one date range is selected
       const hasCreationDateRange = dateRange?.startDate && dateRange?.endDate;
       const hasDeliveryDateRange =
         deliveryDateRange?.startDate && deliveryDateRange?.endDate;
@@ -142,7 +162,6 @@ const SalesBillReport = () => {
         return;
       }
 
-      // Check if both date ranges are selected (not allowed)
       if (hasCreationDateRange && hasDeliveryDateRange) {
         toast.error(
           "Please select only one date range - either bill creation date or bill delivery date.",
@@ -154,7 +173,6 @@ const SalesBillReport = () => {
         return;
       }
 
-      // Check if delivery date range is selected but bill status is not "Delivered"
       if (hasDeliveryDateRange && billStatus !== "Delivered") {
         toast.error(
           "Bill status must be 'Delivered' when using delivery date range filter.",
@@ -167,18 +185,15 @@ const SalesBillReport = () => {
       }
 
       while (currentPage) {
-        // Changed loop condition, break logic handles exit
         toast.loading(`Processing Page ${currentPage}...`, {
           id: toastId,
         });
 
-        // Build query object
         const query = {
           page: currentPage,
           limit: 200,
         };
 
-        // ✅ Date filters
         if (hasCreationDateRange) {
           query.fromDate = dateRange.startDate;
           query.toDate = dateRange.endDate;
@@ -189,7 +204,6 @@ const SalesBillReport = () => {
           query.deliveryToDate = deliveryDateRange.endDate;
         }
 
-        // ✅ Basic filters
         if (billStatus !== "all") query.billStatus = billStatus;
         if (billNo) query.billNo = billNo;
         if (orderNo) query.orderNo = orderNo;
@@ -198,7 +212,7 @@ const SalesBillReport = () => {
             query.brandIds = selectedBrands.join(",");
           }
         }
-        // ✅ Dropdown filters
+
         if (salesman !== "all") query.salesmanName = salesman;
         if (route) query.routeId = route;
         if (retailer) query.retailerId = retailer;
@@ -211,16 +225,22 @@ const SalesBillReport = () => {
         if (orderSource !== "all") query.orderSource = orderSource;
         if (orderStatus !== "all") query.orderStatus = orderStatus;
 
-        // ✅ Distributor
         if (selectedDistributors.length > 0) {
           if (!selectedDistributors.includes("all")) {
             query.distributorIds = selectedDistributors.join(",");
           }
         }
+
+        // NEW: godown filter
+        if (selectedGodowns.length > 0) {
+          if (!selectedGodowns.includes("all")) {
+            query.godownIds = selectedGodowns.join(",");
+          }
+        }
+
         console.log("ROUTE STATE:", route);
         console.log("FINAL QUERY:", query);
 
-        // Fetching the paginated data from backend
         const response = await AllBillListReport({ ...query });
 
         const data = response?.data?.data || [];
@@ -230,15 +250,11 @@ const SalesBillReport = () => {
           allData = [...allData, ...data];
         }
 
-        // Use a small delay to prevent UI freeze and potential rate limits
-        await delay(200); // Reduced delay slightly
+        await delay(200);
 
-        // Check break conditions
         if (data.length === 0) {
-          // No more data on this page, assume we're done
           break;
         }
-        // Optional: More robust check using totalPages if available and reliable
         const totalPages = pagination?.totalPages || 0;
         if (currentPage >= totalPages) {
           break;
@@ -259,22 +275,15 @@ const SalesBillReport = () => {
         id: toastId,
       });
 
-      // console.log({ allData });
-
-      // --- Transformation Step: Flatten data for CSV ---
       const flattenedData = allData.flatMap((bill) => {
 
-        // Handle cases where lineItems might be missing or empty
         if (!bill.lineItems || bill.lineItems.length === 0) {
-          // Optionally create a row for the bill itself with empty item details
-          // Or simply skip this bill if no line items exist
-          return []; // Skip bills with no line items
+          return [];
         }
 
         return bill?.lineItems
           ?.filter((item) => item?.itemBillType !== "Item Removed")
           ?.map((item) => ({
-            // --- Bill Level Information ---
             "Bill No": bill.new_billno || bill.billNo,
             "Bill Creation Date": moment(bill.createdAt)
               .tz("Asia/Kolkata")
@@ -289,11 +298,14 @@ const SalesBillReport = () => {
               .format("DD/MM/YYYY hh:mm a"),
             "Distributor Code": bill.distributorId?.dbCode,
             "Distributor Name": bill.distributorId?.name,
-            // "Distributor's Zone": bill.distributorId?.stateId?.zoneId?.name,
             "Distributor's State": bill.distributorId?.stateId?.name,
             "Distributor's City": bill.distributorId?.city,
-            // "Allocation No": bill?.loadSheetId?.allocationNo,
-            // "Vehicle No": bill?.loadSheetId?.vehicleId?.vehicle_no,
+            // NEW: Godown columns — sourced from bill.orderId.godownId,
+            // since Bill itself doesn't carry godownId directly (it's set
+            // on the OrderEntry the bill was generated from). Requires the
+            // backend to populate orderId.godownId — see note below.
+           "Godown Code": bill?.godownId?.godownCode,
+"Godown Name": bill?.godownId?.godownName,
 
             "Salesman Emp ID": bill.salesmanName?.empId,
             "Salesman Name": bill.salesmanName?.name,
@@ -305,18 +317,13 @@ const SalesBillReport = () => {
             "Route Code": bill.routeId?.code,
             "Route Name": bill.routeId?.name,
             "Retailer Code": bill.retailerId?.outletCode,
-            // "Retailer UID": bill.retailerId?.outletUID,
             "Retailer Name": bill.retailerId?.outletName,
-            // --- Line Item Information ---
             "Product Code": item.product?.product_code,
             "Product Name": item.product?.name,
             "SKU Group Code": item.product?.sku_group_id,
             "SKU Group Name": item.product?.sku_group__name,
-            // "Category Code": item.product?.cat_id?.code,
             "Category Name": item.product?.cat_id?.name,
-            // "Collection Code": item.product?.collection_id?.code,
             "Collection Name": item.product?.collection_id?.name,
-            // "Brand Code": item.product?.brand?.code,
             "Brand Name": item?.product?.brand?.name,
             "Sub-Brand Name": item?.product?.subBrand?.name,
             Size: item.product?.size,
@@ -339,27 +346,12 @@ const SalesBillReport = () => {
             IGST: item?.totalIGST,
             "Net Amt": item?.netAmt,
             "Total Bill Value": bill?.netAmount,
-            // "Bill Type": item?.itemBillType,
             "Goods Type": item?.goodsType,
             Remark: item?.remark,
-            // "Base Point":
-            //   bill?.distributorId?.RBPSchemeMapped === "yes"
-            //     ? Number(
-            //       Number(
-            //         item?.useBasePoint ?? item?.product?.base_point ?? 0,
-            //       ) * Number(item?.billQty ?? 0),
-            //     )
-            //     : 0,
-            // "Total Bill Points":
-            //   bill?.distributorId?.RBPSchemeMapped === "yes"
-            //     ? Number(bill?.totalBasePoints ?? 0)
-            //     : 0,
           }));
       });
-      // --- End Transformation Step ---
 
       if (flattenedData.length === 0) {
-        // This might happen if all bills had empty lineItems
         toast.error("No line item data found in the fetched bills.", {
           id: toastId,
         });
@@ -367,20 +359,18 @@ const SalesBillReport = () => {
         return;
       }
 
-      // Generate CSV using PapaParse
       const csv = Papa.unparse(flattenedData);
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.style.display = "none"; // Hide the link
+      a.style.display = "none";
       a.href = url;
       a.download = `sales-bill-report-csp-${moment()
         .tz("Asia/Kolkata")
-        .format("DD-MM-YY")}.csv`; // Updated filename
+        .format("DD-MM-YY")}.csv`;
       document.body.appendChild(a);
       a.click();
 
-      // Clean up
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
@@ -389,7 +379,6 @@ const SalesBillReport = () => {
       });
     } catch (error) {
       console.error("Download Report Error:", error);
-      // Use the existing toastId to update the message
       toast.error(
         error?.response?.data?.message ||
         error?.message ||
@@ -433,6 +422,10 @@ const SalesBillReport = () => {
 
   const handleDistributorChange = (e) => {
     setSelectedDistributors(e.target.value);
+  };
+
+  const handleGodownChange = (e) => {  // NEW
+    setSelectedGodowns(e.target.value);
   };
 
   const fetchBeatsWithSearch = async (search = "", page = 1) => {
@@ -479,10 +472,8 @@ const SalesBillReport = () => {
         <div className="flex justify-start items-center flex-col gap-4 w-full p-4">
           <Card className="flex justify-center items-center flex-col w-full p-4">
 
-            {/* ✅ FIXED GRID */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
 
-              {/* Bill Creation Date */}
               <div>
                 <Label value="Bill Creation Date" />
                 <Datepicker
@@ -493,7 +484,6 @@ const SalesBillReport = () => {
                 />
               </div>
 
-              {/* Delivery / Cancelled Date */}
               <div>
                 <Label value="Delivery / Cancelled Date" />
                 <Datepicker
@@ -504,7 +494,6 @@ const SalesBillReport = () => {
                 />
               </div>
 
-              {/* Bill Status */}
               <div>
                 <Label value="Bill Status" />
                 <Select
@@ -518,7 +507,6 @@ const SalesBillReport = () => {
                 </Select>
               </div>
 
-              {/* Route */}
               <div>
                 <Label value="Route" />
                 <PaginatedSearchableSelect
@@ -535,7 +523,6 @@ const SalesBillReport = () => {
                 />
               </div>
 
-              {/* Distributor */}
               <div>
                 <Label value="Select Distributor(s)" />
                 <SearchableSelect
@@ -553,7 +540,23 @@ const SalesBillReport = () => {
                 />
               </div>
 
-              {/* Retailer */}
+              {/* NEW: Godown filter */}
+              <div>
+                <Label value="Select Godown(s)" />
+                <SearchableSelect
+                  id="godown-select"
+                  className="w-full"
+                  options={godownList}
+                  value={selectedGodowns}
+                  onChange={handleGodownChange}
+                  placeholder="Select Godown(s)"
+                  disabled={loading || godownLoading}
+                  displayKey="godownName"
+                  valueKey="_id"
+                  multiple
+                />
+              </div>
+
               <div>
                 <Label value="Retailer" />
                 <PaginatedSearchableSelect
@@ -570,7 +573,6 @@ const SalesBillReport = () => {
                 />
               </div>
 
-              {/* ✅ FIXED BRAND (no center wrapper) */}
               <div>
                 <Label value="Brand" />
                 <SearchableSelect
@@ -584,42 +586,8 @@ const SalesBillReport = () => {
                   multiple={true}
                 />
               </div>
-    {/* Retailer Phone */}
-                {/* <div className="w-56">
-                  <Label value="Retailer Phone" />
-                  <SearchableSelect
-                    options={retailerPhoneList}
-                    value={retailerPhone}
-                    onChange={(e) => setRetailerPhone(e.target.value)}
-                    displayKey="phoneDisplay"
-                    valueKey="mobile1"
-                  />
-                </div> */}
-
-                {/* Outlet Code */}
-                {/* <div className="w-56">
-                  <Label value="Outlet Code" />
-                  <SearchableSelect
-                    options={outletCodeList}
-                    value={outletCode}
-                    onChange={(e) => setOutletCode(e.target.value)}
-                    displayKey="outletCodeDisplay"
-                    valueKey="outletCode"
-                  />
-                </div> */}
-
-                {/* Order Status */}
-                {/* <div className="w-44">
-                  <Label value="Order Status" />
-                  <Select value={orderStatus} onChange={(e) => setOrderStatus(e.target.value)}>
-                    <option value="all">All</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Completed_Billed">Completed</option>
-                  </Select>
-                </div> */}
             </div>
 
-            {/* ✅ BUTTON ALIGN FIX */}
             <div className="flex justify-end items-center gap-3 mt-4">
               {pagePermission?.view && (
                 <Button
