@@ -22,9 +22,9 @@ const initialGodownForm = {
   distributorId: "",
   godownCode: "",
   godownName: "",
-  godownType: "MAIN",
   location: "",
   contactPerson: "",
+  contactPersonNumber: "",
   isActive: true,
   remarks: "",
 };
@@ -33,14 +33,12 @@ const initialEditGodownForm = {
   godownId: "",
   godownCode: "",
   godownName: "",
-  godownType: "MAIN",
   location: "",
   contactPerson: "",
+  contactPersonNumber: "",
   isActive: true,
   remarks: "",
 };
-
-const godownTypeOptions = ["MAIN", "SUB", "TRANSIT", "OTHER"];
 
 const AddGodown = () => {
   const [godowns, setGodowns] = useState([]);
@@ -175,9 +173,9 @@ const AddGodown = () => {
         distributorId: godownForm.distributorId,
         godownCode: godownForm.godownCode.trim(),
         godownName: godownForm.godownName.trim(),
-        godownType: godownForm.godownType,
         location: godownForm.location.trim(),
         contactPerson: godownForm.contactPerson.trim(),
+        contactPersonNumber: godownForm.contactPersonNumber.trim(),
         isActive: godownForm.isActive,
         remarks: godownForm.remarks.trim(),
       };
@@ -207,9 +205,9 @@ const AddGodown = () => {
       godownId: godown?._id || "",
       godownCode: godown?.godownCode || "",
       godownName: godown?.godownName || "",
-      godownType: godown?.godownType || "MAIN",
       location: godown?.location || "",
       contactPerson: godown?.contactPerson || "",
+      contactPersonNumber: godown?.contactPersonNumber || "",
       isActive: !!godown?.isActive,
       remarks: godown?.remarks || "",
     });
@@ -233,9 +231,9 @@ const AddGodown = () => {
       const payload = {
         godownCode: editGodownForm.godownCode,
         godownName: editGodownForm.godownName.trim(),
-        godownType: editGodownForm.godownType,
         location: editGodownForm.location.trim(),
         contactPerson: editGodownForm.contactPerson.trim(),
+        contactPersonNumber: editGodownForm.contactPersonNumber.trim(),
         isActive: editGodownForm.isActive,
         remarks: editGodownForm.remarks.trim(),
       };
@@ -362,13 +360,13 @@ const AddGodown = () => {
                 Godown Name
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
-                Type
-              </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap">
-                Location
+                Address
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
                 Contact Person
+              </Table.HeadCell>
+              <Table.HeadCell className="whitespace-nowrap">
+                Contact Person Number
               </Table.HeadCell>
               <Table.HeadCell className="whitespace-nowrap">
                 Status
@@ -410,13 +408,13 @@ const AddGodown = () => {
                         {godown?.godownName}
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        {godown?.godownType}
-                      </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {godown?.location || "—"}
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                         {godown?.contactPerson || "—"}
+                      </Table.Cell>
+                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                        {godown?.contactPersonNumber || "—"}
                       </Table.Cell>
                       <Table.Cell className="whitespace-nowrap font-medium">
                         <Badge color={godown?.isActive ? "success" : "failure"}>
@@ -534,44 +532,6 @@ const AddGodown = () => {
 
             <div>
               <Label
-                value="Godown Type"
-                className="mb-2 block text-xs font-semibold uppercase tracking-wide"
-              />
-              <Select
-                name="godownType"
-                value={godownForm.godownType}
-                onChange={handleGodownFormChange}
-              >
-                {godownTypeOptions.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </Select>
-            </div>
-
-            <div>
-              <Label
-                value="Status"
-                className="mb-2 block text-xs font-semibold uppercase tracking-wide"
-              />
-              <Select
-                name="isActive"
-                value={godownForm.isActive ? "true" : "false"}
-                onChange={(e) =>
-                  setGodownForm((prev) => ({
-                    ...prev,
-                    isActive: e.target.value === "true",
-                  }))
-                }
-              >
-                <option value="true">Active</option>
-                <option value="false">Inactive</option>
-              </Select>
-            </div>
-
-            <div>
-              <Label
                 value="Contact Person"
                 className="mb-2 block text-xs font-semibold uppercase tracking-wide"
               />
@@ -586,7 +546,21 @@ const AddGodown = () => {
 
             <div>
               <Label
-                value="Location"
+                value="Contact Person Number"
+                className="mb-2 block text-xs font-semibold uppercase tracking-wide"
+              />
+              <TextInput
+                name="contactPersonNumber"
+                placeholder="Enter contact person number"
+                value={godownForm.contactPersonNumber}
+                onChange={handleGodownFormChange}
+                className={commonInputClass}
+              />
+            </div>
+
+            <div>
+              <Label
+                value="Address"
                 className="mb-2 block text-xs font-semibold uppercase tracking-wide"
               />
               <TextInput
@@ -684,24 +658,6 @@ const AddGodown = () => {
 
             <div>
               <Label
-                value="Godown Type"
-                className="mb-2 block text-xs font-semibold uppercase tracking-wide"
-              />
-              <Select
-                name="godownType"
-                value={editGodownForm.godownType}
-                onChange={handleEditGodownFormChange}
-              >
-                {godownTypeOptions.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </Select>
-            </div>
-
-            <div>
-              <Label
                 value="Status"
                 className="mb-2 block text-xs font-semibold uppercase tracking-wide"
               />
@@ -736,7 +692,21 @@ const AddGodown = () => {
 
             <div>
               <Label
-                value="Location"
+                value="Contact Person Number"
+                className="mb-2 block text-xs font-semibold uppercase tracking-wide"
+              />
+              <TextInput
+                name="contactPersonNumber"
+                placeholder="Enter contact person number"
+                value={editGodownForm.contactPersonNumber}
+                onChange={handleEditGodownFormChange}
+                className={commonInputClass}
+              />
+            </div>
+
+            <div>
+              <Label
+                value="Adderss"
                 className="mb-2 block text-xs font-semibold uppercase tracking-wide"
               />
               <TextInput
