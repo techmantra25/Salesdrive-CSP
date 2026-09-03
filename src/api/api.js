@@ -2392,3 +2392,47 @@ export const getCategoryDateWiseMatrix = async (params) => {
     );
   }
 };
+
+// Date wise pricing matrix — Excel export (ALL filtered rows, unpaginated).
+// Same filters as getProductDateWiseMatrix / getCategoryDateWiseMatrix above,
+// but hits the /export routes and returns a blob (.xlsx) instead of JSON.
+
+export const exportProductDateWiseMatrix = async (params) => {
+  try {
+    const response = await axios.get(
+      `${BACKEND_URL}/api/v1/price/product-date-wise-paginated/export`,
+      {
+        headers: setAuthHeader(),
+        params,
+        responseType: "blob",
+      },
+    );
+    return response;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to download product date wise pricing",
+    );
+  }
+};
+
+export const exportCategoryDateWiseMatrix = async (params) => {
+  try {
+    const response = await axios.get(
+      `${BACKEND_URL}/api/v1/price/category-date-wise-matrix/export`,
+      {
+        headers: setAuthHeader(),
+        params,
+        responseType: "blob",
+      },
+    );
+    return response;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to download category date wise pricing",
+    );
+  }
+};
