@@ -7,6 +7,7 @@ import {
   Spinner,
   Table,
   TextInput,
+  Select,
 } from "flowbite-react";
 import moment from "moment";
 import { useCallback, useEffect, useState } from "react";
@@ -19,7 +20,7 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { fetchDistributors } from "../../redux/distributorListSlice";
 import SearchableSelect from "../../components/SearchableSelect";
 import { AllDBpaginatedOrderList } from "../../api/orderApi";
-import { getApprovedOutletList, ApprovedOutletPaginated, SearchOutletsDropdown } from "../../api/api";
+import { getApprovedOutletList, ApprovedOutletPaginated, SearchOutletsDropdown, viewGodownList } from "../../api/api";
 import PaginatedSearchableSelect from "../../components/PaginatedSearchableSelect";
 import { getPagePermission } from "../../utils/permissionHelper";
 
@@ -33,6 +34,8 @@ const AllDistributorOrderList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDB, setSelectedDB] = useState("default");
   const [selectedRetailer, setSelectedRetailer] = useState("default");
+  const [godownList, setGodownList] = useState([]);
+  const [selectedGodown, setSelectedGodown] = useState("");
   const [salesOrdersLoading, setSalesOrdersLoading] = useState(false);
   const [dateRange, setDateRange] = useState({
     startDate: null,
@@ -106,6 +109,28 @@ const AllDistributorOrderList = () => {
     []
   );
 
+  const fetchGodownList = async () => {
+    try {
+      const response = await viewGodownList({
+        page: 1,
+        limit: 1000,
+      });
+
+      setGodownList(response?.data?.data || []);
+    } catch (error) {
+      console.error("Failed to fetch godown list:", error);
+      toast.error(
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to fetch godown list"
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchGodownList();
+  }, []);
+
   const handleDateRangeChange = (range) => {
     setDateRange(range);
   };
@@ -135,6 +160,9 @@ const AllDistributorOrderList = () => {
       if (selectedRetailer && selectedRetailer !== "default") {
         query.retailerId = selectedRetailer;
       }
+      if (selectedGodown) {
+        query.godownId = selectedGodown;
+      }
       const response = await AllDBpaginatedOrderList(query); // Use mock API for demonstration
 
       setAllDBOrders(response?.data?.data);
@@ -162,6 +190,7 @@ const AllDistributorOrderList = () => {
     setSearchTerm("");
     setSelectedDB("default");
     setSelectedRetailer("default");
+    setSelectedGodown("");
     setDateRange({
       startDate: null,
       endDate: null,
@@ -173,11 +202,18 @@ const AllDistributorOrderList = () => {
   useEffect(() => {
     fetchSalesOrdersLogPaginated();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, searchTerm, selectedDB, dateRange, selectedRetailer]);
+  }, [
+    currentPage,
+    searchTerm,
+    selectedDB,
+    dateRange,
+    selectedRetailer,
+    selectedGodown,
+  ]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedDB, dateRange, selectedRetailer]);
+  }, [searchTerm, selectedDB, dateRange, selectedRetailer, selectedGodown]);
 
   // useEffect(() => {
   //   getOutletList();
@@ -264,6 +300,21 @@ const AllDistributorOrderList = () => {
                   />
                 </div>
 
+                <div className="w-56">
+                  <Label value="Godown" />
+                  <Select
+                    value={selectedGodown}
+                    onChange={(e) => setSelectedGodown(e.target.value)}
+                  >
+                    <option value="">All Godown</option>
+                    {godownList?.map((godown) => (
+                      <option key={godown?._id} value={godown?._id}>
+                        {godown?.godownName}
+                      </option>
+                    ))}
+                  </Select>
+                </div>
+
                 <div className="w-44">
                   <div className="block">
                     <Label value="Search" />
@@ -336,6 +387,7 @@ const AllDistributorOrderList = () => {
                   <Table.HeadCell>Retailer</Table.HeadCell>
                   <Table.HeadCell>Sales Man</Table.HeadCell>
                   <Table.HeadCell>Route</Table.HeadCell>
+                  <Table.HeadCell>Godown</Table.HeadCell>
                   <Table.HeadCell>Order Status</Table.HeadCell>
                   <Table.HeadCell>Net Amount</Table.HeadCell>
                   <Table.HeadCell>No of Bills</Table.HeadCell>
@@ -403,6 +455,9 @@ const AllDistributorOrderList = () => {
                           </Table.Cell>
                           <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                             {order?.routeId?.name}({order?.routeId?.code})
+                          </Table.Cell>
+                          <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
+                            {order?.godownId?.godownName || "-"}
                           </Table.Cell>
                           <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
                             {order?.status}

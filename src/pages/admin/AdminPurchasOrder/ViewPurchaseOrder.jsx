@@ -18,7 +18,7 @@ import { RiRefreshFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Datepicker from "react-tailwindcss-datepicker";
-import { getPurchaseOrderList } from "../../../api/api";
+import { getPurchaseOrderList, viewGodownList } from "../../../api/api";
 import UniqueCode from "../../../assets/common/UniqueCode";
 import { useDebounce } from "../../../hooks/useDebounce";
 
@@ -30,6 +30,31 @@ import { ConfirmationModelContext } from "../../../context/ContextProvider";
 import { fetchQuotationStatus } from "../../../api/prchaseApi";
 import { getPagePermission } from "../../../utils/permissionHelper";
 
+// --- Order Status helper -------------------------------------------------
+// Mirrors PurchaseOrderList.jsx: a PO that is still a Draft (or has been
+// Cancelled) shows that status directly. Only once the order is out of
+// Draft/Cancelled do we fall back to the invoice-progress based status
+// (Pending / Partial / Complete).
+const getOrderStatusLabel = (po) => {
+  if (po?.status === "Draft") return "Draft";
+  if (po?.status === "Cancelled") return "Cancelled";
+
+  return (
+    po?.invoicestatus
+      ?.replace("Partially-Invoiced", "Partial")
+      ?.replace("Complete-Invoiced", "Complete") || "Pending"
+  );
+};
+
+const getOrderStatusColorClass = (po) => {
+  if (po?.status === "Draft") return "text-gray-500";
+  if (po?.status === "Cancelled") return "text-red-600";
+
+  if (po?.invoicestatus === "Complete-Invoiced") return "text-green-600";
+  if (po?.invoicestatus === "Partially-Invoiced") return "text-blue-600";
+  if (po?.invoicestatus === "Cancelled") return "text-red-600";
+  return "text-yellow-500";
+};
 
 export const ViewPurchaseOrder = () => {
   const dispatch = useDispatch();
@@ -39,7 +64,9 @@ export const ViewPurchaseOrder = () => {
   const [filteredCount, setFilteredCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [purchaseOrderList, setPurchaseOrderList] = useState([]);
-  const [approvedStatus, setApprovedStatus] = useState("All");
+  const [selectedOrderStatus, setSelectedOrderStatus] = useState("all");
+  const [godownList, setGodownList] = useState([]);
+  const [selectedGodown, setSelectedGodown] = useState("");
   const [dateRange, setDateRange] = useState({
     startDate: null,
     endDate: null,
@@ -99,8 +126,12 @@ export const ViewPurchaseOrder = () => {
         query.toDate = dateRange.endDate;
       }
 
-      if (approvedStatus !== "All") {
-        query.approvedStatus = approvedStatus;
+      if (selectedOrderStatus !== "all") {
+        query.orderStatus = selectedOrderStatus;
+      }
+
+      if (selectedGodown) {
+        query.godownId = selectedGodown;
       }
 
       if (selectedDistributor !== "default") {
@@ -141,7 +172,8 @@ export const ViewPurchaseOrder = () => {
       endDate: null,
     });
     setPurchaseOrderNo("");
-    setApprovedStatus("All");
+    setSelectedOrderStatus("all");
+    setSelectedGodown("");
     setSelectedDistributor("default");
     fetchPurchaseOrderPaginated();
     dispatch(fetchDistributors());
@@ -153,18 +185,47 @@ export const ViewPurchaseOrder = () => {
   }, [
     currentPage,
     dateRange,
-    approvedStatus,
+    selectedOrderStatus,
     selectedDistributor,
     purchaseOrderNo,
+    selectedGodown,
   ]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [dateRange, approvedStatus, selectedDistributor, purchaseOrderNo]);
+  }, [
+    dateRange,
+    selectedOrderStatus,
+    selectedDistributor,
+    purchaseOrderNo,
+    selectedGodown,
+  ]);
 
   useEffect(() => {
     dispatch(fetchDistributors());
   }, [dispatch]);
+
+  const fetchGodownList = async () => {
+    try {
+      const response = await viewGodownList({
+        page: 1,
+        limit: 1000,
+      });
+
+      setGodownList(response?.data?.data || []);
+    } catch (error) {
+      console.error("Failed to fetch godown list:", error);
+      toast.error(
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to fetch godown list"
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchGodownList();
+  }, []);
 
   const handleViewOrderData = (orderData) => {
     setCurrentOrderData(orderData);
@@ -260,24 +321,33 @@ export const ViewPurchaseOrder = () => {
             </div>
             <div className="w-56">
               <div className="block">
-                <Label>
-                  Approval Status <br />
-                  (Quotation Send Status)
-                </Label>
+                <Label value="Order Status" />
               </div>
               <Select
-                value={approvedStatus}
-                onChange={(e) => setApprovedStatus(e.target.value)}
+                value={selectedOrderStatus}
+                onChange={(e) => setSelectedOrderStatus(e.target.value)}
                 required
               >
-                <option value="All">All</option>
-                <option value="Approved">Approved (Quotation Sent)</option>
-                <option value="Not Approved">
-                  Not Approved (Quotation Not Sent)
-                </option>
-                <option value="Rejected">
-                  Rejected (Quotation Sent Approval Rejected)
-                </option>
+                <option value="all">All</option>
+                <option value="Draft">Draft</option>
+                <option value="Pending">Pending</option>
+                <option value="Complete">Complete</option>
+                <option value="Cancelled">Cancelled</option>
+              </Select>
+            </div>
+
+            <div className="w-56">
+              <Label value="Godown" />
+              <Select
+                value={selectedGodown}
+                onChange={(e) => setSelectedGodown(e.target.value)}
+              >
+                <option value="">All Godown</option>
+                {godownList?.map((godown) => (
+                  <option key={godown?._id} value={godown?._id}>
+                    {godown?.godownName}
+                  </option>
+                ))}
               </Select>
             </div>
 
@@ -361,227 +431,6 @@ export const ViewPurchaseOrder = () => {
 
       {/* table */}
       <div className="flex justify-start items-center flex-col gap-2 w-full p-4">
-        {/* old table normal table  */}
-        {/* <div className="overflow-x-auto w-full">
-          <Table striped className="rounded-none">
-            <Table.Head className="text-center">
-              <Table.HeadCell className="bg-lavender-900 text-oWhite-100"></Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
-                Purchase Order No
-              </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
-                View
-              </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
-                Distributor Code
-              </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
-                Distributor Name
-              </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
-                Supplier Name
-              </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
-                Created
-              </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
-                Expected Delivery Date
-              </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
-                Net Amount
-              </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
-                Total <br /> Line Items
-              </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
-                Order Status
-              </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
-                Quotation Response
-              </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
-                Quotation Status
-              </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
-                SAP <br /> Quotation No
-              </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
-                Sap <br /> Sales Order No
-              </Table.HeadCell>
-              <Table.HeadCell className="whitespace-nowrap bg-lavender-900 text-oWhite-100">
-                Quotation <br />
-                Status Data
-              </Table.HeadCell>
-            </Table.Head>
-            <Table.Body className="divide-y">
-              {pageLoading ? (
-                <Table.Row className="text-center bg-white dark:border-gray-700 dark:bg-gray-800">
-                  <Table.Cell
-                    colSpan={"100%"}
-                    className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200"
-                  >
-                    <div
-                      className="w-full flex justify-center items-center"
-                      role="status"
-                    >
-                      <Spinner aria-label="Loading data" size="xl" />
-                    </div>
-                  </Table.Cell>
-                </Table.Row>
-              ) : (
-                <>
-                  {purchaseOrderList?.map((po) => (
-                    <Table.Row
-                      key={po._id}
-                      className="text-center bg-white dark:border-gray-700 dark:bg-gray-800"
-                    >
-                      <Table.Cell className="text-center"></Table.Cell>
-
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        <div className="flex items-center justify-center gap-2">
-                          <UniqueCode
-                            text={po?.purchaseOrderNo}
-                            codeName="Purchase Order No"
-                          />
-                          <Link
-                            to={`/${userInfo?.role}/purchase-order-detail/${po?._id}`}
-                            className="cursor-pointer"
-                          >
-                            <FiExternalLink color="#3795BD" />
-                          </Link>
-                        </div>
-                      </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        <Link
-                          to={`/${userInfo?.role}/purchase-order-detail/${po?._id}`}
-                          className="flex items-center justify-center gap-1 text-blue-500 hover:text-blue
-                            -700 text-xs font-bold cursor-pointer"
-                        >
-                          <Button size="xs" className="flex items-center gap-1">
-                            View
-                          </Button>
-                        </Link>
-                      </Table.Cell>
-
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        <UniqueCode
-                          text={po?.distributorId?.dbCode}
-                          codeName="Distributor Code"
-                        />
-                      </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        {po?.distributorId?.name}
-                      </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        {po?.supplierId?.supplierName}
-                      </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        {moment(po?.createdAt).tz("Asia/Kolkata").format("LLL")}
-                      </Table.Cell>
-
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        {po?.expectedDeliveryDate
-                          ? moment(po?.expectedDeliveryDate)
-                              .tz("Asia/Kolkata")
-                              .format("LLL")
-                          : ""}
-                      </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        {po?.netAmount?.toLocaleString("en-IN", {
-                          style: "currency",
-                          currency: "INR",
-                        })}
-                      </Table.Cell>
-
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        {po?.lineItems?.length > 0 && (
-                          <span
-                            className="flex items-center justify-center gap-2 text-green-500 font-bold 
-                             cursor-pointer
-                            "
-                          >
-                            {po.lineItems.length} Items
-                          </span>
-                        )}
-                      </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        {po?.status}
-                      </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        <span className="flex justify-center items-center gap-2">
-                          {po?.quotationResponse && (
-                            <Button
-                              size="xs"
-                              onClick={() =>
-                                handleViewOrderData(po?.quotationResponse)
-                              }
-                            >
-                              <span className="flex items-center gap-1">
-                                <FiEye size={16} />
-                                Show
-                              </span>
-                            </Button>
-                          )}
-                        </span>
-                      </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        {po?.sapStatus}
-                      </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        {po?.sapStatusData ? (
-                          <UniqueCode
-                            text={po?.sapStatusData?.Vbeln}
-                            codeName={"SAP Quotation No"}
-                          />
-                        ) : (
-                          ""
-                        )}
-                      </Table.Cell>
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        {po?.sapStatusData ? (
-                          <UniqueCode
-                            text={po?.sapStatusData?.Vbelnso}
-                            codeName={"SAP Sales Order No"}
-                          />
-                        ) : (
-                          ""
-                        )}
-                      </Table.Cell>
-
-                      <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200">
-                        <span className="flex justify-center items-center gap-2">
-                          {po?.sapStatusData && (
-                            <Button
-                              size="xs"
-                              onClick={() =>
-                                handleViewStatusData(po?.sapStatusData)
-                              }
-                            >
-                              <span className="flex items-center gap-1">
-                                <FiEye size={16} />
-                                Show
-                              </span>
-                            </Button>
-                          )}
-                        </span>
-                      </Table.Cell>
-                    </Table.Row>
-                  ))}
-                  {purchaseOrderList?.length === 0 && (
-                    <Table.Row className="text-center bg-white dark:border-gray-700 dark:bg-gray-800">
-                      <Table.Cell
-                        colSpan="100%"
-                        className="whitespace-nowrap font-medium text-gray-900 dark:text-gray-200"
-                      >
-                        No data found
-                      </Table.Cell>
-                    </Table.Row>
-                  )}
-                </>
-              )}
-            </Table.Body>
-          </Table>
-        </div> */}
         {/* new table with sticky columns and horizontal scroll */}
         <div className="overflow-x-auto w-full">
           <Table
@@ -602,6 +451,9 @@ export const ViewPurchaseOrder = () => {
               {/* Scrollable Columns */}
               <Table.HeadCell className="bg-lavender-900 text-oWhite-100">
                 Distributor Name
+              </Table.HeadCell>
+              <Table.HeadCell className="bg-lavender-900 text-oWhite-100">
+                Godown Name
               </Table.HeadCell>
               <Table.HeadCell className="bg-lavender-900 text-oWhite-100">
                 Created
@@ -674,6 +526,7 @@ export const ViewPurchaseOrder = () => {
 
                   {/* Scrollable Rest */}
                   <Table.Cell>{po?.distributorId?.name}</Table.Cell>
+                  <Table.Cell>{po?.godownId?.godownName || "-"}</Table.Cell>
                   <Table.Cell>
                     {moment(po?.createdAt).tz("Asia/Kolkata").format("LLL")}
                   </Table.Cell>
@@ -683,7 +536,13 @@ export const ViewPurchaseOrder = () => {
                       currency: "INR",
                     })}
                   </Table.Cell>
-                  <Table.Cell>{po?.status}</Table.Cell>
+                  <Table.Cell>
+                    <span
+                      className={`font-semibold ${getOrderStatusColorClass(po)}`}
+                    >
+                      {getOrderStatusLabel(po)}
+                    </span>
+                  </Table.Cell>
                   <Table.Cell>
                     {po?.quotationResponse && (
                       <Button
