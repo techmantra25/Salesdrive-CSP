@@ -359,7 +359,7 @@ useEffect(() => {
                 <option value="openingstock">Opening Stock</option>
                 <option value="stockadjustment">Stock Adjustment</option>
                 <option value="invoice">Invoice</option>
-                <option value="stocktransfer">Stock Transfer</option>
+                <option value="godowntransfer">Godown Stock Transfer</option>
                 <option value="salesreturn">Sales Return</option>
                 <option value="delivery">Delivery</option>
               </Select>
