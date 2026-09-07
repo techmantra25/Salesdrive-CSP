@@ -10,9 +10,10 @@ import {
   Select,
 } from "flowbite-react";
 import moment from "moment";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { RiRefreshFill } from "react-icons/ri";
+import { HiChevronDown } from "react-icons/hi";
 import Datepicker from "react-tailwindcss-datepicker";
 import UniqueCode from "../../assets/common/UniqueCode";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,9 +21,151 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { fetchDistributors } from "../../redux/distributorListSlice";
 import SearchableSelect from "../../components/SearchableSelect";
 import { AllDBpaginatedOrderList } from "../../api/orderApi";
-import { getApprovedOutletList, ApprovedOutletPaginated, SearchOutletsDropdown, viewGodownList } from "../../api/api";
+import {
+  getApprovedOutletList,
+  ApprovedOutletPaginated,
+  SearchOutletsDropdown,
+  viewGodownList,
+  AllZoneList,
+} from "../../api/api";
 import PaginatedSearchableSelect from "../../components/PaginatedSearchableSelect";
 import { getPagePermission } from "../../utils/permissionHelper";
+
+
+const MultiSelectDropdown = ({
+  label,
+  options,
+  selected,
+  onChange,
+  loading,
+}) => {
+  const [open, setOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const containerRef = useRef(null);
+  const searchInputRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => searchInputRef.current?.focus(), 0);
+    } else {
+      setSearchTerm("");
+    }
+  }, [open]);
+
+  const toggleOption = (id) => {
+    if (selected.includes(id)) {
+      onChange(selected.filter((s) => s !== id));
+    } else {
+      onChange([...selected, id]);
+    }
+  };
+
+  const displayText = loading
+    ? "Loading..."
+    : selected.length === 0
+      ? "All"
+      : selected.length === options.length
+        ? "All"
+        : `${selected.length} selected`;
+
+  const filteredOptions = options.filter((opt) => {
+    if (!searchTerm.trim()) return true;
+
+    const searchableText = [opt.label].filter(Boolean).join(" ").toLowerCase();
+
+    const keywords = searchTerm.toLowerCase().trim().split(/\s+/);
+
+    return keywords.every((keyword) => searchableText.includes(keyword));
+  });
+
+  return (
+    <div className="w-56 relative" ref={containerRef}>
+      <div className="block">
+        <Label value={label} className="dark:text-white" />
+      </div>
+
+      <button
+        type="button"
+        disabled={loading}
+        onClick={() => setOpen((prev) => !prev)}
+        className="relative block w-full p-2.5 pr-8 border border-gray-300 rounded-lg dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm text-left focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {displayText}
+        <HiChevronDown
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none"
+          size={18}
+        />
+      </button>
+
+      {open && !loading && (
+        <div className="absolute z-50 mt-1 w-72 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg text-sm">
+          <div className="p-1.5 border-b border-gray-200 dark:border-gray-600 sticky top-0 bg-white dark:bg-gray-700">
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={`Search ${label}...`}
+              className="w-full py-1 px-2 text-xs border border-gray-300 dark:border-gray-500 rounded-sm bg-gray-50 dark:bg-gray-600 text-gray-900 dark:text-white/80 focus:outline-none focus:ring-1 focus:border-cyan-500"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+
+          <ul className="max-h-96 overflow-y-auto py-1">
+            <li
+              onClick={() => onChange([])}
+              className={`px-4 py-1.5 cursor-pointer select-none ${selected.length === 0
+                ? "bg-blue-600 text-white"
+                : "text-gray-900 dark:text-white/80 hover:bg-blue-100 dark:hover:bg-gray-600"
+                }`}
+            >
+              All
+            </li>
+            {filteredOptions.length === 0 && (
+              <li className="px-4 py-1.5 text-gray-400 select-none">
+                No results found
+              </li>
+            )}
+            {filteredOptions.map((opt) => {
+              const isSelected = selected.includes(opt.id);
+              return (
+                <li
+                  key={opt.id}
+                  onClick={() => toggleOption(opt.id)}
+                  className={`px-4 py-1.5 cursor-pointer select-none ${isSelected
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-900 dark:text-white/80 hover:bg-blue-100 dark:hover:bg-gray-600"
+                    }`}
+                >
+                  {opt.label}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Order status values as seen on distributor orders (order.status), same
+// enum used by the Sales Order list.
+const STATUS_OPTIONS = [
+  { id: "Pending", label: "Pending" },
+  { id: "Completed_Billed", label: "Completely Billed" },
+  { id: "Partially_Billed", label: "Partially Billed" },
+  { id: "Cancelled", label: "Cancelled" },
+];
 
 const AllDistributorOrderList = () => {
   const [dataLoading, setDataLoading] = useState(true);
@@ -43,6 +186,16 @@ const AllDistributorOrderList = () => {
   });
   // const [outletList, setOutletList] = useState([]);
 
+  // Multi-select filters (arrays of ids), same pattern as the Sales Order list
+  const [salesman, setSalesman] = useState([]);
+  const [cso, setCso] = useState([]);
+  const [route, setRoute] = useState([]);
+  const [zone, setZone] = useState([]);
+  const [orderStatus, setOrderStatus] = useState([]);
+
+  const [zoneList, setZoneList] = useState([]);
+  const [zoneLoading, setZoneLoading] = useState(false);
+
   const { distributors } = useSelector((state) => state.distributors);
   const permissionState = useSelector((state) => state.permission);
   const [pagePermission, setPagePermission] = useState(null);
@@ -58,26 +211,6 @@ const AllDistributorOrderList = () => {
 
     setPagePermission(permission);
   }, [permissionState]);
-
-  // async function getOutletList() {
-  //   setDataLoading(true);
-  //   try {
-  //     const res = await getApprovedOutletList();
-
-  //     setOutletList(res?.data?.data);
-  //   } catch (error) {
-  //     console.error(error);
-  //     toast.error(
-  //       error?.response?.data?.message ||
-  //         error?.message ||
-  //         "Failed to fetch all outlet List"
-  //     );
-  //   } finally {
-  //     setDataLoading(false);
-  //   }
-  // }
-
-  // Add this function after your state declarations
 
   const fetchOutletsWithSearch = useCallback(
     async (searchTerm = "", page = 1) => {
@@ -127,9 +260,76 @@ const AllDistributorOrderList = () => {
     }
   };
 
+  const fetchZoneList = async () => {
+    setZoneLoading(true);
+    try {
+      const response = await AllZoneList();
+      setZoneList(response?.data?.data || []);
+    } catch (error) {
+      console.error("Failed to fetch zone list:", error);
+      toast.error(
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to fetch zone list"
+      );
+    } finally {
+      setZoneLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchGodownList();
+    fetchZoneList();
   }, []);
+
+  // Salesman / CSO / Route options are derived from the orders currently
+  // loaded (same approach the Sales Order list uses for CSO), since there's
+  // no distributor-agnostic salesman/route directory available here.
+  const salesmanOptions = useMemo(() => {
+    const uniqueSalesmen = new Map();
+    allDBOrders?.forEach((o) => {
+      const s = o?.salesmanName;
+      if (s?._id && !uniqueSalesmen.has(s._id)) {
+        uniqueSalesmen.set(s._id, s.name);
+      }
+    });
+    return Array.from(uniqueSalesmen.entries()).map(([id, label]) => ({
+      id,
+      label,
+    }));
+  }, [allDBOrders]);
+
+  const csoOptions = useMemo(() => {
+    const uniqueCso = new Map();
+    allDBOrders?.forEach((o) => {
+      const c = o?.retailerId?.cso;
+      if (c) uniqueCso.set(c, c);
+    });
+    return Array.from(uniqueCso.keys()).map((code) => ({
+      id: code,
+      label: code,
+    }));
+  }, [allDBOrders]);
+
+  const routeOptions = useMemo(() => {
+    const uniqueRoutes = new Map();
+    allDBOrders?.forEach((o) => {
+      const r = o?.routeId;
+      if (r?._id && !uniqueRoutes.has(r._id)) {
+        uniqueRoutes.set(r._id, `${r.name}${r.code ? ` (${r.code})` : ""}`);
+      }
+    });
+    return Array.from(uniqueRoutes.entries()).map(([id, label]) => ({
+      id,
+      label,
+    }));
+  }, [allDBOrders]);
+
+  const zoneOptions =
+    zoneList?.map((z) => ({
+      id: z._id,
+      label: z.name,
+    })) || [];
 
   const handleDateRangeChange = (range) => {
     setDateRange(range);
@@ -163,6 +363,21 @@ const AllDistributorOrderList = () => {
       if (selectedGodown) {
         query.godownId = selectedGodown;
       }
+      if (salesman.length > 0) {
+        query.salesmanName = salesman.join(",");
+      }
+      if (cso.length > 0) {
+        query.cso = cso.join(",");
+      }
+      if (route.length > 0) {
+        query.routeId = route.join(",");
+      }
+      if (zone.length > 0) {
+        query.zoneId = zone.join(",");
+      }
+      if (orderStatus.length > 0) {
+        query.status = orderStatus.join(",");
+      }
       const response = await AllDBpaginatedOrderList(query); // Use mock API for demonstration
 
       setAllDBOrders(response?.data?.data);
@@ -191,6 +406,11 @@ const AllDistributorOrderList = () => {
     setSelectedDB("default");
     setSelectedRetailer("default");
     setSelectedGodown("");
+    setSalesman([]);
+    setCso([]);
+    setRoute([]);
+    setZone([]);
+    setOrderStatus([]);
     setDateRange({
       startDate: null,
       endDate: null,
@@ -209,41 +429,27 @@ const AllDistributorOrderList = () => {
     dateRange,
     selectedRetailer,
     selectedGodown,
+    salesman,
+    cso,
+    route,
+    zone,
+    orderStatus,
   ]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedDB, dateRange, selectedRetailer, selectedGodown]);
-
-  // useEffect(() => {
-  //   getOutletList();
-  //   dispatch(fetchDistributors());
-  // }, [dispatch]);
-
-  // const downloadReport = async () => {
-  //   const query = {};
-
-  //   if (searchTerm) {
-  //     query.search = searchTerm.trim();
-  //   }
-
-  //   if (dateRange.startDate && dateRange.endDate) {
-  //     query.fromDate = dateRange.startDate;
-  //     query.toDate = dateRange.endDate;
-  //   }
-
-  //   if (selectedDB && selectedDB !== "default") {
-  //     query.distributorId = selectedDB;
-  //   }
-
-  //   if (selectedRetailer && selectedRetailer !== "default") {
-  //     query.retailerId = selectedRetailer;
-  //   }
-  //   const params = new URLSearchParams(query).toString();
-  //   const url = `${BACKEND_URL}/api/v1/external/secondary-order-entry-log-report?${params}`;
-
-  //   window.open(url, "_blank");
-  // };
+  }, [
+    searchTerm,
+    selectedDB,
+    dateRange,
+    selectedRetailer,
+    selectedGodown,
+    salesman,
+    cso,
+    route,
+    zone,
+    orderStatus,
+  ]);
 
   return (
     <>
@@ -315,7 +521,52 @@ const AllDistributorOrderList = () => {
                   </Select>
                 </div>
 
-                <div className="w-44">
+                {/* Zone */}
+                <MultiSelectDropdown
+                  label="Zone"
+                  options={zoneOptions}
+                  selected={zone}
+                  onChange={setZone}
+                  loading={zoneLoading}
+                />
+
+                {/* Salesman */}
+                <MultiSelectDropdown
+                  label="Salesman"
+                  options={salesmanOptions}
+                  selected={salesman}
+                  onChange={setSalesman}
+                  loading={salesOrdersLoading}
+                />
+
+                {/* CSO
+                <MultiSelectDropdown
+                  label="CSO"
+                  options={csoOptions}
+                  selected={cso}
+                  onChange={setCso}
+                  loading={salesOrdersLoading}
+                /> */}
+
+                {/* Route */}
+                <MultiSelectDropdown
+                  label="Route"
+                  options={routeOptions}
+                  selected={route}
+                  onChange={setRoute}
+                  loading={salesOrdersLoading}
+                />
+
+                {/* Order Status */}
+                <MultiSelectDropdown
+                  label="Order Status"
+                  options={STATUS_OPTIONS}
+                  selected={orderStatus}
+                  onChange={setOrderStatus}
+                  loading={false}
+                />
+
+                <div className="w-56">
                   <div className="block">
                     <Label value="Search" />
                   </div>
@@ -354,12 +605,6 @@ const AllDistributorOrderList = () => {
                     </span>
                   </Button>
                 )}
-                {/* <Button size="sm" color="purple" onClick={() => downloadReport()}>
-                  <span className="flex justify-center items-center gap-2">
-                    <FaDownload size={15} />
-                    CSV Download
-                  </span>
-                </Button> */}
               </div>
             </Card>
           </div>
