@@ -1560,6 +1560,26 @@ export async function deleteReason(id) {
   }
 }
 
+export const bulkModifyProduct = async (payload) => {
+
+  try {
+    const response = await axios.post(
+      BACKEND_URL + "/api/v1/product/bulk-modify-product",
+      payload,
+      {
+        headers: setAuthHeader(),
+      }
+    );
+
+    return response;
+  } catch (error) {
+    throw new Error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to bulk modify products"
+    );
+  }
+};
 // Suppliers api
 
 export async function getSuppliersList(payload) {

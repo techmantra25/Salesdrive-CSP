@@ -26,6 +26,7 @@ import {
   AllSubBrandList,
   // bulkUpload,
   bulkUploadProduct,
+  bulkModifyProduct,
   getSuppliersList,
   updateProduct,
   bulkUpdateEan, //temporary import will delete after usage
@@ -75,6 +76,9 @@ const Product = () => {
   const [paginatedLoading, setPaginatedLoading] = useState(false);
   const permissionState = useSelector((state) => state.permission);
   const [pagePermission, setPagePermission] = useState(null);
+  const [modifyModalOpen, setModifyModalOpen] = useState(false);
+  const [modifyFile, setModifyFile] = useState(null);
+  const [modifyLoading, setModifyLoading] = useState(false);
 
   // Sorting state
   const [sortBy, setSortBy] = useState("updatedAt");
@@ -103,6 +107,68 @@ const Product = () => {
     setCurrentPage(page);
   };
 
+
+  const handleModifySubmit = async () => {
+    try {
+      if (!modifyFile) {
+        toast.error("Please select a file");
+        return;
+      }
+
+      setModifyLoading(true);
+      toast.loading("Updating...");
+
+      const arrayBuffer = await modifyFile.arrayBuffer();
+
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+      const rows = XLSX.utils.sheet_to_json(sheet, {
+        defval: "",
+      });
+
+      if (!rows.length) {
+        toast.dismiss();
+        toast.error("File is empty");
+        return;
+      }
+
+      const res = await bulkModifyProduct({
+        data: rows,
+      });
+
+      toast.dismiss();
+
+      console.log("Modify Response:", res);
+
+      const updated = res?.data?.updatedCount || 0;
+      const skipped = res?.data?.skippedCount || 0;
+
+      toast.success(
+        `Updated: ${updated}, Skipped: ${skipped}`,
+        { duration: 6000 }
+      );
+
+      if (res?.data?.skippedRows?.length > 0) {
+        setErrorLog(res.data.skippedRows);
+      }
+
+      setModifyModalOpen(false);
+      setModifyFile(null);
+
+      fetchProductsPaginated();
+
+    } catch (error) {
+      toast.dismiss();
+      console.error("Modify upload failed:", error);
+
+      toast.error(
+        error?.response?.data?.message || "Modify upload failed"
+      );
+    } finally {
+      setModifyLoading(false);
+    }
+  };
   // Function to handle sorting when a column header is clicked
   const handleSort = (field) => {
     if (sortBy === field) {
@@ -1223,7 +1289,7 @@ const Product = () => {
                       inputClassName={
                         "w-full rounded-md focus:ring-0 font-normal text-white bg-gray-800 dark:bg-gray-800 border-gray-600 dark:border-gray-600"
                       }
-                      containerClassName={`relative ${openModal ? "z-0" : "z-[1000]"
+                      containerClassName={`relative ${openModal || uploadModalOpen || modifyModalOpen ? "z-0" : "z-[1000]"
                         }`}
                     />
                   </div>
@@ -1327,6 +1393,16 @@ const Product = () => {
                   >
                     {eanUploading ? "Uploading..." : "Upload EAN File"}
                   </Button>
+
+                  {pagePermission?.update && (
+                    <Button
+                      size="xs"
+                      color="cyan"
+                      onClick={() => setModifyModalOpen(true)}
+                    >
+                      Bulk Outlet Modification
+                    </Button>
+                  )}
 
                   {errorLog.length > 0 && (
                     <Button
@@ -2089,6 +2165,48 @@ const Product = () => {
                 disabled={uploadLoading}
               >
                 {uploadLoading ? <Spinner size="sm" /> : "Upload"}
+              </Button>
+            </Modal.Footer>
+          </Modal>
+          <Modal show={modifyModalOpen} onClose={() => setModifyModalOpen(false)}>
+            <Modal.Header>Modify Existing Products</Modal.Header>
+
+            <Modal.Body>
+              <div className="flex flex-col gap-4">
+
+                {/* File Input */}
+                <input
+                  type="file"
+                  accept=".xlsx,.csv"
+                  onChange={(e) => setModifyFile(e.target.files[0])}
+                />
+
+                {/* Show file name */}
+                {modifyFile && (
+                  <p className="text-sm text-green-600">
+                    Selected: {modifyFile.name}
+                  </p>
+                )}
+
+              </div>
+            </Modal.Body>
+
+            <Modal.Footer>
+              <Button
+                color="gray"
+                onClick={() => {
+                  setModifyModalOpen(false);
+                  setModifyFile(null);
+                }}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                onClick={handleModifySubmit}
+                disabled={modifyLoading}
+              >
+                {modifyLoading ? <Spinner size="sm" /> : "Update"}
               </Button>
             </Modal.Footer>
           </Modal>
