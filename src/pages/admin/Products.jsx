@@ -1400,7 +1400,7 @@ const Product = () => {
                       color="cyan"
                       onClick={() => setModifyModalOpen(true)}
                     >
-                      Bulk Outlet Modification
+                      Bulk Product Modification
                     </Button>
                   )}
 
@@ -2168,66 +2168,66 @@ const Product = () => {
               </Button>
             </Modal.Footer>
           </Modal>
-         <Modal show={modifyModalOpen} onClose={() => setModifyModalOpen(false)}>
-  <Modal.Header>Modify Existing Products</Modal.Header>
+          <Modal show={modifyModalOpen} onClose={() => setModifyModalOpen(false)}>
+            <Modal.Header>Modify Existing Products</Modal.Header>
 
-  <Modal.Body>
-    <div className="flex flex-col gap-4">
+            <Modal.Body>
+              <div className="flex flex-col gap-4">
 
-      {/* File Input */}
-      <input
-        type="file"
-        accept=".xlsx,.csv"
-        onChange={(e) => setModifyFile(e.target.files[0])}
-      />
+                {/* File Input */}
+                <input
+                  type="file"
+                  accept=".xlsx,.csv"
+                  onChange={(e) => setModifyFile(e.target.files[0])}
+                />
 
-      {/* Show file name */}
-      {modifyFile && (
-        <p className="text-sm text-green-600">
-          Selected: {modifyFile.name}
-        </p>
-      )}
+                {/* Show file name */}
+                {modifyFile && (
+                  <p className="text-sm text-green-600">
+                    Selected: {modifyFile.name}
+                  </p>
+                )}
 
-    </div>
-  </Modal.Body>
+              </div>
+            </Modal.Body>
 
-  <Modal.Footer>
-    <div className="flex justify-between items-center w-full">
-      {/* Template Download - left side */}
-      <Button
-        size="sm"
-        color="light"
-        onClick={handleCSVTemplateDownload}
-        aria-label="Download Template"
-      >
-        <span className="flex items-center gap-1">
-          <MdSimCardDownload size={16} />
-          <span>Download Template</span>
-        </span>
-      </Button>
+            <Modal.Footer>
+              <div className="flex justify-between items-center w-full">
+                {/* Template Download - left side */}
+                <Button
+                  size="sm"
+                  color="light"
+                  onClick={handleCSVTemplateDownload}
+                  aria-label="Download Template"
+                >
+                  <span className="flex items-center gap-1">
+                    <MdSimCardDownload size={16} />
+                    <span>Download Template</span>
+                  </span>
+                </Button>
 
-      {/* Cancel + Confirm - right side */}
-      <div className="flex gap-2">
-        <Button
-          color="gray"
-          onClick={() => {
-            setModifyModalOpen(false);
-            setModifyFile(null);
-          }}
-        >
-          Cancel
-        </Button>
+                {/* Cancel + Confirm - right side */}
+                <div className="flex gap-2">
+                  <Button
+                    color="gray"
+                    onClick={() => {
+                      setModifyModalOpen(false);
+                      setModifyFile(null);
+                    }}
+                  >
+                    Cancel
+                  </Button>
 
-        <Button
-          onClick={handleModifySubmit}
-          disabled={modifyLoading}
-        >
-          {modifyLoading ? <Spinner size="sm" /> : "Confirm"}
-        </Button>
-      </div>
-    </div>
-  </Modal.Footer>
-</Modal>
+                  <Button
+                    onClick={handleModifySubmit}
+                    disabled={modifyLoading}
+                  >
+                    {modifyLoading ? <Spinner size="sm" /> : "Confirm"}
+                  </Button>
+                </div>
+              </div>
+            </Modal.Footer>
+          </Modal>
 
         </>
       )}
