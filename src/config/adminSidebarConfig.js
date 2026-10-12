@@ -1,16 +1,20 @@
 // src/config/adminSidebarConfig.js
-import { AiFillDashboard, AiOutlineMenuUnfold } from "react-icons/ai";
+import { AiFillDashboard, AiOutlineLineChart } from "react-icons/ai";
 import { BiDisc, BiSolidCategory } from "react-icons/bi";
 import { BsCollectionFill } from "react-icons/bs";
 import { CiSettings } from "react-icons/ci";
 import {
+  FaIndustry,
   FaLayerGroup,
   FaList,
   FaListAlt,
+  FaMobileAlt,
   FaProductHunt,
   FaRegBuilding,
   FaRoute,
   FaSignOutAlt,
+  FaSitemap,
+  FaTruck,
   FaUsers,
   FaWarehouse,
 } from "react-icons/fa";
@@ -18,8 +22,16 @@ import { FaCodePullRequest, FaPerson, FaUsersGear } from "react-icons/fa6";
 import { IoIosAdd, IoIosImages } from "react-icons/io";
 import { IoPricetags } from "react-icons/io5";
 import { LuBookDown } from "react-icons/lu";
-import { MdChecklist, MdVerifiedUser } from "react-icons/md";
-import { TbMicrophone2 } from "react-icons/tb";
+import {
+  MdChecklist,
+  MdOutlineCancel,
+  MdOutlineMap,
+  MdOutlineShoppingBag,
+  MdOutlineSignpost,
+  MdStorefront,
+  MdVerifiedUser,
+} from "react-icons/md";
+import { TbMicrophone2, TbReportAnalytics } from "react-icons/tb";
 
 
 // IF you here to add any page then u have to add for  Super admin , admin ,sub-admin, user, sales
@@ -36,7 +48,7 @@ export const adminSidebarConfig = [
   {
     type: "collapse",
     label: "Reports",
-    icon: AiOutlineMenuUnfold,
+    icon: TbReportAnalytics,
     children: [
       {
         label: "Stock Report",
@@ -122,7 +134,7 @@ export const adminSidebarConfig = [
   {
     type: "collapse",
     label: "Geo Hierarchy",
-    icon: AiOutlineMenuUnfold,
+    icon: MdOutlineMap,
     children: [
       // {
       //   label: "Zone",
@@ -155,7 +167,7 @@ export const adminSidebarConfig = [
   {
     type: "collapse",
     label: "Product Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaProductHunt,
     children: [
       {
         label: "Brand",
@@ -187,7 +199,7 @@ export const adminSidebarConfig = [
   {
     type: "collapse",
     label: "Pricing Master",
-    icon: AiOutlineMenuUnfold,
+    icon: IoPricetags,
     children: [
       {
         label: "Pricing",
@@ -209,7 +221,7 @@ export const adminSidebarConfig = [
   // {
   //   type: "collapse",
   //   label: "Plant Master",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaIndustry,
   //   children: [
   //     {
   //       label: "Plant",
@@ -221,7 +233,7 @@ export const adminSidebarConfig = [
   {
     type: "collapse",
     label: "Cancel Reason Master",
-    icon: AiOutlineMenuUnfold,
+    icon: MdOutlineCancel,
     children: [
       {
         label: "Reasons",
@@ -233,7 +245,7 @@ export const adminSidebarConfig = [
   {
     type: "collapse",
     label: "Distributor Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaTruck,
     children: [
       {
         label: "Distributer",
@@ -245,7 +257,7 @@ export const adminSidebarConfig = [
   {
     type: "collapse",
     label: "Sales Hierarchy",
-    icon: AiOutlineMenuUnfold,
+    icon: FaSitemap,
     children: [
       {
         label: "Designation",
@@ -262,7 +274,7 @@ export const adminSidebarConfig = [
   {
     type: "collapse",
     label: "Route Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaRoute,
     children: [
       {
         label: "Beat",
@@ -279,7 +291,7 @@ export const adminSidebarConfig = [
   // {
   //   type: "collapse",
   //   label: "Beat Mapping",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaUsersGear,
   //   children: [
   //     {
   //       label: "Beat Mapping",
@@ -291,7 +303,7 @@ export const adminSidebarConfig = [
   // {
   //   type: "collapse",
   //   label: "Lead Management",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaCodePullRequest,
   //   children: [
   //     {
   //       label: "Lead Approval",
@@ -303,7 +315,7 @@ export const adminSidebarConfig = [
   {
     type: "collapse",
     label: "Outlet Master",
-    icon: AiOutlineMenuUnfold,
+    icon: MdStorefront,
     children: [
       {
         label: "Add Outlet",
@@ -325,7 +337,7 @@ export const adminSidebarConfig = [
   {
     type: "collapse",
     label: "Purchase",
-    icon: AiOutlineMenuUnfold,
+    icon: MdOutlineShoppingBag,
     children: [
       {
         label: "Supplier Master",
@@ -358,7 +370,7 @@ export const adminSidebarConfig = [
   {
     type: "collapse",
     label: "Sales",
-    icon: AiOutlineMenuUnfold,
+    icon: AiOutlineLineChart,
     children: [
       {
         label: "Sales Order Log",
@@ -375,7 +387,7 @@ export const adminSidebarConfig = [
   {
     type: "collapse",
     label: "Godown Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaWarehouse,
     children: [
       {
         label: "Add Godown",
@@ -388,7 +400,7 @@ export const adminSidebarConfig = [
   // {
   //   type: "collapse",
   //   label: "RBP App",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaMobileAlt,
   //   children: [
   //     // {
   //     //   label: "App Banner",
@@ -465,7 +477,7 @@ export const adminSidebarConfig = [
   {
     type: "collapse",
     label: "Settings & Configs",
-    icon: AiOutlineMenuUnfold,
+    icon: CiSettings,
     children: [
       {
         label: "Settings & Configs",
@@ -487,7 +499,7 @@ export const adminSidebarConfig = [
   // {
   //   type: "collapse",
   //   label: "Target VS  Achievement",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: MdOutlineSignpost,
   //   children: [
   //     {
   //       label: "Primary Slab Setting ",
@@ -516,7 +528,7 @@ export const adminSidebarConfig = [
   {
     type: "collapse",
     label: "User Management",
-    icon: AiOutlineMenuUnfold,
+    icon: FaUsersGear,
     children: [
       {
         label: "User Management",
@@ -565,7 +577,7 @@ export const usersidebarconfig = [
   {
     type: "collapse",
     label: "Reports",
-    icon: AiOutlineMenuUnfold,
+    icon: TbReportAnalytics,
     children: [
       {
         label: "Stock Report",
@@ -657,7 +669,7 @@ export const usersidebarconfig = [
   {
     type: "collapse",
     label: "Geo Hierarchy",
-    icon: AiOutlineMenuUnfold,
+    icon: MdOutlineMap,
     children: [
       // {
       //   label: "Zone",
@@ -694,7 +706,7 @@ export const usersidebarconfig = [
   {
     type: "collapse",
     label: "Product Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaProductHunt,
     children: [
       {
         label: "Brand",
@@ -731,7 +743,7 @@ export const usersidebarconfig = [
   {
     type: "collapse",
     label: "Pricing Master",
-    icon: AiOutlineMenuUnfold,
+    icon: IoPricetags,
     children: [
       {
         label: "Pricing",
@@ -758,7 +770,7 @@ export const usersidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "Plant Master",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaIndustry,
   //   children: [
   //     {
   //       label: "Plant",
@@ -771,7 +783,7 @@ export const usersidebarconfig = [
   {
     type: "collapse",
     label: "Cancel Reason Master",
-    icon: AiOutlineMenuUnfold,
+    icon: MdOutlineCancel,
     children: [
       {
         label: "Reasons",
@@ -784,7 +796,7 @@ export const usersidebarconfig = [
   {
     type: "collapse",
     label: "Distributor Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaTruck,
     children: [
       {
         label: "Distributer",
@@ -797,7 +809,7 @@ export const usersidebarconfig = [
   {
     type: "collapse",
     label: "Sales Hierarchy",
-    icon: AiOutlineMenuUnfold,
+    icon: FaSitemap,
     children: [
       {
         label: "Designation",
@@ -816,7 +828,7 @@ export const usersidebarconfig = [
   {
     type: "collapse",
     label: "Route Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaRoute,
     children: [
       {
         label: "Beat",
@@ -835,7 +847,7 @@ export const usersidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "Beat Mapping",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaUsersGear,
   //   children: [
   //     {
   //       label: "Beat Mapping",
@@ -847,7 +859,7 @@ export const usersidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "Lead Management",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaCodePullRequest,
   //   children: [
   //     {
   //       label: "Lead Approval",
@@ -859,7 +871,7 @@ export const usersidebarconfig = [
   {
     type: "collapse",
     label: "Outlet Master",
-    icon: AiOutlineMenuUnfold,
+    icon: MdStorefront,
     children: [
       {
         label: "Add Outlet",
@@ -883,7 +895,7 @@ export const usersidebarconfig = [
   {
     type: "collapse",
     label: "Purchase",
-    icon: AiOutlineMenuUnfold,
+    icon: MdOutlineShoppingBag,
     children: [
       {
         label: "Supplier Master",
@@ -921,7 +933,7 @@ export const usersidebarconfig = [
   {
     type: "collapse",
     label: "Sales",
-    icon: AiOutlineMenuUnfold,
+    icon: AiOutlineLineChart,
     children: [
       {
         label: "Sales Order Log",
@@ -940,7 +952,7 @@ export const usersidebarconfig = [
   {
     type: "collapse",
     label: "Godown Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaWarehouse,
     children: [
       {
         label: "Add Godown",
@@ -953,7 +965,7 @@ export const usersidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "RBP App",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaMobileAlt,
   //   children: [
   //     // {
   //     //   label: "App Banner",
@@ -1040,7 +1052,7 @@ export const usersidebarconfig = [
   {
     type: "collapse",
     label: "Settings & Configs",
-    icon: AiOutlineMenuUnfold,
+    icon: CiSettings,
     children: [
       {
         label: "Settings & Configs",
@@ -1053,7 +1065,7 @@ export const usersidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "Target VS  Achievement",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: MdOutlineSignpost,
   //   children: [
   //     {
   //       label: "Primary Slab Setting ",
@@ -1086,7 +1098,7 @@ export const usersidebarconfig = [
   //   {
   //   type: "collapse",
   //   label: "User Management",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaUsersGear,
   //   children: [
   //     {
   //       label: "User Management",
@@ -1137,7 +1149,7 @@ export const subadminssidebarconfig = [
   {
     type: "collapse",
     label: "Reports",
-    icon: AiOutlineMenuUnfold,
+    icon: TbReportAnalytics,
     children: [
       {
         label: "Stock Report",
@@ -1229,7 +1241,7 @@ export const subadminssidebarconfig = [
   {
     type: "collapse",
     label: "Geo Hierarchy",
-    icon: AiOutlineMenuUnfold,
+    icon: MdOutlineMap,
     children: [
       {
         label: "Zone",
@@ -1266,7 +1278,7 @@ export const subadminssidebarconfig = [
   {
     type: "collapse",
     label: "Product Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaProductHunt,
     children: [
       {
         label: "Brand",
@@ -1303,7 +1315,7 @@ export const subadminssidebarconfig = [
   {
     type: "collapse",
     label: "Pricing Master",
-    icon: AiOutlineMenuUnfold,
+    icon: IoPricetags,
     children: [
       {
         label: "Pricing",
@@ -1329,7 +1341,7 @@ export const subadminssidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "Plant Master",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaIndustry,
   //   children: [
   //     {
   //       label: "Plant",
@@ -1342,7 +1354,7 @@ export const subadminssidebarconfig = [
   {
     type: "collapse",
     label: "Cancel Reason Master",
-    icon: AiOutlineMenuUnfold,
+    icon: MdOutlineCancel,
     children: [
       {
         label: "Reasons",
@@ -1355,7 +1367,7 @@ export const subadminssidebarconfig = [
   {
     type: "collapse",
     label: "Distributor Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaTruck,
     children: [
       {
         label: "Distributer",
@@ -1368,7 +1380,7 @@ export const subadminssidebarconfig = [
   {
     type: "collapse",
     label: "Sales Hierarchy",
-    icon: AiOutlineMenuUnfold,
+    icon: FaSitemap,
     children: [
       {
         label: "Designation",
@@ -1387,7 +1399,7 @@ export const subadminssidebarconfig = [
   {
     type: "collapse",
     label: "Route Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaRoute,
     children: [
       {
         label: "Beat",
@@ -1406,7 +1418,7 @@ export const subadminssidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "Beat Mapping",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaUsersGear,
   //   children: [
   //     {
   //       label: "Beat Mapping",
@@ -1418,7 +1430,7 @@ export const subadminssidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "Lead Management",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaCodePullRequest,
   //   children: [
   //     {
   //       label: "Lead Approval",
@@ -1430,7 +1442,7 @@ export const subadminssidebarconfig = [
   {
     type: "collapse",
     label: "Outlet Master",
-    icon: AiOutlineMenuUnfold,
+    icon: MdStorefront,
     children: [
       {
         label: "Add Outlet",
@@ -1454,7 +1466,7 @@ export const subadminssidebarconfig = [
   {
     type: "collapse",
     label: "Purchase",
-    icon: AiOutlineMenuUnfold,
+    icon: MdOutlineShoppingBag,
     children: [
       {
         label: "Supplier Master",
@@ -1492,7 +1504,7 @@ export const subadminssidebarconfig = [
   {
     type: "collapse",
     label: "Sales",
-    icon: AiOutlineMenuUnfold,
+    icon: AiOutlineLineChart,
     children: [
       {
         label: "Sales Order Log",
@@ -1511,7 +1523,7 @@ export const subadminssidebarconfig = [
   {
     type: "collapse",
     label: "Godown Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaWarehouse,
     children: [
       {
         label: "Add Godown",
@@ -1524,7 +1536,7 @@ export const subadminssidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "RBP App",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaMobileAlt,
   //   children: [
   //     // {
   //     //   label: "App Banner",
@@ -1611,7 +1623,7 @@ export const subadminssidebarconfig = [
   {
     type: "collapse",
     label: "Settings & Configs",
-    icon: AiOutlineMenuUnfold,
+    icon: CiSettings,
     children: [
       {
         label: "Settings & Configs",
@@ -1624,7 +1636,7 @@ export const subadminssidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "Target VS  Achievement",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: MdOutlineSignpost,
   //   children: [
   //     {
   //       label: "Primary Slab Setting ",
@@ -1657,7 +1669,7 @@ export const subadminssidebarconfig = [
   //   {
   //   type: "collapse",
   //   label: "User Management",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaUsersGear,
   //   children: [
   //     {
   //       label: "User Management",
@@ -1708,7 +1720,7 @@ export const aaadminsesidebarconfig = [
   {
     type: "collapse",
     label: "Reports",
-    icon: AiOutlineMenuUnfold,
+    icon: TbReportAnalytics,
     children: [
       {
         label: "Stock Report",
@@ -1800,7 +1812,7 @@ export const aaadminsesidebarconfig = [
   {
     type: "collapse",
     label: "Geo Hierarchy",
-    icon: AiOutlineMenuUnfold,
+    icon: MdOutlineMap,
     children: [
       {
         label: "Zone",
@@ -1837,7 +1849,7 @@ export const aaadminsesidebarconfig = [
   {
     type: "collapse",
     label: "Product Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaProductHunt,
     children: [
       {
         label: "Brand",
@@ -1874,7 +1886,7 @@ export const aaadminsesidebarconfig = [
   {
     type: "collapse",
     label: "Pricing Master",
-    icon: AiOutlineMenuUnfold,
+    icon: IoPricetags,
     children: [
       {
         label: "Pricing",
@@ -1900,7 +1912,7 @@ export const aaadminsesidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "Plant Master",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaIndustry,
   //   children: [
   //     {
   //       label: "Plant",
@@ -1913,7 +1925,7 @@ export const aaadminsesidebarconfig = [
   {
     type: "collapse",
     label: "Cancel Reason Master",
-    icon: AiOutlineMenuUnfold,
+    icon: MdOutlineCancel,
     children: [
       {
         label: "Reasons",
@@ -1926,7 +1938,7 @@ export const aaadminsesidebarconfig = [
   {
     type: "collapse",
     label: "Distributor Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaTruck,
     children: [
       {
         label: "Distributer",
@@ -1939,7 +1951,7 @@ export const aaadminsesidebarconfig = [
   {
     type: "collapse",
     label: "Sales Hierarchy",
-    icon: AiOutlineMenuUnfold,
+    icon: FaSitemap,
     children: [
       {
         label: "Designation",
@@ -1958,7 +1970,7 @@ export const aaadminsesidebarconfig = [
   {
     type: "collapse",
     label: "Route Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaRoute,
     children: [
       {
         label: "Beat",
@@ -1977,7 +1989,7 @@ export const aaadminsesidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "Beat Mapping",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaUsersGear,
   //   children: [
   //     {
   //       label: "Beat Mapping",
@@ -1989,7 +2001,7 @@ export const aaadminsesidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "Lead Management",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaCodePullRequest,
   //   children: [
   //     {
   //       label: "Lead Approval",
@@ -2001,7 +2013,7 @@ export const aaadminsesidebarconfig = [
   {
     type: "collapse",
     label: "Outlet Master",
-    icon: AiOutlineMenuUnfold,
+    icon: MdStorefront,
     children: [
       {
         label: "Add Outlet",
@@ -2025,7 +2037,7 @@ export const aaadminsesidebarconfig = [
   {
     type: "collapse",
     label: "Purchase",
-    icon: AiOutlineMenuUnfold,
+    icon: MdOutlineShoppingBag,
     children: [
       {
         label: "Supplier Master",
@@ -2063,7 +2075,7 @@ export const aaadminsesidebarconfig = [
   {
     type: "collapse",
     label: "Sales",
-    icon: AiOutlineMenuUnfold,
+    icon: AiOutlineLineChart,
     children: [
       {
         label: "Sales Order Log",
@@ -2082,7 +2094,7 @@ export const aaadminsesidebarconfig = [
   {
     type: "collapse",
     label: "Godown Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaWarehouse,
     children: [
       {
         label: "Add Godown",
@@ -2095,7 +2107,7 @@ export const aaadminsesidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "RBP App",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaMobileAlt,
   //   children: [
   //     // {
   //     //   label: "App Banner",
@@ -2183,7 +2195,7 @@ export const aaadminsesidebarconfig = [
   {
     type: "collapse",
     label: "Settings & Configs",
-    icon: AiOutlineMenuUnfold,
+    icon: CiSettings,
     children: [
       {
         label: "Settings & Configs",
@@ -2196,7 +2208,7 @@ export const aaadminsesidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "Target VS  Achievement",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: MdOutlineSignpost,
   //   children: [
   //     {
   //       label: "Primary Slab Setting ",
@@ -2229,7 +2241,7 @@ export const aaadminsesidebarconfig = [
   //   {
   //   type: "collapse",
   //   label: "User Management",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaUsersGear,
   //   children: [
   //     {
   //       label: "User Management",
@@ -2280,7 +2292,7 @@ export const salessidebarconfig = [
   {
     type: "collapse",
     label: "Reports",
-    icon: AiOutlineMenuUnfold,
+    icon: TbReportAnalytics,
     children: [
       {
         label: "Stock Report",
@@ -2372,7 +2384,7 @@ export const salessidebarconfig = [
   {
     type: "collapse",
     label: "Geo Hierarchy",
-    icon: AiOutlineMenuUnfold,
+    icon: MdOutlineMap,
     children: [
       {
         label: "Zone",
@@ -2409,7 +2421,7 @@ export const salessidebarconfig = [
   {
     type: "collapse",
     label: "Product Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaProductHunt,
     children: [
       {
         label: "Brand",
@@ -2446,7 +2458,7 @@ export const salessidebarconfig = [
   {
     type: "collapse",
     label: "Pricing Master",
-    icon: AiOutlineMenuUnfold,
+    icon: IoPricetags,
     children: [
       {
         label: "Pricing",
@@ -2472,7 +2484,7 @@ export const salessidebarconfig = [
   {
     type: "collapse",
     label: "Plant Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaIndustry,
     children: [
       {
         label: "Plant",
@@ -2485,7 +2497,7 @@ export const salessidebarconfig = [
   {
     type: "collapse",
     label: "Cancel Reason Master",
-    icon: AiOutlineMenuUnfold,
+    icon: MdOutlineCancel,
     children: [
       {
         label: "Reasons",
@@ -2498,7 +2510,7 @@ export const salessidebarconfig = [
   {
     type: "collapse",
     label: "Distributor Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaTruck,
     children: [
       {
         label: "Distributer",
@@ -2511,7 +2523,7 @@ export const salessidebarconfig = [
   {
     type: "collapse",
     label: "Sales Hierarchy",
-    icon: AiOutlineMenuUnfold,
+    icon: FaSitemap,
     children: [
       {
         label: "Designation",
@@ -2530,7 +2542,7 @@ export const salessidebarconfig = [
   {
     type: "collapse",
     label: "Route Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaRoute,
     children: [
       {
         label: "Beat",
@@ -2549,7 +2561,7 @@ export const salessidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "Beat Mapping",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaUsersGear,
   //   children: [
   //     {
   //       label: "Beat Mapping",
@@ -2561,7 +2573,7 @@ export const salessidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "Lead Management",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaCodePullRequest,
   //   children: [
   //     {
   //       label: "Lead Approval",
@@ -2573,7 +2585,7 @@ export const salessidebarconfig = [
   {
     type: "collapse",
     label: "Outlet Master",
-    icon: AiOutlineMenuUnfold,
+    icon: MdStorefront,
     children: [
       {
         label: "Add Outlet",
@@ -2597,7 +2609,7 @@ export const salessidebarconfig = [
   {
     type: "collapse",
     label: "Purchase",
-    icon: AiOutlineMenuUnfold,
+    icon: MdOutlineShoppingBag,
     children: [
       {
         label: "Supplier Master",
@@ -2635,7 +2647,7 @@ export const salessidebarconfig = [
   {
     type: "collapse",
     label: "Sales",
-    icon: AiOutlineMenuUnfold,
+    icon: AiOutlineLineChart,
     children: [
       {
         label: "Sales Order Log",
@@ -2654,7 +2666,7 @@ export const salessidebarconfig = [
   {
     type: "collapse",
     label: "Godown Master",
-    icon: AiOutlineMenuUnfold,
+    icon: FaWarehouse,
     children: [
       {
         label: "Add Godown",
@@ -2666,7 +2678,7 @@ export const salessidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "RBP App",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaMobileAlt,
   //   children: [
   //     // {
   //     //   label: "App Banner",
@@ -2752,7 +2764,7 @@ export const salessidebarconfig = [
   {
     type: "collapse",
     label: "Settings & Configs",
-    icon: AiOutlineMenuUnfold,
+    icon: CiSettings,
     children: [
       {
         label: "Settings & Configs",
@@ -2765,7 +2777,7 @@ export const salessidebarconfig = [
   // {
   //   type: "collapse",
   //   label: "Target VS  Achievement",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: MdOutlineSignpost,
   //   children: [
   //     {
   //       label: "Primary Slab Setting ",
@@ -2798,7 +2810,7 @@ export const salessidebarconfig = [
   //   {
   //   type: "collapse",
   //   label: "User Management",
-  //   icon: AiOutlineMenuUnfold,
+  //   icon: FaUsersGear,
   //   children: [
   //     {
   //       label: "User Management",
@@ -2836,696 +2848,6 @@ export const salessidebarconfig = [
     isLogout: true,
   },
 ];
-
-//  subAdminPrimarySidebarConfig //////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// export const subAdminPrimarySidebarConfig = [
-//   // {
-//   //   type: "item",
-//   //   label: "Dashboard",
-//   //   path: "/admin/dashboard",
-//   //   icon: AiFillDashboard,
-//   // },
-//   {
-//     type: "collapse",
-//     label: "Reports",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Purchase Order Report",
-//         path: "/sub-admin/purchase-order-report",
-//         icon: LuBookDown,
-//       },
-//       {
-//         label: "Primary Invoice Report",
-//         path: "/sub-admin/primary-invoice-report",
-//         icon: LuBookDown,
-//       },
-//       {
-//         label: "Stock Report",
-//         path: "/sub-admin/stock-report",
-//         icon: LuBookDown,
-//       },
-//       // {
-//       //   label: "Stock Adjustment Report",
-//       //   path: "/admin/stock-adjustment-report",
-//       //   icon: LuBookDown,
-//       // },
-//       {
-//         label: "Sales Order Report",
-//         path: "/sub-admin/order-report",
-//         icon: LuBookDown,
-//       },
-//       {
-//         label: "Order vs Bill Report",
-//         path: "/sub-admin/order-to-bill-report",
-//         icon: LuBookDown,
-//       },
-//       {
-//         label: "Sales Bill Report",
-//         path: "/sub-admin/sales-bill-report",
-//         icon: LuBookDown,
-//       },
-//       {
-//         label: "Sales Return Report",
-//         path: "/sub-admin/sales-return-report",
-//         icon: LuBookDown,
-//       },
-//       // {
-//       //   label: "Collection Report",
-//       //   path: "/sub-admin-primary/collection-report",
-//       //   icon: LuBookDown,
-//       // },
-//       {
-//         label: "Distributor RBP Ledger",
-//         path: "/sub-admin/distributor-rbp-ledger",
-//         icon: LuBookDown,
-//       },
-//       {
-//         label: "Retailer RBP Ledger",
-//         path: "/sub-admin/retailer-rbp-ledger",
-//         icon: LuBookDown,
-//       },
-//       {
-//         label: "Distributor Inventory Report",
-//         path: "/sub-admin/distributor-inventory-report",
-//         icon: LuBookDown,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Geo Hierarchy",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Zone",
-//         path: "/sub-admin/zone",
-//         icon: BiSolidCategory,
-//       },
-//       {
-//         label: "State",
-//         path: "/sub-admin/state",
-//         icon: FaLayerGroup,
-//       },
-//       {
-//         label: "Region",
-//         path: "/sub-admin/region",
-//         icon: BsCollectionFill,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Product Master",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Brand",
-//         path: "/sub-admin/brand",
-//         icon: MdVerifiedUser,
-//       },
-//       {
-//         label: "Sub-Brand",
-//         path: "/sub-admin/sub-brand",
-//         icon: BiDisc,
-//       },
-//       {
-//         label: "Category",
-//         path: "/sub-admin/category",
-//         icon: BiSolidCategory,
-//       },
-//       {
-//         label: "Collection",
-//         path: "/sub-admin/collection",
-//         icon: BsCollectionFill,
-//       },
-//       {
-//         label: "Product",
-//         path: "/sub-admin/products",
-//         icon: FaProductHunt,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Pricing Master",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Pricing",
-//         path: "/sub-admin/pricing",
-//         icon: IoPricetags,
-//       },
-
-
-//       {
-//         label: "Price Update",
-//         path: "/sub-admin/price-update",
-//         icon: IoPricetags,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Distributor Master",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Distributer",
-//         path: "/sub-admin/distributer",
-//         icon: FaUsers,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Sales Hierarchy",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Designation",
-//         path: "/sub-admin/designation",
-//         icon: FaUsers,
-//       },
-//       {
-//         label: "Employee",
-//         path: "/sub-admin/employee",
-//         icon: FaPerson,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Route Master",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Beat",
-//         path: "/sub-admin/beat",
-//         icon: FaRoute,
-//       },
-//       {
-//         label: "Beat Mapping",
-//         path: "/sub-admin/beat-mapping",
-//         icon: FaUsersGear,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Plant Master",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Plant",
-//         path: "/sub-admin/plant",
-//         icon: FaRegBuilding,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Outlet Master",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Outlet List",
-//         path: "/sub-admin/outlet-list",
-//         icon: FaCodePullRequest,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Reason Master",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Reasons",
-//         path: "/sub-admin/reason-master",
-//         icon: IoIosAdd,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Purchase",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Supplier Master",
-//         path: "/sub-admin/supplier-list",
-//         icon: FaListAlt,
-//       },
-
-//       {
-//         label: "Purchase Invoice Log",
-//         path: "/sub-admin/purchase-invoice-log",
-//         icon: FaList,
-//       },
-//       {
-//         label: "Purchase  Order Log",
-//         path: "/sub-admin/purchase-order-log",
-//         icon: FaList,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Sales",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Sales Order Log",
-//         path: "/sub-admin/sales-order-log",
-//         icon: FaListAlt,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "RBP App",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       // {
-//       //   label: "App Banner",
-//       //   path: "/sub-admin/rvp-app-banner",
-//       //   icon: PiFlagBannerFoldLight,
-//       // },
-//       // {
-//       //   label: "Gift Master",
-//       //   path: "/sub-admin/rbp-reward-products",
-//       //   icon: FaGift,
-//       // },
-//       // {
-//       //   label: "Terms & Conditions",
-//       //   path: "/sub-admin/rvp-terms-conditions",
-//       //   icon: MdChecklist,
-//       // },
-//       // {
-//       //   label: "Catalogue",
-//       //   path: "/sub-admin/rvp-catalogue",
-//       //   icon: MdChecklist,
-//       // },
-//       {
-//         label: "Multiplier Slab Config",
-//         path: "/sub-admin/multiplier-slab-config",
-//         icon: MdChecklist,
-//       },
-//       {
-//         label: "Reward Transactions",
-//         path: "/sub-admin/reward-transactions",
-//         icon: MdChecklist,
-//       },
-//       {
-//         label: "Multiplier Transactions",
-//         path: "/sub-admin/multiplier-transactions",
-//         icon: MdChecklist,
-//       },
-//     ],
-//   },
-//   // {
-//   //   type: "collapse",
-//   //   label: "Settings & Configs",
-//   //   icon: AiOutlineMenuUnfold,
-//   //   children: [
-//   //     {
-//   //       label: "Settings & Configs",
-//   //       path: "/admin/settings",
-//   //       icon: CiSettings,
-//   //     },
-//   //   ],
-//   // },
-//   // {
-//   //   type: "collapse",
-//   //   label: "Target Setting",
-//   //   icon: AiOutlineMenuUnfold,
-//   //   children: [
-//   //     {
-//   //       label: "Primary Target Setting",
-//   //       path: "/admin/primary-target-setting",
-//   //       icon: CiSettings,
-//   //     },
-//   //   ],
-//   // },
-//   // {
-//   //   type: "item",
-//   //   label: "HelpDesk",
-//   //   path: "/admin/view-helpdesk",
-//   //   icon: MdChecklist,
-//   // },
-//   {
-//     type: "item",
-//     label: "Logout",
-//     path: "/logout",
-//     icon: FaSignOutAlt,
-//     isLogout: true,
-//   },
-// ];
-
-// export const subAdminRBPSidebarConfig = [
-//   // {
-//   //   type: "item",
-//   //   label: "Dashboard",
-//   //   path: "/admin/dashboard",
-//   //   icon: AiFillDashboard,
-//   // },
-//   {
-//     type: "collapse",
-//     label: "Reports",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Purchase Order Report",
-//         path: "/sub-admin/purchase-order-report",
-//         icon: LuBookDown,
-//       },
-//       {
-//         label: "Primary Invoice Report",
-//         path: "/sub-admin/primary-invoice-report",
-//         icon: LuBookDown,
-//       },
-//       {
-//         label: "Stock Report",
-//         path: "/sub-admin/stock-report",
-//         icon: LuBookDown,
-//       },
-//       // {
-//       //   label: "Stock Adjustment Report",
-//       //   path: "/admin/stock-adjustment-report",
-//       //   icon: LuBookDown,
-//       // },
-//       {
-//         label: "Sales Order Report",
-//         path: "/sub-admin/order-report",
-//         icon: LuBookDown,
-//       },
-//       {
-//         label: "Order vs Bill Report",
-//         path: "/sub-admin/order-to-bill-report",
-//         icon: LuBookDown,
-//       },
-//       {
-//         label: "Sales Bill Report",
-//         path: "/sub-admin/sales-bill-report",
-//         icon: LuBookDown,
-//       },
-//       {
-//         label: "Sales Return Report",
-//         path: "/sub-admin/sales-return-report",
-//         icon: LuBookDown,
-//       },
-//       // {
-//       //   label: "Collection Report",
-//       //   path: "/sub-admin-primary/collection-report",
-//       //   icon: LuBookDown,
-//       // },
-//       {
-//         label: "Distributor RBP Ledger",
-//         path: "/sub-admin/distributor-rbp-ledger",
-//         icon: LuBookDown,
-//       },
-//       {
-//         label: "Retailer RBP Ledger",
-//         path: "/sub-admin/retailer-rbp-ledger",
-//         icon: LuBookDown,
-//       },
-//       {
-//         label: "Distributor Inventory Report",
-//         path: "/sub-admin/distributor-inventory-report",
-//         icon: LuBookDown,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Geo Hierarchy",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Zone",
-//         path: "/sub-admin/zone",
-//         icon: BiSolidCategory,
-//       },
-//       {
-//         label: "State",
-//         path: "/sub-admin/state",
-//         icon: FaLayerGroup,
-//       },
-//       {
-//         label: "Region",
-//         path: "/sub-admin/region",
-//         icon: BsCollectionFill,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Product Master",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Brand",
-//         path: "/sub-admin/brand",
-//         icon: MdVerifiedUser,
-//       },
-//       {
-//         label: "Sub-Brand",
-//         path: "/sub-admin/sub-brand",
-//         icon: BiDisc,
-//       },
-//       {
-//         label: "Category",
-//         path: "/sub-admin/category",
-//         icon: BiSolidCategory,
-//       },
-//       {
-//         label: "Collection",
-//         path: "/sub-admin/collection",
-//         icon: BsCollectionFill,
-//       },
-//       {
-//         label: "Product",
-//         path: "/sub-admin/products",
-//         icon: FaProductHunt,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Pricing Master",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Pricing",
-//         path: "/sub-admin/pricing",
-//         icon: IoPricetags,
-//       },
-//       {
-//         label: "Price Update",
-//         path: "/sub-admin/price-update",
-//         icon: IoPricetags,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Distributor Master",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Distributer",
-//         path: "/sub-admin/distributer",
-//         icon: FaUsers,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Sales Hierarchy",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Designation",
-//         path: "/sub-admin/designation",
-//         icon: FaUsers,
-//       },
-//       {
-//         label: "Employee",
-//         path: "/sub-admin/employee",
-//         icon: FaPerson,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Route Master",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Beat",
-//         path: "/sub-admin/beat",
-//         icon: FaRoute,
-//       },
-//       {
-//         label: "Beat Mapping",
-//         path: "/sub-admin/beat-mapping",
-//         icon: FaUsersGear,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Plant Master",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Plant",
-//         path: "/sub-admin/plant",
-//         icon: FaRegBuilding,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Outlet Master",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Outlet List",
-//         path: "/sub-admin/outlet-list",
-//         icon: FaCodePullRequest,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Reason Master",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Reasons",
-//         path: "/sub-admin/reason-master",
-//         icon: IoIosAdd,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Purchase",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Supplier Master",
-//         path: "/sub-admin/supplier-list",
-//         icon: FaListAlt,
-//       },
-
-//       {
-//         label: "Purchase Invoice Log",
-//         path: "/sub-admin/purchase-invoice-log",
-//         icon: FaList,
-//       },
-//       {
-//         label: "Purchase  Order Log",
-//         path: "/sub-admin/purchase-order-log",
-//         icon: FaList,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "Sales",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       {
-//         label: "Sales Order Log",
-//         path: "/sub-admin/sales-order-log",
-//         icon: FaListAlt,
-//       },
-//     ],
-//   },
-//   {
-//     type: "collapse",
-//     label: "RBP App",
-//     icon: AiOutlineMenuUnfold,
-//     children: [
-//       // {
-//       //   label: "App Banner",
-//       //   path: "/sub-admin/rvp-app-banner",
-//       //   icon: PiFlagBannerFoldLight,
-//       // },
-//       // {
-//       //   label: "Gift Master",
-//       //   path: "/sub-admin/rbp-reward-products",
-//       //   icon: FaGift,
-//       // },
-//       // {
-//       //   label: "Terms & Conditions",
-//       //   path: "/sub-admin/rvp-terms-conditions",
-//       //   icon: MdChecklist,
-//       // },
-//       // {
-//       //   label: "Catalogue",
-//       //   path: "/sub-admin/rvp-catalogue",
-//       //   icon: MdChecklist,
-//       // },
-//       {
-//         label: "Multiplier Slab Config",
-//         path: "/sub-admin/multiplier-slab-config",
-//         icon: MdChecklist,
-//       },
-//       {
-//         label: "Reward Transactions",
-//         path: "/sub-admin/reward-transactions",
-//         icon: MdChecklist,
-//       },
-//       {
-//         label: "Multiplier Transactions",
-//         path: "/sub-admin/multiplier-transactions",
-//         icon: MdChecklist,
-//       },
-//     ],
-//   },
-//   // {
-//   //   type: "collapse",
-//   //   label: "Settings & Configs",
-//   //   icon: AiOutlineMenuUnfold,
-//   //   children: [
-//   //     {
-//   //       label: "Settings & Configs",
-//   //       path: "/admin/settings",
-//   //       icon: CiSettings,
-//   //     },
-//   //   ],
-//   // },
-//   // {
-//   //   type: "collapse",
-//   //   label: "Target Setting",
-//   //   icon: AiOutlineMenuUnfold,
-//   //   children: [
-//   //     {
-//   //       label: "Primary Target Setting",
-//   //       path: "/admin/primary-target-setting",
-//   //       icon: CiSettings,
-//   //     },
-//   //   ],
-//   // },
-//   // {
-//   //   type: "item",
-//   //   label: "HelpDesk",
-//   //   path: "/admin/view-helpdesk",
-//   //   icon: MdChecklist,
-//   // },
-//   {
-//     type: "item",
-//     label: "Logout",
-//     path: "/logout",
-//     icon: FaSignOutAlt,
-//     isLogout: true,
-//   },
-// ];
 
 export const need_employee_approval_for_po_paths_for_admin = [
   "/admin/purchase-order-list",
